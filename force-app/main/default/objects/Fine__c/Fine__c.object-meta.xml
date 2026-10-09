@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.salesforce.com/2006/04/metadata">
+    <label>Fine</label><pluralLabel>Fines</pluralLabel>
+    <nameField><displayFormat>FINE-{00000}</displayFormat><label>Fine Number</label><type>AutoNumber</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus><sharingModel>Private</sharingModel>
+    <fields><fullName>Member__c</fullName><label>Member</label><relationshipLabel>Fines</relationshipLabel><relationshipName>Fines</relationshipName><type>Lookup</type><referenceTo>Member__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Borrow_Record__c</fullName><label>Borrow Record</label><relationshipLabel>Fines</relationshipLabel><relationshipName>Fines</relationshipName><type>Lookup</type><referenceTo>Borrow_Record__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Contact__c</fullName><description>Canonical Contact associated with the library member responsible for this fine. Used for Experience Cloud record sharing.</description><label>Contact</label><relationshipLabel>Fines By Contact</relationshipLabel><relationshipName>Fines_By_Contact</relationshipName><type>Lookup</type><referenceTo>Contact</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Fine_Type__c</fullName><label>Fine Type</label><type>Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value><fullName>Overdue</fullName><default>true</default><label>Overdue</label></value><value><fullName>Lost Book</fullName><default>false</default><label>Lost Book</label></value><value><fullName>Damaged Book</fullName><default>false</default><label>Damaged Book</label></value><value><fullName>Other</fullName><default>false</default><label>Other</label></value></valueSetDefinition></valueSet></fields>
+    <fields><fullName>Amount__c</fullName><label>Amount</label><precision>18</precision><scale>2</scale><type>Currency</type></fields>
+    <fields><fullName>Paid_Amount__c</fullName><label>Paid Amount</label><defaultValue>0</defaultValue><precision>18</precision><scale>2</scale><type>Currency</type></fields>
+    <fields><fullName>Balance__c</fullName><label>Balance</label><formula>Amount__c - Paid_Amount__c</formula><precision>18</precision><scale>2</scale><type>Currency</type></fields>
+    <fields><fullName>Status__c</fullName><label>Status</label><type>Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value><fullName>Unpaid</fullName><default>true</default><label>Unpaid</label></value><value><fullName>Partially Paid</fullName><default>false</default><label>Partially Paid</label></value><value><fullName>Paid</fullName><default>false</default><label>Paid</label></value><value><fullName>Waived</fullName><default>false</default><label>Waived</label></value></valueSetDefinition></valueSet></fields>
+    <fields><fullName>Generated_Date__c</fullName><label>Generated Date</label><type>Date</type></fields>
+    <fields><fullName>Paid_Date__c</fullName><label>Paid Date</label><type>Date</type></fields>
+    <fields><fullName>Notes__c</fullName><label>Notes</label><length>32768</length><type>LongTextArea</type><visibleLines>5</visibleLines></fields>
+    <validationRules><fullName>Amount_Nonnegative</fullName><active>true</active><errorConditionFormula>Amount__c &lt; 0</errorConditionFormula><errorMessage>Fine amount cannot be negative.</errorMessage></validationRules>
+    <validationRules><fullName>Paid_Amount_Nonnegative</fullName><active>true</active><errorConditionFormula>Paid_Amount__c &lt; 0</errorConditionFormula><errorMessage>Paid amount cannot be negative.</errorMessage></validationRules>
+    <validationRules><fullName>Paid_Amount_Not_Over_Amount</fullName><active>true</active><errorConditionFormula>AND(NOT(ISBLANK(Amount__c)), NOT(ISBLANK(Paid_Amount__c)), Paid_Amount__c &gt; Amount__c)</errorConditionFormula><errorMessage>Paid amount cannot exceed fine amount.</errorMessage></validationRules>
+</CustomObject>

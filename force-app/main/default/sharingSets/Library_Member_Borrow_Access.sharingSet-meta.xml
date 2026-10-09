@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingSet xmlns="http://soap.salesforce.com/2006/04/metadata">
+    <accessMappings><accessLevel>Read</accessLevel><object>Borrow_Record__c</object><objectField>Contact__c</objectField><userField>Contact</userField></accessMappings>
+    <description>Read-only access to borrowing transactions associated with the authenticated user's Contact.</description>
+    <name>Library_Member_Borrow_Access</name>
+    <profiles>customer community user</profiles>
+    <profiles>Customer Community User</profiles>
+</SharingSet>

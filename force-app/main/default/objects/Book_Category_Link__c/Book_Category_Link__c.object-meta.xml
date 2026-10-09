@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Book Category Link</label><pluralLabel>Book Category Links</pluralLabel>
+    <nameField><displayFormat>BCL-{00000}</displayFormat><label>Book Category Link Number</label><type>AutoNumber</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus><sharingModel>ControlledByParent</sharingModel>
+    <fields><fullName>Book__c</fullName><label>Book</label><relationshipLabel>Categories</relationshipLabel><relationshipName>Book_Category_Links</relationshipName><type>MasterDetail</type><referenceTo>Book__c</referenceTo><relationshipOrder>0</relationshipOrder></fields>
+    <fields><fullName>Book_Category__c</fullName><label>Book Category</label><relationshipLabel>Books</relationshipLabel><relationshipName>Book_Category_Links</relationshipName><type>MasterDetail</type><referenceTo>Book_Category__c</referenceTo><relationshipOrder>1</relationshipOrder></fields>
+    <fields><fullName>Book_Category_Key__c</fullName><description>Composite key of Book and Book Category IDs, populated by integration or future automation to prevent duplicate links.</description><externalId>true</externalId><label>Book Category Key</label><length>255</length><type>Text</type><unique>true</unique></fields>
+</CustomObject>

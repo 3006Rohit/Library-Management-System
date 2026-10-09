@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.salesforce.com/2006/04/metadata">
+    <label>Borrow Record</label><pluralLabel>Borrow Records</pluralLabel>
+    <nameField><displayFormat>LOAN-{00000}</displayFormat><label>Loan Number</label><type>AutoNumber</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus><sharingModel>Private</sharingModel>
+    <fields><fullName>Member__c</fullName><label>Member</label><relationshipLabel>Borrow Records</relationshipLabel><relationshipName>Borrow_Records</relationshipName><type>Lookup</type><referenceTo>Member__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Book_Copy__c</fullName><label>Book Copy</label><relationshipLabel>Borrow Records</relationshipLabel><relationshipName>Borrow_Records</relationshipName><type>Lookup</type><referenceTo>Book_Copy__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Contact__c</fullName><description>Canonical Contact associated with the library member who owns this borrowing transaction. Used for Experience Cloud record sharing.</description><label>Contact</label><relationshipLabel>Borrow Records By Contact</relationshipLabel><relationshipName>Borrow_Records_By_Contact</relationshipName><type>Lookup</type><referenceTo>Contact</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Borrow_Date__c</fullName><label>Borrow Date</label><type>DateTime</type></fields>
+    <fields><fullName>Due_Date__c</fullName><label>Due Date</label><type>DateTime</type></fields>
+    <fields><fullName>Return_Date__c</fullName><label>Return Date</label><type>DateTime</type></fields>
+    <fields><fullName>Status__c</fullName><label>Status</label><type>Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value><fullName>Active</fullName><default>true</default><label>Active</label></value><value><fullName>Overdue</fullName><default>false</default><label>Overdue</label></value><value><fullName>Returned</fullName><default>false</default><label>Returned</label></value><value><fullName>Lost</fullName><default>false</default><label>Lost</label></value></valueSetDefinition></valueSet></fields>
+    <fields><fullName>Renewal_Count__c</fullName><label>Renewal Count</label><defaultValue>0</defaultValue><precision>18</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Last_Renewed_Date__c</fullName><label>Last Renewed Date</label><type>DateTime</type></fields>
+    <fields><fullName>Notes__c</fullName><label>Notes</label><length>32768</length><type>LongTextArea</type><visibleLines>5</visibleLines></fields>
+    <fields><fullName>Defect_Reported_Date__c</fullName><label>Defect Reported Date</label><type>DateTime</type></fields>
+    <fields><fullName>Replacement_Date__c</fullName><label>Replacement Date</label><type>DateTime</type></fields>
+    <fields><fullName>Replacement_Days__c</fullName><label>Replacement Delay Days</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Replacement_Required__c</fullName><label>Replacement Required</label><defaultValue>false</defaultValue><type>Checkbox</type></fields>
+    <validationRules><fullName>Due_Date_After_Borrow_Date</fullName><active>true</active><errorConditionFormula>AND(NOT(ISBLANK(Borrow_Date__c)), NOT(ISBLANK(Due_Date__c)), Due_Date__c &lt; Borrow_Date__c)</errorConditionFormula><errorMessage>Due date cannot be before borrow date.</errorMessage></validationRules>
+    <validationRules><fullName>Return_Date_After_Borrow_Date</fullName><active>true</active><errorConditionFormula>AND(NOT(ISBLANK(Borrow_Date__c)), NOT(ISBLANK(Return_Date__c)), Return_Date__c &lt; Borrow_Date__c)</errorConditionFormula><errorMessage>Return date cannot be before borrow date.</errorMessage></validationRules>
+    <validationRules><fullName>Renewal_Count_Nonnegative</fullName><active>true</active><errorConditionFormula>Renewal_Count__c &lt; 0</errorConditionFormula><errorMessage>Renewal count cannot be negative.</errorMessage></validationRules>
+</CustomObject>

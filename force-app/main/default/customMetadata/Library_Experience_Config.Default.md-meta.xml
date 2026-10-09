@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Default</label>
+    <protected>false</protected>
+    <values><field>Community_Account_Name__c</field><value xsi:type="xsd:string">Library Community Members</value></values>
+    <values><field>External_Profile_Name__c</field><value xsi:type="xsd:string">Customer Community User</value></values>
+    <values><field>Member_Permission_Set_Name__c</field><value xsi:type="xsd:string">Library_Member</value></values>
+    <values><field>Network_Name__c</field><value xsi:type="xsd:string">Library</value></values>
+    <values><field>Hold_Duration_Days__c</field><value xsi:type="xsd:double">3</value></values>
+</CustomMetadata>

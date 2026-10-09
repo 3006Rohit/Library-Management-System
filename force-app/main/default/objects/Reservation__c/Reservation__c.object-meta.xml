@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.salesforce.com/2006/04/metadata">
+    <label>Reservation</label><pluralLabel>Reservations</pluralLabel>
+    <nameField><displayFormat>RSV-{00000}</displayFormat><label>Reservation Number</label><type>AutoNumber</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus><sharingModel>Private</sharingModel>
+    <fields><fullName>Member__c</fullName><label>Member</label><relationshipLabel>Reservations</relationshipLabel><relationshipName>Reservations</relationshipName><type>Lookup</type><referenceTo>Member__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Book__c</fullName><label>Book</label><relationshipLabel>Reservations</relationshipLabel><relationshipName>Reservations</relationshipName><type>Lookup</type><referenceTo>Book__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Book_Copy__c</fullName><description>Optional specific physical copy held for this reservation.</description><label>Book Copy</label><relationshipLabel>Reservations</relationshipLabel><relationshipName>Reservations</relationshipName><type>Lookup</type><referenceTo>Book_Copy__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Contact__c</fullName><description>Canonical Contact associated with the library member who owns this reservation. Used for Experience Cloud record sharing.</description><label>Contact</label><relationshipLabel>Reservations By Contact</relationshipLabel><relationshipName>Reservations_By_Contact</relationshipName><type>Lookup</type><referenceTo>Contact</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Reservation_Date__c</fullName><label>Reservation Date</label><type>DateTime</type></fields>
+    <fields><fullName>Expiry_Date__c</fullName><label>Expiry Date</label><type>DateTime</type></fields>
+    <fields><fullName>Queue_Position__c</fullName><label>Queue Position</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Status__c</fullName><label>Status</label><type>Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value><fullName>Pending</fullName><default>true</default><label>Pending</label></value><value><fullName>Ready</fullName><default>false</default><label>Ready</label></value><value><fullName>Fulfilled</fullName><default>false</default><label>Fulfilled</label></value><value><fullName>Cancelled</fullName><default>false</default><label>Cancelled</label></value><value><fullName>Expired</fullName><default>false</default><label>Expired</label></value></valueSetDefinition></valueSet></fields>
+    <fields><fullName>Ready_Date__c</fullName><label>Ready Date</label><type>DateTime</type></fields>
+    <fields><fullName>Fulfilled_Date__c</fullName><label>Fulfilled Date</label><type>DateTime</type></fields>
+    <validationRules><fullName>Expiry_After_Reservation_Date</fullName><active>true</active><errorConditionFormula>AND(NOT(ISBLANK(Reservation_Date__c)), NOT(ISBLANK(Expiry_Date__c)), Expiry_Date__c &lt; Reservation_Date__c)</errorConditionFormula><errorMessage>Reservation expiry cannot be before reservation date.</errorMessage></validationRules>
+    <validationRules><fullName>Queue_Position_Nonnegative</fullName><active>true</active><errorConditionFormula>Queue_Position__c &lt; 0</errorConditionFormula><errorMessage>Queue position cannot be negative.</errorMessage></validationRules>
+</CustomObject>

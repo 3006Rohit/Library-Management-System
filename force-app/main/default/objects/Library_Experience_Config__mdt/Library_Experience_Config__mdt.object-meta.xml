@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Library Experience Config</label><pluralLabel>Library Experience Configs</pluralLabel><visibility>Public</visibility>
+    <fields><fullName>Community_Account_Name__c</fullName><label>Community Account Name</label><length>255</length><type>Text</type></fields>
+    <fields><fullName>External_Profile_Name__c</fullName><label>External Profile Name</label><length>255</length><type>Text</type></fields>
+    <fields><fullName>Member_Permission_Set_Name__c</fullName><label>Member Permission Set Name</label><length>255</length><type>Text</type></fields>
+    <fields><fullName>Network_Name__c</fullName><label>Network Name</label><length>255</length><type>Text</type></fields>
+    <fields><fullName>Hold_Duration_Days__c</fullName><label>Hold Duration Days</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
+</CustomObject>

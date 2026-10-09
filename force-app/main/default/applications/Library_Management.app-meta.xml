@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Library Management</label>
+    <description>Internal Lightning app for library operations.</description>
+    <formFactors>Large</formFactors>
+    <navType>Standard</navType>
+    <tabs>Book__c</tabs>
+    <tabs>Author__c</tabs>
+    <tabs>Book_Category__c</tabs>
+    <tabs>Book_Copy__c</tabs>
+    <tabs>Member__c</tabs>
+    <tabs>Membership_Plan__c</tabs>
+    <tabs>Borrow_Record__c</tabs>
+    <tabs>Reservation__c</tabs>
+    <tabs>Fine__c</tabs>
+    <tabs>Library_Registration__c</tabs>
+    <tabs>Library_Librarian_Workspace</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

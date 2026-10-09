@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.salesforce.com/2006/04/metadata">
+    <label>Membership Plan</label><pluralLabel>Membership Plans</pluralLabel>
+    <nameField><label>Plan Name</label><type>Text</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus><sharingModel>Read</sharingModel>
+    <fields><fullName>Description__c</fullName><label>Description</label><length>32768</length><type>LongTextArea</type><visibleLines>5</visibleLines></fields>
+    <fields><fullName>Fee__c</fullName><label>Fee</label><precision>18</precision><scale>2</scale><type>Currency</type></fields>
+    <fields><fullName>Duration_Days__c</fullName><label>Duration Days</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Borrow_Limit__c</fullName><label>Borrow Limit</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Loan_Duration_Days__c</fullName><label>Loan Duration Days</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Reservation_Limit__c</fullName><label>Reservation Limit</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Renewal_Limit__c</fullName><label>Renewal Limit</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Fine_Per_Day__c</fullName><label>Fine Per Day</label><precision>18</precision><scale>2</scale><type>Currency</type></fields>
+    <fields><fullName>Active__c</fullName><label>Active</label><defaultValue>true</defaultValue><type>Checkbox</type></fields>
+    <validationRules><fullName>Limits_Nonnegative</fullName><active>true</active><errorConditionFormula>OR(Fee__c &lt; 0, Duration_Days__c &lt; 0, Borrow_Limit__c &lt; 0, Loan_Duration_Days__c &lt; 0, Reservation_Limit__c &lt; 0, Renewal_Limit__c &lt; 0, Fine_Per_Day__c &lt; 0)</errorConditionFormula><errorMessage>Membership plan fees, durations, limits, and fine rates cannot be negative.</errorMessage></validationRules>
+</CustomObject>

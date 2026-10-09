@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Book</label>
+    <pluralLabel>Books</pluralLabel>
+    <nameField>
+        <label>Book Title</label>
+        <type>Text</type>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>Read</sharingModel>
+    <fields>
+        <fullName>ISBN__c</fullName><description>International Standard Book Number for the bibliographic title.</description><externalId>true</externalId><label>ISBN</label><length>20</length><type>Text</type><unique>true</unique>
+    </fields>
+    <fields>
+        <fullName>Publisher__c</fullName><label>Publisher</label><length>150</length><type>Text</type>
+    </fields>
+    <fields>
+        <fullName>Publication_Year__c</fullName><label>Publication Year</label><precision>4</precision><scale>0</scale><type>Number</type>
+    </fields>
+    <fields>
+        <fullName>Edition__c</fullName><label>Edition</label><length>50</length><type>Text</type>
+    </fields>
+    <fields>
+        <fullName>Language__c</fullName><label>Language</label><type>Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value><fullName>English</fullName><default>true</default><label>English</label></value><value><fullName>Hindi</fullName><default>false</default><label>Hindi</label></value><value><fullName>Other</fullName><default>false</default><label>Other</label></value></valueSetDefinition></valueSet>
+    </fields>
+    <fields>
+        <fullName>Description__c</fullName><label>Description</label><length>32768</length><type>LongTextArea</type><visibleLines>5</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Cover_Image_URL__c</fullName><label>Cover Image URL</label><type>Url</type>
+    </fields>
+    <fields>
+        <fullName>Total_Copies__c</fullName><label>Total Copies</label><precision>18</precision><scale>0</scale><type>Number</type>
+    </fields>
+    <fields>
+        <fullName>Available_Copies__c</fullName><label>Available Copies</label><precision>18</precision><scale>0</scale><type>Number</type>
+    </fields>
+    <fields>
+        <fullName>Status__c</fullName><label>Status</label><type>Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value><fullName>Active</fullName><default>true</default><label>Active</label></value><value><fullName>Inactive</fullName><default>false</default><label>Inactive</label></value><value><fullName>Archived</fullName><default>false</default><label>Archived</label></value></valueSetDefinition></valueSet>
+    </fields>
+    <validationRules>
+        <fullName>Publication_Year_Reasonable</fullName><active>true</active><errorConditionFormula>NOT(ISBLANK(Publication_Year__c)) &amp;&amp; (Publication_Year__c &lt; 1000 || Publication_Year__c &gt; YEAR(TODAY()) + 1)</errorConditionFormula><errorMessage>Publication Year must be between 1000 and next year.</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>Copy_Counts_Nonnegative</fullName><active>true</active><errorConditionFormula>OR(Total_Copies__c &lt; 0, Available_Copies__c &lt; 0, Available_Copies__c &gt; Total_Copies__c)</errorConditionFormula><errorMessage>Copy counts must be non-negative, and available copies cannot exceed total copies.</errorMessage>
+    </validationRules>
+</CustomObject>
