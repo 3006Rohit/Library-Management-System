@@ -2,6 +2,7 @@
 private class LibrarySettingsControllerTest {
   @IsTest
   static void settingsCanBeSavedAndRead() {
+    LibraryPolicyService.testPermissionOverrideEnabled = true;
     LibraryPolicyService.testGrantedPermissions = new Set<String>{
       'Manage_Library_Circulation'
     };
