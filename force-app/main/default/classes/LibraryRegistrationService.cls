@@ -23,6 +23,7 @@ public with sharing class LibraryRegistrationService {
         'You are not authorized to manage library registrations.'
       );
     }
+    LibrarySecurityService.requireRegistrationAccess();
   }
 
   public static String submit(
