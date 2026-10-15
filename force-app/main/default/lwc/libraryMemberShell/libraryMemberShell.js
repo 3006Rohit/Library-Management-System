@@ -1137,8 +1137,8 @@ export default class LibraryMemberShell extends LightningElement {
       return this.call(borrowBook, { bookId: record.Id }, () => {
         this.closeConfirmation();
         this.toast(
-          "Book borrowed",
-          "The available copy is now on your account.",
+          "Borrow request submitted",
+          "A librarian must approve this request before the book is issued.",
           "success"
         );
         this.bookDetail = undefined;

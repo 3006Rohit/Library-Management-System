@@ -1,4 +1,54 @@
 public without sharing class LibraryMemberBorrowService {
+  public static Id request(Member__c resolvedMember, Id bookId) {
+    if (resolvedMember == null || resolvedMember.Id == null)
+      throw new AuraHandledException('An authenticated member is required.');
+    if (bookId == null)
+      throw new AuraHandledException('A book must be selected.');
+    Member__c member = [
+      SELECT Id, Contact__c, Status__c
+      FROM Member__c
+      WHERE Id = :resolvedMember.Id
+      FOR UPDATE
+    ];
+    if (member.Status__c != 'Active')
+      throw new AuraHandledException(
+        'Your membership must be active to request a book.'
+      );
+    if (
+      [
+        SELECT COUNT()
+        FROM Borrow_Record__c
+        WHERE Member__c = :member.Id AND Status__c = 'Pending'
+      ] > 0
+    )
+      throw new AuraHandledException(
+        'You already have a borrowing request awaiting librarian approval.'
+      );
+    List<Book_Copy__c> copies = [
+      SELECT Id
+      FROM Book_Copy__c
+      WHERE Book__c = :bookId AND Status__c = 'Available'
+      LIMIT 1
+      FOR UPDATE
+    ];
+    if (copies.isEmpty())
+      throw new AuraHandledException(
+        'No copy is currently available. Reserve this title to join the queue.'
+      );
+    Borrow_Record__c request = new Borrow_Record__c(
+      Member__c = member.Id,
+      Contact__c = member.Contact__c,
+      Book_Copy__c = copies[0].Id,
+      Borrow_Date__c = System.now(),
+      Status__c = 'Pending',
+      Renewal_Count__c = 0,
+      Notes__c = 'Requested by member; awaiting librarian approval.'
+    );
+    insert request;
+    update new Book_Copy__c(Id = copies[0].Id, Status__c = 'Reserved');
+    return request.Id;
+  }
+
   public static Id checkout(Member__c resolvedMember, Id copyId) {
     if (resolvedMember == null || resolvedMember.Id == null)
       throw new AuraHandledException('An authenticated member is required.');

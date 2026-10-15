@@ -774,6 +774,14 @@ public with sharing class LibraryLibrarianController {
     return LibraryCirculationService.checkout(memberId, copyId);
   }
   @AuraEnabled
+  public static void approveBorrowRequest(Id loanId) {
+    LibraryCirculationService.approveBorrowRequest(loanId);
+  }
+  @AuraEnabled
+  public static void rejectBorrowRequest(Id loanId, String reason) {
+    LibraryCirculationService.rejectBorrowRequest(loanId, reason);
+  }
+  @AuraEnabled
   public static Id issueReservedBook(Id reservationId) {
     LibraryPolicyService.require('Manage_Library_Circulation');
     List<Reservation__c> reservations = [

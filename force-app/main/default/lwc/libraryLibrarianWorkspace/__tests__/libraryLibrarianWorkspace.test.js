@@ -249,7 +249,7 @@ describe("libraryLibrarianWorkspace", () => {
     getDashboard.mockResolvedValue({ totalBooks: 2, recentLoans: [] });
     getDashboardAnalytics.mockResolvedValue({
       available: true,
-      refreshCadence: "Live Salesforce data • updates automatically",
+      refreshCadence: "Live Salesforce data • refreshes after changes",
       copyMetrics: {
         totalCopies: 10,
         availableCopies: 8,

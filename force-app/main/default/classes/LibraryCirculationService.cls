@@ -1,4 +1,50 @@
 public without sharing class LibraryCirculationService {
+  public static void approveBorrowRequest(Id loanId) {
+    LibraryPolicyService.require('Manage_Library_Circulation');
+    Borrow_Record__c loan = [
+      SELECT Id, Member__c, Book_Copy__c, Status__c
+      FROM Borrow_Record__c
+      WHERE Id = :loanId
+      FOR UPDATE
+    ];
+    if (loan.Status__c != 'Pending')
+      throw new AuraHandledException(
+        'Only pending borrowing requests can be approved.'
+      );
+    Book_Copy__c copy = [
+      SELECT Id, Status__c
+      FROM Book_Copy__c
+      WHERE Id = :loan.Book_Copy__c
+      FOR UPDATE
+    ];
+    if (copy.Status__c != 'Reserved' && copy.Status__c != 'Available')
+      throw new AuraHandledException(
+        'The requested copy is no longer available.'
+      );
+    update new Book_Copy__c(Id = copy.Id, Status__c = 'Available');
+    checkout(loan.Member__c, copy.Id);
+    delete new Borrow_Record__c(Id = loan.Id);
+  }
+
+  public static void rejectBorrowRequest(Id loanId, String reason) {
+    LibraryPolicyService.require('Manage_Library_Circulation');
+    Borrow_Record__c loan = [
+      SELECT Id, Book_Copy__c, Status__c
+      FROM Borrow_Record__c
+      WHERE Id = :loanId
+      FOR UPDATE
+    ];
+    if (loan.Status__c != 'Pending')
+      throw new AuraHandledException(
+        'Only pending borrowing requests can be rejected.'
+      );
+    loan.Status__c = 'Rejected';
+    loan.Notes__c = String.isBlank(reason) ? 'Rejected by librarian.' : reason;
+    update loan;
+    if (loan.Book_Copy__c != null)
+      update new Book_Copy__c(Id = loan.Book_Copy__c, Status__c = 'Available');
+  }
+
   public static Id checkout(Id memberId, Id copyId) {
     LibraryPolicyService.require('Manage_Library_Circulation');
     Member__c member = [

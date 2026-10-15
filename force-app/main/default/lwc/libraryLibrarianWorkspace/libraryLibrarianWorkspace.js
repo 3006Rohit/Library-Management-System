@@ -41,6 +41,8 @@ import updateBook from "@salesforce/apex/LibraryLibrarianController.updateBook";
 import addCopy from "@salesforce/apex/LibraryLibrarianController.addCopy";
 import updateCopy from "@salesforce/apex/LibraryLibrarianController.updateCopy";
 import checkout from "@salesforce/apex/LibraryLibrarianController.checkout";
+import approveBorrowRequest from "@salesforce/apex/LibraryLibrarianController.approveBorrowRequest";
+import rejectBorrowRequest from "@salesforce/apex/LibraryLibrarianController.rejectBorrowRequest";
 import issueReservedBook from "@salesforce/apex/LibraryLibrarianController.issueReservedBook";
 import prepareReservation from "@salesforce/apex/LibraryLibrarianController.prepareReservation";
 import returnLoan from "@salesforce/apex/LibraryLibrarianController.returnLoan";
@@ -186,7 +188,6 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   assistantSessionId;
   assistantSequence = 0;
   assistantBusy = false;
-  realtimeRefreshTimer;
   assistantMessages = [
     {
       id: "welcome",
@@ -205,18 +206,9 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
 
   connectedCallback() {
     this.loadDashboard();
-    // Intentional polling keeps operational analytics current between user actions.
-    // eslint-disable-next-line @lwc/lwc/no-async-operation
-    this.realtimeRefreshTimer = window.setInterval(() => {
-      if (this.section === "Dashboard" && !this.loading) this.loadDashboard();
-    }, 5000);
   }
 
   disconnectedCallback() {
-    if (this.realtimeRefreshTimer) {
-      window.clearInterval(this.realtimeRefreshTimer);
-      this.realtimeRefreshTimer = undefined;
-    }
     if (this.assistantSessionId) {
       endAgentSession({ sessionId: this.assistantSessionId }).catch(
         () => undefined
@@ -383,7 +375,7 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   get analyticsCadence() {
     const cadence =
       this.analytics?.refreshCadence ||
-      "Live Salesforce data • updates automatically";
+      "Live Salesforce data • refreshes after changes";
     return this.analytics?.lastUpdated
       ? `Last updated: ${new Date(this.analytics.lastUpdated).toLocaleString()} • ${cadence}`
       : cadence;
@@ -801,10 +793,12 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   get loanStatusOptions() {
     return [
       { label: "All", value: "" },
-      ...["Active", "Overdue", "Returned"].map((value) => ({
-        label: value,
-        value
-      }))
+      ...["Pending", "Active", "Overdue", "Returned", "Rejected"].map(
+        (value) => ({
+          label: value,
+          value
+        })
+      )
     ];
   }
   get loanTabs() {
@@ -1177,7 +1171,9 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
         bookName: r.Book_Copy__r?.Book__r?.Name || "—",
         copyName: r.Book_Copy__r?.Name || "—",
         statusClass: this.badge(r.Status__c),
-        canAct: !["Returned"].includes(r.Status__c)
+        canAct: ["Active", "Overdue"].includes(r.Status__c),
+        canApprove: r.Status__c === "Pending",
+        canReject: r.Status__c === "Pending"
       }));
     });
   }
@@ -1806,6 +1802,41 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
           this.loadCopies(),
           this.loadDashboard()
         ]);
+      }
+    );
+  }
+  approveBorrow(event) {
+    return this.run(
+      approveBorrowRequest,
+      { loanId: event.currentTarget.dataset.id },
+      () => {
+        this.toast(
+          "Borrowing approved",
+          "The book is now active for the member.",
+          "success"
+        );
+        return Promise.all([
+          this.loadLoans(),
+          this.loadCopies(),
+          this.loadDashboard()
+        ]);
+      }
+    );
+  }
+  rejectBorrow(event) {
+    return this.run(
+      rejectBorrowRequest,
+      {
+        loanId: event.currentTarget.dataset.id,
+        reason: "Rejected by librarian."
+      },
+      () => {
+        this.toast(
+          "Borrowing rejected",
+          "The copy was released back to the library.",
+          "success"
+        );
+        return Promise.all([this.loadLoans(), this.loadCopies()]);
       }
     );
   }

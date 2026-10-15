@@ -718,7 +718,7 @@ public without sharing class LibraryMemberSessionController {
       throw new AuraHandledException(
         'No copy is currently available. Reserve this title to join the queue.'
       );
-    return LibraryMemberBorrowService.checkout(m, copies[0].Id);
+    return LibraryMemberBorrowService.request(m, bookId);
   }
 
   private static List<Reservation__c> systemReservations(

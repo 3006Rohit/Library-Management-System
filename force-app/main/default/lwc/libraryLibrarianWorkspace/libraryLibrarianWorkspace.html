@@ -1092,6 +1092,21 @@
                         <span class={loan.statusClass}>{loan.Status__c}</span>
                       </td>
                       <td class="row-actions">
+                        <template if:true={loan.canApprove}
+                          ><button
+                            class="action-link approve-link"
+                            data-id={loan.Id}
+                            onclick={approveBorrow}
+                          >
+                            Approve</button
+                          ><button
+                            class="action-link"
+                            data-id={loan.Id}
+                            onclick={rejectBorrow}
+                          >
+                            Reject
+                          </button></template
+                        >
                         <template if:true={loan.canAct}
                           ><button
                             class="action-link"
