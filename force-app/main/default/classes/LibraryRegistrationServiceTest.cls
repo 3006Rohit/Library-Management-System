@@ -1,9 +1,13 @@
 @IsTest
 private class LibraryRegistrationServiceTest {
     @TestSetup static void setupData() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
         insert new Membership_Plan__c(Name='Test Plan', Active__c=true, Duration_Days__c=30, Borrow_Limit__c=5);
     }
     @IsTest static void validSubmissionAndNormalizedDuplicate() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
         Membership_Plan__c plan=[SELECT Id FROM Membership_Plan__c LIMIT 1]; LibraryRegistrationController.RegistrationInput input=new LibraryRegistrationController.RegistrationInput();
         input.firstName='Test'; input.lastName='Member'; input.email='  Test.Member@example.com '; input.phone='+91 9876543210'; input.requestedPlanId=plan.Id;
         Test.startTest(); String id=LibraryRegistrationService.submit(input); Test.stopTest();
@@ -12,6 +16,8 @@ private class LibraryRegistrationServiceTest {
         input.email='TEST.MEMBER@EXAMPLE.COM'; try { LibraryRegistrationService.submit(input); System.assert(false); } catch (AuraHandledException e) { System.assert(true); }
     }
     @IsTest static void invalidInputAndInactivePlan() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
         LibraryRegistrationController.RegistrationInput input=new LibraryRegistrationController.RegistrationInput(); input.firstName='A'; input.lastName='B'; input.email='bad';
         try { LibraryRegistrationService.submit(input); System.assert(false); } catch (AuraHandledException e) { System.assert(true); }
         Membership_Plan__c plan=[SELECT Id FROM Membership_Plan__c LIMIT 1]; plan.Active__c=false; update plan; input.email='valid@example.com'; input.requestedPlanId=plan.Id;
