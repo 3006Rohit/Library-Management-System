@@ -1,6 +1,8 @@
 public with sharing class LibraryRegistrationService {
   @TestVisible
   private static Boolean testLibrarianAuthorized = false;
+  @TestVisible
+  private static Boolean testAuthorizationOverrideEnabled = false;
   public class RegistrationException extends Exception {
   }
   public static final String DUPLICATE_MESSAGE = 'An application for this email address is already awaiting review.';
@@ -13,7 +15,7 @@ public with sharing class LibraryRegistrationService {
   }
 
   public static void requireLibrarian() {
-    Boolean authorized = Test.isRunningTest()
+    Boolean authorized = testAuthorizationOverrideEnabled
       ? testLibrarianAuthorized
       : FeatureManagement.checkPermission('Manage_Library_Registrations');
     if (!authorized) {
