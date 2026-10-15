@@ -395,16 +395,16 @@
     >Library_Registration__c.Created_Contact__c</field><editable
     >true</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field
-    >Library_Registration__c.Registration_Email_Key__c</field><editable
+    >Library_Registration__c.Normalized_Email__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field
-    >Library_Registration__c.Provisioning_State__c</field><editable
+    >Library_Registration__c.Provisioning_Status__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field
-    >Library_Registration__c.Provisioning_Message__c</field><editable
+    >Library_Registration__c.Provisioning_Error__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field
-    >Library_Registration__c.External_User__c</field><editable
+    >Library_Registration__c.Provisioned_User__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field
     >Library_Registration__c.External_Auth_Id__c</field><editable
