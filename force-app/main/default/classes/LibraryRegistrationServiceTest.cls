@@ -7,8 +7,8 @@ private class LibraryRegistrationServiceTest {
         Membership_Plan__c plan=[SELECT Id FROM Membership_Plan__c LIMIT 1]; LibraryRegistrationController.RegistrationInput input=new LibraryRegistrationController.RegistrationInput();
         input.firstName='Test'; input.lastName='Member'; input.email='  Test.Member@example.com '; input.phone='+91 9876543210'; input.requestedPlanId=plan.Id;
         Test.startTest(); String id=LibraryRegistrationService.submit(input); Test.stopTest();
-        Library_Registration__c r=[SELECT Email__c, Registration_Email_Key__c, Provisioning_State__c, Status__c FROM Library_Registration__c WHERE Id=:id];
-        System.assertEquals('test.member@example.com',r.Email__c); System.assertEquals('test.member@example.com', r.Registration_Email_Key__c); System.assertEquals('Not Started', r.Provisioning_State__c); System.assertEquals('Pending',r.Status__c);
+        Library_Registration__c r=[SELECT Email__c, Normalized_Email__c, Provisioning_Status__c, Status__c FROM Library_Registration__c WHERE Id=:id];
+        System.assertEquals('test.member@example.com',r.Email__c); System.assertEquals('test.member@example.com', r.Normalized_Email__c); System.assertEquals('Not Started', r.Provisioning_Status__c); System.assertEquals('Pending',r.Status__c);
         input.email='TEST.MEMBER@EXAMPLE.COM'; try { LibraryRegistrationService.submit(input); System.assert(false); } catch (AuraHandledException e) { System.assert(true); }
     }
     @IsTest static void invalidInputAndInactivePlan() {
