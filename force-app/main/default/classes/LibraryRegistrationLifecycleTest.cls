@@ -11,15 +11,15 @@ private class LibraryRegistrationLifecycleTest {
 
     String id = LibraryRegistrationService.submit(input);
     Library_Registration__c value = [
-      SELECT Registration_Email_Key__c, Provisioning_State__c, Status__c
+      SELECT Normalized_Email__c, Provisioning_Status__c, Status__c
       FROM Library_Registration__c
       WHERE Id = :id
     ];
     System.assertEquals(
       'lifecycle@example.com',
-      value.Registration_Email_Key__c
+      value.Normalized_Email__c
     );
-    System.assertEquals('Not Started', value.Provisioning_State__c);
+    System.assertEquals('Not Started', value.Provisioning_Status__c);
     System.assertEquals('Pending', value.Status__c);
     System.assertEquals(
       true,
@@ -27,7 +27,7 @@ private class LibraryRegistrationLifecycleTest {
         .get('Library_Registration__c')
         .getDescribe()
         .fields.getMap()
-        .containsKey('External_User__c')
+        .containsKey('Provisioned_User__c')
     );
   }
 
@@ -44,17 +44,17 @@ private class LibraryRegistrationLifecycleTest {
     Test.stopTest();
 
     value = [
-      SELECT Provisioning_State__c, Provisioning_Message__c
+      SELECT Provisioning_Status__c, Provisioning_Error__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
-    System.assertEquals('Failed', value.Provisioning_State__c);
+    System.assertEquals('Failed', value.Provisioning_Status__c);
     System.assert(
-      value.Provisioning_Message__c.contains('Contact library administration')
+      value.Provisioning_Error__c.contains('Contact library administration')
     );
     System.assertEquals(
       false,
-      value.Provisioning_Message__c.contains('Class.')
+      value.Provisioning_Error__c.contains('Class.')
     );
   }
 
@@ -92,18 +92,18 @@ private class LibraryRegistrationLifecycleTest {
     value = [
       SELECT
         Status__c,
-        Provisioning_State__c,
-        Provisioning_Message__c,
-        External_User__c,
+        Provisioning_Status__c,
+        Provisioning_Error__c,
+        Provisioned_User__c,
         Created_Contact__c,
         Created_Member__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
     System.assertEquals('Approved', value.Status__c);
-    System.assertEquals('Completed', value.Provisioning_State__c);
-    System.assertEquals(null, value.Provisioning_Message__c);
-    System.assertEquals(UserInfo.getUserId(), value.External_User__c);
+    System.assertEquals('Completed', value.Provisioning_Status__c);
+    System.assertEquals(null, value.Provisioning_Error__c);
+    System.assertEquals(UserInfo.getUserId(), value.Provisioned_User__c);
     System.assertEquals(contact.Id, value.Created_Contact__c);
     System.assertEquals(member.Id, value.Created_Member__c);
   }
@@ -124,11 +124,11 @@ private class LibraryRegistrationLifecycleTest {
       System.assertEquals(
         'Not Started',
         [
-          SELECT Provisioning_State__c
+          SELECT Provisioning_Status__c
           FROM Library_Registration__c
           WHERE Id = :value.Id
         ]
-        .Provisioning_State__c
+        .Provisioning_Status__c
       );
     }
   }
@@ -154,10 +154,10 @@ private class LibraryRegistrationLifecycleTest {
     Library_Registration__c review = LibraryRegistrationController.getRegistrationForReview(
       id
     );
-    System.assertEquals('Not Started', review.Provisioning_State__c);
+    System.assertEquals('Not Started', review.Provisioning_Status__c);
     System.assertEquals(
       'controller@example.com',
-      review.Registration_Email_Key__c
+      review.Normalized_Email__c
     );
   }
 
@@ -205,12 +205,12 @@ private class LibraryRegistrationLifecycleTest {
     LibraryRegistrationController.approveRegistration(approved.Id);
     Test.stopTest();
     approved = [
-      SELECT Status__c, Provisioning_State__c
+      SELECT Status__c, Provisioning_Status__c
       FROM Library_Registration__c
       WHERE Id = :approved.Id
     ];
     System.assertEquals('Approved', approved.Status__c);
-    System.assertEquals('Completed', approved.Provisioning_State__c);
+    System.assertEquals('Completed', approved.Provisioning_Status__c);
 
     Library_Registration__c rejected = LibraryTestDataFactory.registration(
       plan,
@@ -222,12 +222,12 @@ private class LibraryRegistrationLifecycleTest {
       'Duplicate application'
     );
     rejected = [
-      SELECT Status__c, Provisioning_State__c, Rejection_Reason__c
+      SELECT Status__c, Provisioning_Status__c, Rejection_Reason__c
       FROM Library_Registration__c
       WHERE Id = :rejected.Id
     ];
     System.assertEquals('Rejected', rejected.Status__c);
-    System.assertEquals('Not Started', rejected.Provisioning_State__c);
+    System.assertEquals('Not Started', rejected.Provisioning_Status__c);
     System.assertEquals('Duplicate application', rejected.Rejection_Reason__c);
   }
 
@@ -264,13 +264,13 @@ private class LibraryRegistrationLifecycleTest {
       [SELECT COUNT() FROM Member__c WHERE Id = :member.Id]
     );
     value = [
-      SELECT Created_Contact__c, Created_Member__c, Provisioning_State__c
+      SELECT Created_Contact__c, Created_Member__c, Provisioning_Status__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
     System.assertEquals(null, value.Created_Contact__c);
     System.assertEquals(member.Id, value.Created_Member__c);
-    System.assertEquals('Completed', value.Provisioning_State__c);
+    System.assertEquals('Completed', value.Provisioning_Status__c);
   }
 
   @IsTest
@@ -303,19 +303,19 @@ private class LibraryRegistrationLifecycleTest {
       'retryable@example.com',
       'Failed'
     );
-    value.Provisioning_Message__c = 'Previous failure';
+    value.Provisioning_Error__c = 'Previous failure';
     update value;
     Test.startTest();
     LibraryRegistrationController.retryProvisioning(value.Id);
     Test.stopTest();
     value = [
-      SELECT Provisioning_State__c, Provisioning_Message__c
+      SELECT Provisioning_Status__c, Provisioning_Error__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
-    System.assertEquals('Failed', value.Provisioning_State__c);
+    System.assertEquals('Failed', value.Provisioning_Status__c);
     System.assert(
-      value.Provisioning_Message__c.contains('Contact library administration')
+      value.Provisioning_Error__c.contains('Contact library administration')
     );
   }
 
@@ -399,14 +399,14 @@ private class LibraryRegistrationLifecycleTest {
     );
     Test.stopTest();
     value = [
-      SELECT Provisioning_State__c, Provisioning_Message__c
+      SELECT Provisioning_Status__c, Provisioning_Error__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
-    System.assertEquals('Failed', value.Provisioning_State__c);
+    System.assertEquals('Failed', value.Provisioning_Status__c);
     System.assertEquals(
       'Provisioning could not be completed. Contact library administration.',
-      value.Provisioning_Message__c
+      value.Provisioning_Error__c
     );
   }
 }
