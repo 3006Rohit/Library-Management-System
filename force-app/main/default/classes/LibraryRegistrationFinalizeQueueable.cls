@@ -21,7 +21,7 @@ public without sharing class LibraryRegistrationFinalizeQueueable implements Que
       SELECT
         Id,
         Status__c,
-        Provisioning_State__c,
+        Provisioning_Status__c,
         Approved_By__c,
         Approved_Date__c,
         Email__c,
@@ -52,9 +52,9 @@ public without sharing class LibraryRegistrationFinalizeQueueable implements Que
     m.Account_Status__c = 'Active';
     update m;
     r.Status__c = 'Approved';
-    r.Provisioning_State__c = 'Completed';
-    r.External_User__c = userId;
-    r.Provisioning_Message__c = null;
+    r.Provisioning_Status__c = 'Completed';
+    r.Provisioned_User__c = userId;
+    r.Provisioning_Error__c = null;
     if (r.Approved_By__c == null)
       r.Approved_By__c = UserInfo.getUserId();
     if (r.Approved_Date__c == null)
