@@ -12,7 +12,7 @@ public without sharing class LibraryRegistrationProvisioningQueueable implements
         First_Name__c,
         Last_Name__c,
         Email__c,
-        Registration_Email_Key__c,
+        Normalized_Email__c,
         Phone__c,
         Date_of_Birth__c,
         Address__c,
@@ -21,7 +21,7 @@ public without sharing class LibraryRegistrationProvisioningQueueable implements
         Requested_Plan__r.Duration_Days__c,
         Requested_Plan__r.Borrow_Limit__c,
         Status__c,
-        Provisioning_State__c,
+        Provisioning_Status__c,
         Created_Member__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
@@ -31,15 +31,15 @@ public without sharing class LibraryRegistrationProvisioningQueueable implements
       return;
     Library_Registration__c registration = rows[0];
     try {
-      registration.Provisioning_State__c = 'Processing';
-      registration.Provisioning_Message__c = null;
+      registration.Provisioning_Status__c = 'Processing';
+      registration.Provisioning_Error__c = null;
       update registration;
       List<Member__c> existing = [
         SELECT Id, Status__c, Account_Status__c
         FROM Member__c
         WHERE
-          Normalized_Email__c = :registration.Registration_Email_Key__c
-          OR Email__c = :registration.Registration_Email_Key__c
+          Normalized_Email__c = :registration.Normalized_Email__c
+          OR Email__c = :registration.Normalized_Email__c
         LIMIT 2
       ];
       if (existing.size() > 1)
@@ -54,7 +54,7 @@ public without sharing class LibraryRegistrationProvisioningQueueable implements
           First_Name__c = registration.First_Name__c,
           Last_Name__c = registration.Last_Name__c,
           Email__c = registration.Email__c,
-          Normalized_Email__c = registration.Registration_Email_Key__c,
+          Normalized_Email__c = registration.Normalized_Email__c,
           Phone__c = registration.Phone__c,
           Date_of_Birth__c = registration.Date_of_Birth__c,
           Address__c = registration.Address__c,
@@ -88,8 +88,8 @@ public without sharing class LibraryRegistrationProvisioningQueueable implements
       );
       registration.Created_Member__c = member.Id;
       registration.Status__c = 'Approved';
-      registration.Provisioning_State__c = 'Completed';
-      registration.Provisioning_Message__c = null;
+      registration.Provisioning_Status__c = 'Completed';
+      registration.Provisioning_Error__c = null;
       update registration;
       sendActivation(registration, activationToken);
     } catch (Exception e) {
@@ -135,7 +135,7 @@ public without sharing class LibraryRegistrationProvisioningQueueable implements
       Database.update(
         new Library_Registration__c(
           Id = r.Id,
-          Provisioning_Message__c = 'Membership approved, but the activation email could not be sent: ' +
+          Provisioning_Error__c = 'Membership approved, but the activation email could not be sent: ' +
             String.join(errors, '; ')
         ),
         AccessLevel.SYSTEM_MODE
