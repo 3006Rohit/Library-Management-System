@@ -56,14 +56,14 @@ public with sharing class LibraryRegistrationService {
     Membership_Plan__c plan = plans[0];
     String normalizedEmail = email;
     List<Library_Registration__c> pending = [
-      SELECT Id, Registration_Email_Key__c
+      SELECT Id, Normalized_Email__c
       FROM Library_Registration__c
       WHERE
         Status__c = 'Pending'
-        AND Registration_Email_Key__c = :normalizedEmail
+        AND Normalized_Email__c = :normalizedEmail
     ];
     for (Library_Registration__c existing : pending) {
-      if (existing.Registration_Email_Key__c == email)
+      if (existing.Normalized_Email__c == email)
         throw new AuraHandledException(DUPLICATE_MESSAGE);
     }
     DateTime rateWindow = System.now().addHours(-1);
@@ -72,7 +72,7 @@ public with sharing class LibraryRegistrationService {
         SELECT COUNT()
         FROM Library_Registration__c
         WHERE
-          Registration_Email_Key__c = :normalizedEmail
+          Normalized_Email__c = :normalizedEmail
           AND CreatedDate >= :rateWindow
       ] >= 3
     )
@@ -104,8 +104,8 @@ public with sharing class LibraryRegistrationService {
       Requested_Plan__c = plan.Id,
       Registration_Date__c = System.now(),
       Status__c = 'Pending',
-      Registration_Email_Key__c = email,
-      Provisioning_State__c = 'Not Started'
+      Normalized_Email__c = email,
+      Provisioning_Status__c = 'Not Started'
     );
     try {
       insert registration;
@@ -164,7 +164,7 @@ public with sharing class LibraryRegistrationService {
   public static void approve(Id registrationId) {
     requireLibrarian();
     List<Library_Registration__c> rows = [
-      SELECT Id, Status__c, Provisioning_State__c, Email__c, First_Name__c
+      SELECT Id, Status__c, Provisioning_Status__c, Email__c, First_Name__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
       FOR UPDATE
@@ -176,8 +176,8 @@ public with sharing class LibraryRegistrationService {
       throw new AuraHandledException(
         'Only Pending registrations can be approved.'
       );
-    r.Provisioning_State__c = 'Queued';
-    r.Provisioning_Message__c = null;
+    r.Provisioning_Status__c = 'Queued';
+    r.Provisioning_Error__c = null;
     r.Approved_By__c = UserInfo.getUserId();
     r.Approved_Date__c = System.now();
     update r;
@@ -192,7 +192,7 @@ public with sharing class LibraryRegistrationService {
       SELECT
         Id,
         Status__c,
-        Provisioning_State__c,
+        Provisioning_Status__c,
         Created_Contact__c,
         Created_Member__c,
         Email__c,
@@ -208,7 +208,7 @@ public with sharing class LibraryRegistrationService {
       throw new AuraHandledException(
         'Only Pending registrations can be rejected.'
       );
-    if (r.Provisioning_State__c != 'Not Started')
+    if (r.Provisioning_Status__c != 'Not Started')
       throw new AuraHandledException(
         'This registration is already in provisioning and cannot be rejected.'
       );
@@ -234,7 +234,7 @@ public with sharing class LibraryRegistrationService {
   public static void retry(Id registrationId) {
     requireLibrarian();
     List<Library_Registration__c> rows = [
-      SELECT Id, Status__c, Provisioning_State__c
+      SELECT Id, Status__c, Provisioning_Status__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
       FOR UPDATE
@@ -242,12 +242,12 @@ public with sharing class LibraryRegistrationService {
     if (rows.isEmpty())
       throw new AuraHandledException('The registration could not be found.');
     Library_Registration__c r = rows[0];
-    if (r.Provisioning_State__c != 'Failed')
+    if (r.Provisioning_Status__c != 'Failed')
       throw new AuraHandledException(
         'Only failed provisioning can be retried.'
       );
-    r.Provisioning_State__c = 'Queued';
-    r.Provisioning_Message__c = null;
+    r.Provisioning_Status__c = 'Queued';
+    r.Provisioning_Error__c = null;
     update r;
     System.enqueueJob(new LibraryRegistrationProvisioningQueueable(r.Id));
   }
