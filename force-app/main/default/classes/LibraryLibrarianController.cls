@@ -146,7 +146,7 @@ public with sharing class LibraryLibrarianController {
         Requested_Plan__r.Name,
         Registration_Date__c,
         Status__c,
-        Provisioning_State__c
+        Provisioning_Status__c
       FROM Library_Registration__c
       WHERE Status__c = 'Pending'
       ORDER BY Registration_Date__c ASC
@@ -588,7 +588,7 @@ public with sharing class LibraryLibrarianController {
   @AuraEnabled(cacheable=true)
   public static List<Library_Registration__c> getRegistrations(String status) {
     LibraryPolicyService.require('Manage_Library_Registrations');
-    String q = 'SELECT Id,Name,First_Name__c,Last_Name__c,Email__c,Phone__c,Requested_Plan__r.Name,Registration_Date__c,Status__c,Provisioning_State__c FROM Library_Registration__c';
+    String q = 'SELECT Id,Name,First_Name__c,Last_Name__c,Email__c,Phone__c,Requested_Plan__r.Name,Registration_Date__c,Status__c,Provisioning_Status__c FROM Library_Registration__c';
     if (!String.isBlank(status))
       q += ' WHERE Status__c=:status';
     q += ' ORDER BY Registration_Date__c DESC LIMIT 200';

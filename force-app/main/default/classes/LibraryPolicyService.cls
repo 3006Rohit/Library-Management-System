@@ -1,6 +1,8 @@
 public with sharing class LibraryPolicyService {
   @TestVisible
   private static Set<String> testGrantedPermissions = new Set<String>();
+  @TestVisible
+  private static Boolean testPermissionOverrideEnabled = false;
   public class PolicyResult {
     @AuraEnabled
     public Boolean allowed { get; set; }
@@ -13,13 +15,14 @@ public with sharing class LibraryPolicyService {
   }
 
   public static void require(String permission) {
-    Boolean authorized = Test.isRunningTest()
+    Boolean authorized = testPermissionOverrideEnabled
       ? testGrantedPermissions.contains(permission)
       : FeatureManagement.checkPermission(permission);
     if (!authorized)
       throw new AuraHandledException(
         'You are not authorized to perform this library operation.'
       );
+    LibrarySecurityService.requireForPermission(permission);
   }
 
   public static PolicyResult canBorrow(

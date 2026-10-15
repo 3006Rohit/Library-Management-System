@@ -51,10 +51,10 @@ public with sharing class LibraryRegistrationController {
         Requested_Plan__r.Name,
         Registration_Date__c,
         Status__c,
-        Registration_Email_Key__c,
-        Provisioning_State__c,
-        Provisioning_Message__c,
-        External_User__c,
+        Normalized_Email__c,
+        Provisioning_Status__c,
+        Provisioning_Error__c,
+        Provisioned_User__c,
         Created_Contact__c,
         Created_Member__c
       FROM Library_Registration__c
@@ -106,10 +106,10 @@ public with sharing class LibraryRegistrationController {
         Created_Contact__r.Name,
         Created_Member__c,
         Created_Member__r.Name,
-        Registration_Email_Key__c,
-        Provisioning_State__c,
-        Provisioning_Message__c,
-        External_User__c
+        Normalized_Email__c,
+        Provisioning_Status__c,
+        Provisioning_Error__c,
+        Provisioned_User__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
       LIMIT 1

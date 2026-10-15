@@ -21,15 +21,15 @@ export default class LibraryRegistrationReview extends LightningElement {
     return this.registration?.Status__c === "Pending";
   }
   get isFailed() {
-    return this.registration?.Provisioning_State__c === "Failed";
+    return this.registration?.Provisioning_Status__c === "Failed";
   }
   get isProvisioning() {
     return ["Queued", "Processing"].includes(
-      this.registration?.Provisioning_State__c
+      this.registration?.Provisioning_Status__c
     );
   }
   get isCompleted() {
-    return this.registration?.Provisioning_State__c === "Completed";
+    return this.registration?.Provisioning_Status__c === "Completed";
   }
   get isExternalAuth() {
     return Boolean(this.registration?.External_Auth_Id__c);

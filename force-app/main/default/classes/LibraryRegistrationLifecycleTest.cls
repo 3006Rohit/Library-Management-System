@@ -2,6 +2,8 @@
 private class LibraryRegistrationLifecycleTest {
   @IsTest
   static void runtimeFieldsAndSubmissionStateAreCorrect() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Lifecycle Plan');
     LibraryRegistrationController.RegistrationInput input = new LibraryRegistrationController.RegistrationInput();
     input.firstName = ' Test ';
@@ -11,15 +13,15 @@ private class LibraryRegistrationLifecycleTest {
 
     String id = LibraryRegistrationService.submit(input);
     Library_Registration__c value = [
-      SELECT Registration_Email_Key__c, Provisioning_State__c, Status__c
+      SELECT Normalized_Email__c, Provisioning_Status__c, Status__c
       FROM Library_Registration__c
       WHERE Id = :id
     ];
     System.assertEquals(
       'lifecycle@example.com',
-      value.Registration_Email_Key__c
+      value.Normalized_Email__c
     );
-    System.assertEquals('Not Started', value.Provisioning_State__c);
+    System.assertEquals('Not Started', value.Provisioning_Status__c);
     System.assertEquals('Pending', value.Status__c);
     System.assertEquals(
       true,
@@ -27,12 +29,14 @@ private class LibraryRegistrationLifecycleTest {
         .get('Library_Registration__c')
         .getDescribe()
         .fields.getMap()
-        .containsKey('External_User__c')
+        .containsKey('Provisioned_User__c')
     );
   }
 
   @IsTest
   static void missingSharedAccountFailsSafely() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Failure Plan');
     Library_Registration__c value = LibraryTestDataFactory.registration(
       plan,
@@ -44,22 +48,24 @@ private class LibraryRegistrationLifecycleTest {
     Test.stopTest();
 
     value = [
-      SELECT Provisioning_State__c, Provisioning_Message__c
+      SELECT Provisioning_Status__c, Provisioning_Error__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
-    System.assertEquals('Failed', value.Provisioning_State__c);
+    System.assertEquals('Failed', value.Provisioning_Status__c);
     System.assert(
-      value.Provisioning_Message__c.contains('Contact library administration')
+      value.Provisioning_Error__c.contains('Contact library administration')
     );
     System.assertEquals(
       false,
-      value.Provisioning_Message__c.contains('Class.')
+      value.Provisioning_Error__c.contains('Class.')
     );
   }
 
   @IsTest
   static void finalizationIsIdempotentAndCompletesRegistration() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Finalize Plan');
     Account account = LibraryTestDataFactory.communityAccount();
     Contact contact = LibraryTestDataFactory.contact(
@@ -92,24 +98,26 @@ private class LibraryRegistrationLifecycleTest {
     value = [
       SELECT
         Status__c,
-        Provisioning_State__c,
-        Provisioning_Message__c,
-        External_User__c,
+        Provisioning_Status__c,
+        Provisioning_Error__c,
+        Provisioned_User__c,
         Created_Contact__c,
         Created_Member__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
     System.assertEquals('Approved', value.Status__c);
-    System.assertEquals('Completed', value.Provisioning_State__c);
-    System.assertEquals(null, value.Provisioning_Message__c);
-    System.assertEquals(UserInfo.getUserId(), value.External_User__c);
+    System.assertEquals('Completed', value.Provisioning_Status__c);
+    System.assertEquals(null, value.Provisioning_Error__c);
+    System.assertEquals(UserInfo.getUserId(), value.Provisioned_User__c);
     System.assertEquals(contact.Id, value.Created_Contact__c);
     System.assertEquals(member.Id, value.Created_Member__c);
   }
 
   @IsTest
   static void retryOnlyAllowsFailedState() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Retry Plan');
     Library_Registration__c value = LibraryTestDataFactory.registration(
@@ -124,17 +132,19 @@ private class LibraryRegistrationLifecycleTest {
       System.assertEquals(
         'Not Started',
         [
-          SELECT Provisioning_State__c
+          SELECT Provisioning_Status__c
           FROM Library_Registration__c
           WHERE Id = :value.Id
         ]
-        .Provisioning_State__c
+        .Provisioning_Status__c
       );
     }
   }
 
   @IsTest
   static void controllerAndGuestSurfacesUseCanonicalFields() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Controller Plan');
     LibraryRegistrationController.RegistrationInput input = new LibraryRegistrationController.RegistrationInput();
@@ -154,15 +164,17 @@ private class LibraryRegistrationLifecycleTest {
     Library_Registration__c review = LibraryRegistrationController.getRegistrationForReview(
       id
     );
-    System.assertEquals('Not Started', review.Provisioning_State__c);
+    System.assertEquals('Not Started', review.Provisioning_Status__c);
     System.assertEquals(
       'controller@example.com',
-      review.Registration_Email_Key__c
+      review.Normalized_Email__c
     );
   }
 
   @IsTest
   static void guestCatalogReturnsActiveBooksAndSupportsSearch() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     insert new List<Book__c>{
       new Book__c(
         Name = 'Public Catalog Book',
@@ -194,6 +206,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void approvalAndRejectionFollowStateRules() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Decision Plan');
     Library_Registration__c approved = LibraryTestDataFactory.registration(
@@ -205,12 +219,12 @@ private class LibraryRegistrationLifecycleTest {
     LibraryRegistrationController.approveRegistration(approved.Id);
     Test.stopTest();
     approved = [
-      SELECT Status__c, Provisioning_State__c
+      SELECT Status__c, Provisioning_Status__c
       FROM Library_Registration__c
       WHERE Id = :approved.Id
     ];
     System.assertEquals('Approved', approved.Status__c);
-    System.assertEquals('Completed', approved.Provisioning_State__c);
+    System.assertEquals('Completed', approved.Provisioning_Status__c);
 
     Library_Registration__c rejected = LibraryTestDataFactory.registration(
       plan,
@@ -222,17 +236,19 @@ private class LibraryRegistrationLifecycleTest {
       'Duplicate application'
     );
     rejected = [
-      SELECT Status__c, Provisioning_State__c, Rejection_Reason__c
+      SELECT Status__c, Provisioning_Status__c, Rejection_Reason__c
       FROM Library_Registration__c
       WHERE Id = :rejected.Id
     ];
     System.assertEquals('Rejected', rejected.Status__c);
-    System.assertEquals('Not Started', rejected.Provisioning_State__c);
+    System.assertEquals('Not Started', rejected.Provisioning_Status__c);
     System.assertEquals('Duplicate application', rejected.Rejection_Reason__c);
   }
 
   @IsTest
   static void provisioningReusesExistingContactAndMember() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Reuse Plan');
     Account account = LibraryTestDataFactory.communityAccount();
     Contact contact = LibraryTestDataFactory.contact(
@@ -264,17 +280,19 @@ private class LibraryRegistrationLifecycleTest {
       [SELECT COUNT() FROM Member__c WHERE Id = :member.Id]
     );
     value = [
-      SELECT Created_Contact__c, Created_Member__c, Provisioning_State__c
+      SELECT Created_Contact__c, Created_Member__c, Provisioning_Status__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
     System.assertEquals(null, value.Created_Contact__c);
     System.assertEquals(member.Id, value.Created_Member__c);
-    System.assertEquals('Completed', value.Provisioning_State__c);
+    System.assertEquals('Completed', value.Provisioning_Status__c);
   }
 
   @IsTest
   static void configurationAndNormalizationHelpersAreSafe() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     System.assertEquals(
       'sample@example.com',
       LibraryRegistrationService.normalizeEmail('  SAMPLE@example.com ')
@@ -296,6 +314,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void failedProvisioningCanBeRetriedSafely() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Retryable Plan');
     Library_Registration__c value = LibraryTestDataFactory.registration(
@@ -303,24 +323,26 @@ private class LibraryRegistrationLifecycleTest {
       'retryable@example.com',
       'Failed'
     );
-    value.Provisioning_Message__c = 'Previous failure';
+    value.Provisioning_Error__c = 'Previous failure';
     update value;
     Test.startTest();
     LibraryRegistrationController.retryProvisioning(value.Id);
     Test.stopTest();
     value = [
-      SELECT Provisioning_State__c, Provisioning_Message__c
+      SELECT Provisioning_Status__c, Provisioning_Error__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
-    System.assertEquals('Failed', value.Provisioning_State__c);
+    System.assertEquals('Failed', value.Provisioning_Status__c);
     System.assert(
-      value.Provisioning_Message__c.contains('Contact library administration')
+      value.Provisioning_Error__c.contains('Contact library administration')
     );
   }
 
   @IsTest
   static void completedRegistrationCannotBeApprovedAgain() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Completed Plan');
     Library_Registration__c value = LibraryTestDataFactory.registration(
@@ -349,6 +371,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void inputValidationRejectsUnsafeValues() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Validation Plan');
     LibraryRegistrationController.RegistrationInput input = new LibraryRegistrationController.RegistrationInput();
     input.firstName = 'Valid';
@@ -384,6 +408,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void queuedFailureHandlerStoresSafeMessage() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan(
       'Queued Failure Plan'
     );
@@ -399,14 +425,14 @@ private class LibraryRegistrationLifecycleTest {
     );
     Test.stopTest();
     value = [
-      SELECT Provisioning_State__c, Provisioning_Message__c
+      SELECT Provisioning_Status__c, Provisioning_Error__c
       FROM Library_Registration__c
       WHERE Id = :value.Id
     ];
-    System.assertEquals('Failed', value.Provisioning_State__c);
+    System.assertEquals('Failed', value.Provisioning_Status__c);
     System.assertEquals(
       'Provisioning could not be completed. Contact library administration.',
-      value.Provisioning_Message__c
+      value.Provisioning_Error__c
     );
   }
 }

@@ -105,19 +105,9 @@ public with sharing class LibraryMemberController {
     Schema.SObjectType objectType,
     List<String> fieldNames
   ) {
-    if (!objectType.getDescribe().isUpdateable())
-      throw new AuraHandledException('Profile updates are not permitted.');
-    Map<String, Schema.SObjectField> fields = objectType.getDescribe()
-      .fields.getMap();
-    for (String fieldName : fieldNames)
-      if (
-        !fields.containsKey(fieldName) ||
-        !fields.get(fieldName).getDescribe().isUpdateable()
-      )
-        throw new AuraHandledException(
-          'The profile field ' + fieldName + ' is not editable for this user.'
-        );
+    LibrarySecurityService.requireFields(objectType, fieldNames, true);
   }
+
   @AuraEnabled(cacheable=true)
   public static Member__c getCurrentMemberContext() {
     return readableMember(currentMember());

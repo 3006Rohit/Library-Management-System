@@ -30,7 +30,7 @@ describe("c-library-registration-review", () => {
     getRegistrationForReview.mockResolvedValue({
       Id: "reg-1",
       Status__c: "Pending",
-      Provisioning_State__c: "Not Started",
+      Provisioning_Status__c: "Not Started",
       Requested_Plan__r: {},
       Approved_By__r: {},
       Created_Contact__r: {},

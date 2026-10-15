@@ -182,7 +182,7 @@ Classified legacy artifacts:
 | `LibraryRegistrationFinalizeQueueable`       | TEST-ONLY / legacy               | Active path does not enqueue it; lifecycle tests still exercise it                                |
 | `Member__c.User__c`                          | LEGACY / MIGRATE later           | Data model and permission metadata still retain it                                                |
 | `Member__c.Contact__c`                       | KEEP as sharing bridge           | Existing transaction/contact synchronization depends on it                                        |
-| `External_User__c`, `Provisioned_User__c`    | LEGACY / MIGRATE later           | Registration metadata and review UI still expose them                                             |
+| `Provisioned_User__c`, `Provisioned_User__c`    | LEGACY / MIGRATE later           | Registration metadata and review UI still expose them                                             |
 | Temporary Agentforce diagnostic Apex classes | PLATFORM CLEANUP PENDING         | Salesforce stale internal references block deletion                                               |
 
 The malformed/base64 Agentforce graph is now excluded from Prettier input via

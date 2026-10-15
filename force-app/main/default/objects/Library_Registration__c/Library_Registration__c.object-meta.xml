@@ -59,29 +59,6 @@
     >Registrations</relationshipLabel><relationshipName
     >Registrations</relationshipName><type>Lookup</type><referenceTo
     >Contact</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
-    <fields><fullName>Registration_Email_Key__c</fullName><label
-    >Registration Email Key</label><length>255</length><type>Text</type><unique
-    >true</unique><caseSensitive>false</caseSensitive></fields>
-    <fields><fullName>Provisioning_State__c</fullName><label
-    >Provisioning State</label><type>Picklist</type><valueSet
-    ><valueSetDefinition><sorted>false</sorted><value><fullName
-          >Not Started</fullName><default>true</default><label
-          >Not Started</label></value><value><fullName>Queued</fullName><default
-          >false</default><label>Queued</label></value><value><fullName
-          >Processing</fullName><default>false</default><label
-          >Processing</label></value><value><fullName
-          >Completed</fullName><default>false</default><label
-          >Completed</label></value><value><fullName>Failed</fullName><default
-          >false</default><label
-          >Failed</label></value></valueSetDefinition></valueSet></fields>
-    <fields><fullName>Provisioning_Message__c</fullName><label
-    >Provisioning Message</label><length>32768</length><type
-    >LongTextArea</type><visibleLines>4</visibleLines></fields>
-    <fields><fullName>External_User__c</fullName><label
-    >External User</label><relationshipLabel
-    >External User Registrations</relationshipLabel><relationshipName
-    >External_User_Registrations</relationshipName><type
-    >Lookup</type><referenceTo>User</referenceTo></fields>
     <fields><fullName>Provisioning_Status__c</fullName><label
     >Provisioning Status</label><type>Picklist</type><valueSet
     ><valueSetDefinition><sorted>false</sorted><value><fullName

@@ -43,11 +43,11 @@ public with sharing class LibraryExternalRegistrationController {
       Max_Borrow_Limit__c = registration.Requested_Plan__r.Borrow_Limit__c
     );
     registration.Status__c = 'Approved';
-    registration.Provisioning_State__c = 'Completed';
+    registration.Provisioning_Status__c = 'Completed';
     registration.Provisioning_Status__c = 'Completed';
     registration.Approved_By__c = UserInfo.getUserId();
     registration.Approved_Date__c = System.now();
-    registration.Provisioning_Message__c = null;
+    registration.Provisioning_Error__c = null;
     Database.update(registration, AccessLevel.SYSTEM_MODE);
     notifyApplicant(
       registration.Email__c,
@@ -136,10 +136,10 @@ public with sharing class LibraryExternalRegistrationController {
         Created_Contact__r.Name,
         Created_Member__c,
         Created_Member__r.Name,
-        Registration_Email_Key__c,
-        Provisioning_State__c,
-        Provisioning_Message__c,
-        External_User__c,
+        Normalized_Email__c,
+        Provisioning_Status__c,
+        Provisioning_Error__c,
+        Provisioned_User__c,
         External_Auth_Id__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
