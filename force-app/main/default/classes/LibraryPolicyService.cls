@@ -22,6 +22,7 @@ public with sharing class LibraryPolicyService {
       throw new AuraHandledException(
         'You are not authorized to perform this library operation.'
       );
+    LibrarySecurityService.requireForPermission(permission);
   }
 
   public static PolicyResult canBorrow(
