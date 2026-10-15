@@ -130,6 +130,7 @@ private class LibraryAgentActionsTest {
   }
 
   private static void resetTestState() {
+    LibraryPolicyService.testPermissionOverrideEnabled = true;
     LibraryPolicyService.testGrantedPermissions.clear();
     LibraryDataCloudService.testRows = new Map<String, List<Map<String, Object>>>();
     LibraryDataCloudService.forceFailure = false;
@@ -138,6 +139,7 @@ private class LibraryAgentActionsTest {
   @IsTest
   static void librarianAnalyticsMapsSuccessAndHandlesDataCloudFailure() {
     resetTestState();
+    Fixture fixtureData = fixture();
     LibraryAgentAnalyticsAction.Response denied = LibraryAgentAnalyticsAction.execute(
       new List<LibraryAgentAnalyticsAction.Request>{
         new LibraryAgentAnalyticsAction.Request()
@@ -185,7 +187,7 @@ private class LibraryAgentActionsTest {
       },
       'Library_Book_Popularity__cio' => new List<Map<String, Object>>{
         new Map<String, Object>{
-          'book_id__c' => '001000000000001',
+          'book_id__c' => String.valueOf(fixtureData.bookA.Id),
           'borrow_count__c' => 2
         }
       },
