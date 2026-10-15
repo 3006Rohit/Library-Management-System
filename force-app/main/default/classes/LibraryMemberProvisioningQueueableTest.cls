@@ -12,13 +12,13 @@ private class LibraryMemberProvisioningQueueableTest {
       First_Name__c = 'Auth',
       Last_Name__c = 'UAT',
       Email__c = email,
-      Registration_Email_Key__c = email,
+      Normalized_Email__c = email,
       Requested_Plan__c = plan.Id,
       Registration_Date__c = System.now(),
       Approved_Date__c = System.now(),
       Approved_By__c = UserInfo.getUserId(),
       Status__c = 'Pending',
-      Provisioning_State__c = 'Queued'
+      Provisioning_Status__c = 'Queued'
     );
     insert row;
     return row;
@@ -42,8 +42,8 @@ private class LibraryMemberProvisioningQueueableTest {
     row = [
       SELECT
         Status__c,
-        Provisioning_State__c,
-        Provisioning_Message__c,
+        Provisioning_Status__c,
+        Provisioning_Error__c,
         Created_Member__c
       FROM Library_Registration__c
       WHERE Id = :row.Id
@@ -52,11 +52,11 @@ private class LibraryMemberProvisioningQueueableTest {
       'Approved',
       row.Status__c,
       'Provisioning failed: ' +
-        row.Provisioning_Message__c +
+        row.Provisioning_Error__c +
         ' / ' +
         LibraryRegistrationProvisioningQueueable.testLastError
     );
-    System.assertEquals('Completed', row.Provisioning_State__c);
+    System.assertEquals('Completed', row.Provisioning_Status__c);
     Member__c member = [
       SELECT Status__c, Account_Status__c, User__c
       FROM Member__c
@@ -84,7 +84,7 @@ private class LibraryMemberProvisioningQueueableTest {
     Library_Registration__c row = registration('auth-idempotent@example.com');
     new LibraryRegistrationProvisioningQueueable(row.Id).execute(null);
     row = [
-      SELECT Status__c, Provisioning_State__c, Created_Member__c
+      SELECT Status__c, Provisioning_Status__c, Created_Member__c
       FROM Library_Registration__c
       WHERE Id = :row.Id
     ];
