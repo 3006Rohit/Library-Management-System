@@ -1,0 +1,159 @@
+:host {
+  display: block;
+}
+.state-page {
+  display: grid;
+  grid-template-columns: 38% 62%;
+  min-height: 100vh;
+  background: #eef5fc;
+  color: #09213d;
+  font-family: Inter, "Salesforce Sans", Arial, sans-serif;
+}
+.state-hero {
+  position: relative;
+  min-height: 100vh;
+  padding: 34px;
+  overflow: hidden;
+  color: #fff;
+  background-position: center;
+  background-size: cover;
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 19, 32, 0.25),
+    rgba(2, 19, 32, 0.78)
+  );
+}
+.brand,
+.hero-copy {
+  position: relative;
+  z-index: 1;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 750;
+}
+.brand span {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 5px;
+  color: #0877eb;
+  background: #fff;
+}
+.hero-copy {
+  position: absolute;
+  right: 32px;
+  bottom: 52px;
+  left: 32px;
+}
+.hero-copy p,
+.hero-copy h1 {
+  margin: 0;
+}
+.hero-copy p {
+  font-size: 20px;
+  font-weight: 600;
+}
+.hero-copy h1 {
+  font-size: 31px;
+  line-height: 1.08;
+}
+.hero-copy span {
+  display: block;
+  max-width: 300px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.state-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 55px;
+}
+.state-card {
+  box-sizing: border-box;
+  width: min(610px, 100%);
+  padding: 64px 45px;
+  border: 1px solid #dbe5ef;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(23, 52, 84, 0.06);
+  text-align: center;
+}
+.state-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  margin: auto;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  font-size: 19px;
+  font-weight: 750;
+}
+.state-icon.pending {
+  color: #0877eb;
+}
+.state-icon.rejected {
+  color: #ed3d4b;
+}
+.state-icon.suspended {
+  color: #f39a0b;
+  border: 0;
+  font-size: 28px;
+}
+.state-icon.logout {
+  color: #208da5;
+}
+.state-card h1 {
+  margin: 18px 0 7px;
+  font-size: 20px;
+}
+.state-card p {
+  max-width: 460px;
+  margin: 0 auto;
+  color: #63758a;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.state-card a,
+.state-card button {
+  display: inline-block;
+  min-width: 130px;
+  margin-top: 22px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 5px;
+  background: #0877eb;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+@media (max-width: 760px) {
+  .state-page {
+    grid-template-columns: 1fr;
+  }
+  .state-hero {
+    min-height: 260px;
+  }
+  .hero-copy {
+    bottom: 25px;
+  }
+  .state-content {
+    padding: 25px 14px;
+  }
+  .state-card {
+    padding: 45px 20px;
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "type": "sfdc_cms__view",
+  "title": "Forgot Password",
+  "contentBody": {
+    "component": {
+      "children": [
+        {
+          "children": [
+            {
+              "attributes": {
+                "backgroundImageConfig": "",
+                "backgroundImageOverlay": "rgba(0,0,0,0)",
+                "componentSpacerSize": "",
+                "dxpStyle": {},
+                "layoutDirectionDesktop": "row",
+                "layoutDirectionMobile": "column",
+                "layoutDirectionTablet": "column",
+                "maxContentWidth": "",
+                "sectionColumnGutterWidth": "0",
+                "sectionConfig": "{\"UUID\":\"5d0c3c82-42b3-419c-9787-2f53264f7eea\",\"columns\":[{\"UUID\":\"94494d2f-5763-45d9-80f6-8f18750a1c12\",\"columnName\":\"Hero\",\"columnKey\":\"col1\",\"columnWidth\":\"5\",\"seedComponents\":null},{\"UUID\":\"1d194da9-d015-469f-91b5-56f87bf12fea\",\"columnName\":\"Reset Form\",\"columnKey\":\"col2\",\"columnWidth\":\"7\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "100vh",
+                "sectionVerticalAlign": "center"
+              },
+              "children": [
+                {
+                  "children": [
+                    {
+                      "attributes": {},
+                      "definition": "c:libraryAuthHero",
+                      "id": "777295e8-97d1-4d8a-ad1b-9d9d8ca89cad",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "94494d2f-5763-45d9-80f6-8f18750a1c12",
+                  "name": "col1",
+                  "title": "Hero",
+                  "type": "region"
+                },
+                {
+                  "children": [
+                    {
+                      "attributes": { "mode": "forgot" },
+                      "definition": "c:libraryMemberAuthFlow",
+                      "id": "2fc46745-c4a2-444b-b8c3-44e7ee3bd894",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "1d194da9-d015-469f-91b5-56f87bf12fea",
+                  "name": "col2",
+                  "title": "Reset Form",
+                  "type": "region"
+                }
+              ],
+              "definition": "community_layout:section",
+              "id": "5d0c3c82-42b3-419c-9787-2f53264f7eea",
+              "type": "component"
+            }
+          ],
+          "id": "cc797103-f4c5-49bb-bfd6-f0f638e52147",
+          "name": "content",
+          "title": "Content",
+          "type": "region"
+        },
+        {
+          "children": [
+            {
+              "attributes": {
+                "customHeadTags": "",
+                "description": "",
+                "dxpStyle": {},
+                "pageTitle": "Forgot Password",
+                "recordId": "{!recordId}"
+              },
+              "definition": "community_builder:seoAssistant",
+              "id": "3723734b-4e55-4d62-84dd-75b7839cd2c5",
+              "type": "component"
+            }
+          ],
+          "id": "58a93462-7c3c-4a73-bc65-11c7007a48bb",
+          "name": "sfdcHiddenRegion",
+          "title": "sfdcHiddenRegion",
+          "type": "region"
+        }
+      ],
+      "definition": "community_layout:sldsFlexibleLayout",
+      "id": "6be3142e-18ae-4084-bcdd-e9a576f89138",
+      "type": "component"
+    },
+    "dataProviders": [],
+    "themeLayoutType": "Inner",
+    "viewType": "forgot-password"
+  },
+  "urlName": "forgot-password"
+}

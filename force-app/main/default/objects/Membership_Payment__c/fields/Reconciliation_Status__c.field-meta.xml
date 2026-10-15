@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Reconciliation_Status__c</fullName><label>Reconciliation Status</label><type
+  >Picklist</type><valueSet><valueSetDefinition><value><fullName
+        >Pending</fullName><default>true</default><label
+        >Pending</label></value><value><fullName>Matched</fullName><default
+        >false</default><label>Matched</label></value><value><fullName
+        >Exception</fullName><default>false</default><label
+        >Exception</label></value><value><fullName>Refunded</fullName><default
+        >false</default><label
+        >Refunded</label></value></valueSetDefinition></valueSet></CustomField>

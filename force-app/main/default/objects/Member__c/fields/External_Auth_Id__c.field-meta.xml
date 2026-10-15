@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >External_Auth_Id__c</fullName><description
+  >Canonical immutable identity supplied by the external authentication provider. Never accept this value directly from a browser request.</description><label
+  >External Auth ID</label><length>255</length><type>Text</type><externalId
+  >true</externalId><unique>true</unique><caseSensitive
+  >true</caseSensitive></CustomField>

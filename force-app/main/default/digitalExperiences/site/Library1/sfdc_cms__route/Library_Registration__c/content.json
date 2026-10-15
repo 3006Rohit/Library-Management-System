@@ -1,0 +1,12 @@
+{
+  "type": "sfdc_cms__route",
+  "title": "Library Registration",
+  "contentBody": {
+    "activeViewId": "libraryRegistrationPage",
+    "configurationTags": [],
+    "pageAccess": "Public",
+    "routeType": "custom-library-registration",
+    "urlPrefix": "register"
+  },
+  "urlName": "library-registration"
+}

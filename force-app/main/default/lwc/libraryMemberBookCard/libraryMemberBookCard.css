@@ -1,0 +1,89 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.book-card {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #dce5ef;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(18, 51, 84, 0.06);
+}
+.cover-wrap {
+  display: grid;
+  height: 142px;
+  place-items: center;
+  padding: 10px;
+  background: #f5f8fc;
+}
+.cover {
+  width: 88px;
+  height: 122px;
+  border-radius: 3px;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(13, 32, 55, 0.2);
+}
+.placeholder {
+  display: grid;
+  place-items: center;
+  color: #2473dd;
+  background: linear-gradient(145deg, #e8f2ff, #c8dfff);
+  font-size: 35px;
+}
+.book-content {
+  flex: 1;
+  padding: 10px 11px 7px;
+}
+h3 {
+  overflow: hidden;
+  margin: 0 0 4px;
+  color: #17243a;
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+p {
+  overflow: hidden;
+  margin: 2px 0;
+  color: #687890;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.category {
+  color: #8b62c7;
+}
+.availability,
+.availability-meta {
+  display: block;
+  margin-top: 7px;
+  color: #159447;
+  font-size: 9px;
+  font-weight: 700;
+}
+.availability.unavailable {
+  color: #d14b55;
+}
+.availability.limited {
+  color: #c47c0b;
+}
+.view-button {
+  min-height: 31px;
+  margin: 0 10px 10px;
+  border: 1px solid #b8d4fa;
+  border-radius: 5px;
+  color: #0967d9;
+  background: #fff;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+}
+.view-button:hover,
+.view-button:focus-visible {
+  border-color: #0b6fe8;
+  background: #f3f8ff;
+}

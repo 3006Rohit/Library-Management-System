@@ -1,0 +1,80 @@
+{
+  "type": "sfdc_cms__view",
+  "title": "Logged Out",
+  "contentBody": {
+    "component": {
+      "children": [
+        {
+          "children": [
+            {
+              "attributes": {
+                "backgroundImageConfig": "",
+                "backgroundImageOverlay": "rgba(0,0,0,0)",
+                "componentSpacerSize": "",
+                "dxpStyle": {},
+                "layoutDirectionDesktop": "row",
+                "layoutDirectionMobile": "column",
+                "layoutDirectionTablet": "column",
+                "maxContentWidth": "",
+                "sectionColumnGutterWidth": "",
+                "sectionConfig": "{\"UUID\":\"b334281a-0368-4a19-a40c-216327c81eb1\",\"columns\":[{\"UUID\":\"23442325-0371-4d09-b1b3-529946cf8a1b\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "",
+                "sectionVerticalAlign": "flex-start"
+              },
+              "children": [
+                {
+                  "children": [
+                    {
+                      "attributes": { "dxpStyle": {} },
+                      "definition": "c:libraryLogoutState",
+                      "id": "8b9bdddb-1390-47d0-b14e-d13413e4a70d",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "23442325-0371-4d09-b1b3-529946cf8a1b",
+                  "name": "col1",
+                  "title": "Column 1",
+                  "type": "region"
+                }
+              ],
+              "definition": "community_layout:section",
+              "id": "b334281a-0368-4a19-a40c-216327c81eb1",
+              "type": "component"
+            }
+          ],
+          "id": "25a8fbc9-9411-425e-a667-3a3f98f4fb5f",
+          "name": "content",
+          "title": "Content",
+          "type": "region"
+        },
+        {
+          "children": [
+            {
+              "attributes": {
+                "customHeadTags": "",
+                "description": "Library member logout confirmation.",
+                "dxpStyle": {},
+                "pageTitle": "Logged Out",
+                "recordId": "{!recordId}"
+              },
+              "definition": "community_builder:seoAssistant",
+              "id": "89f8b3d0-d554-414d-aed5-aa7d43774f56",
+              "type": "component"
+            }
+          ],
+          "id": "713ca1e8-eb69-4f60-95fa-55424e8c1c9e",
+          "name": "sfdcHiddenRegion",
+          "title": "Hidden",
+          "type": "region"
+        }
+      ],
+      "definition": "community_layout:sldsFlexibleLayout",
+      "id": "31fa12cb-e037-483b-84d8-0e3d31ba4a57",
+      "type": "component"
+    },
+    "dataProviders": [],
+    "themeLayoutType": "Inner",
+    "viewType": "custom-logged-out"
+  },
+  "urlName": "logged-out"
+}

@@ -1,36 +1,199 @@
 <template>
-    <lightning-card title="Library registration review" icon-name="standard:approval">
-        <template lwc:if={loading}><lightning-spinner alternative-text="Loading registration"></lightning-spinner></template>
-        <template lwc:if={registration}>
-            <div class="slds-p-around_medium">
-                <p class="slds-text-heading_small">{registration.First_Name__c} {registration.Last_Name__c}</p>
-                <dl class="slds-list_horizontal slds-wrap slds-m-top_small">
-                    <dt class="slds-item_label slds-truncate">Email</dt><dd class="slds-item_detail slds-truncate">{registration.Email__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Phone</dt><dd class="slds-item_detail slds-truncate">{registration.Phone__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Date of birth</dt><dd class="slds-item_detail slds-truncate">{registration.Date_of_Birth__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Address</dt><dd class="slds-item_detail slds-truncate">{registration.Address__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Requested plan</dt><dd class="slds-item_detail slds-truncate">{registration.Requested_Plan__r.Name}</dd>
-                    <dt class="slds-item_label slds-truncate">Submitted</dt><dd class="slds-item_detail slds-truncate">{registration.Registration_Date__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Status</dt><dd class="slds-item_detail slds-truncate">{registration.Status__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Provisioning state</dt><dd class="slds-item_detail slds-truncate">{registration.Provisioning_State__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Provisioning message</dt><dd class="slds-item_detail slds-truncate">{registration.Provisioning_Message__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Approved/rejected by</dt><dd class="slds-item_detail slds-truncate">{registration.Approved_By__r.Name}</dd>
-                    <dt class="slds-item_label slds-truncate">Decision date</dt><dd class="slds-item_detail slds-truncate">{registration.Approved_Date__c}</dd>
-                    <dt class="slds-item_label slds-truncate">Created Contact</dt><dd class="slds-item_detail slds-truncate">{registration.Created_Contact__r.Name}</dd>
-                    <dt class="slds-item_label slds-truncate">Created Member</dt><dd class="slds-item_detail slds-truncate">{registration.Created_Member__r.Name}</dd>
-                    <dt class="slds-item_label slds-truncate">External User</dt><dd class="slds-item_detail slds-truncate">{registration.External_User__c}</dd>
-                </dl>
-                <template lwc:if={errorMessage}><div class="slds-text-color_error slds-m-top_small" role="alert">{errorMessage}</div></template>
-                <div class="slds-m-top_medium">
-                    <template lwc:if={isPending}><lightning-button variant="brand" label="Approve" onclick={approve} disabled={working}></lightning-button><lightning-button class="slds-m-left_small" label="Reject" onclick={openReject} disabled={working}></lightning-button></template>
-                    <template lwc:if={isProvisioning}><span class="slds-text-color_weak">Provisioning is in progress.</span></template>
-                    <template lwc:if={isFailed}><lightning-button variant="brand" label="Retry Provisioning" onclick={retry} disabled={working}></lightning-button></template>
-                    <template lwc:if={isCompleted}><span class="slds-text-color_success">Provisioning completed.</span></template>
-                </div>
-            </div>
-        </template>
-        <template lwc:if={rejecting}>
-            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="reject-heading" class="slds-modal slds-fade-in-open"><div class="slds-modal__container"><header class="slds-modal__header"><h2 id="reject-heading" class="slds-text-heading_medium">Reject application</h2></header><div class="slds-modal__content slds-p-around_medium"><lightning-textarea label="Rejection Reason" required value={reason} onchange={changeReason}></lightning-textarea></div><footer class="slds-modal__footer"><lightning-button label="Cancel" onclick={closeReject}></lightning-button><lightning-button class="slds-m-left_small" variant="brand" label="Reject application" onclick={reject} disabled={working}></lightning-button></footer></div></section><div class="slds-backdrop slds-backdrop_open"></div>
-        </template>
-    </lightning-card>
+  <lightning-card
+    title="Library registration review"
+    icon-name="standard:approval"
+  >
+    <template lwc:if={loading}
+      ><lightning-spinner
+        alternative-text="Loading registration"
+      ></lightning-spinner
+    ></template>
+    <template lwc:if={registration}>
+      <div class="slds-p-around_medium">
+        <p class="slds-text-heading_small">
+          {registration.First_Name__c} {registration.Last_Name__c}
+        </p>
+        <dl class="slds-list_horizontal slds-wrap slds-m-top_small">
+          <dt class="slds-item_label slds-truncate">Email</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Email__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Phone</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Phone__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Date of birth</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Date_of_Birth__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Address</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Address__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Requested plan</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Requested_Plan__r.Name}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Submitted</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Registration_Date__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Status</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Status__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Provisioning state</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Provisioning_State__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Provisioning message</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Provisioning_Message__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Approved/rejected by</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Approved_By__r.Name}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Decision date</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Approved_Date__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Created Contact</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Created_Contact__r.Name}
+          </dd>
+          <dt class="slds-item_label slds-truncate">Created Member</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.Created_Member__r.Name}
+          </dd>
+          <dt class="slds-item_label slds-truncate">External User</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.External_User__c}
+          </dd>
+          <dt class="slds-item_label slds-truncate">External Auth ID</dt>
+          <dd class="slds-item_detail slds-truncate">
+            {registration.External_Auth_Id__c}
+          </dd>
+        </dl>
+        <template lwc:if={errorMessage}
+          ><div class="slds-text-color_error slds-m-top_small" role="alert">
+            {errorMessage}
+          </div></template
+        >
+        <div class="slds-m-top_medium">
+          <template lwc:if={isPending}
+            ><lightning-button
+              variant="brand"
+              label="Approve"
+              onclick={approve}
+              disabled={working}
+            ></lightning-button
+            ><lightning-button
+              class="slds-m-left_small"
+              label="Reject"
+              onclick={openReject}
+              disabled={working}
+            ></lightning-button
+          ></template>
+          <template lwc:if={isProvisioning}
+            ><span class="slds-text-color_weak"
+              >Provisioning is in progress.</span
+            ></template
+          >
+          <template lwc:if={isFailed}
+            ><lightning-button
+              variant="brand"
+              label="Retry Provisioning"
+              onclick={retry}
+              disabled={working}
+            ></lightning-button
+          ></template>
+          <template lwc:if={isCompleted}
+            ><span class="slds-text-color_success"
+              >Provisioning completed.</span
+            ></template
+          >
+        </div>
+      </div>
+    </template>
+    <template lwc:if={rejecting}>
+      <section
+        role="dialog"
+        tabindex="-1"
+        aria-modal="true"
+        aria-labelledby="reject-heading"
+        class="slds-modal slds-fade-in-open"
+      >
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <h2 id="reject-heading" class="slds-text-heading_medium">
+              Reject application
+            </h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium">
+            <lightning-textarea
+              label="Rejection Reason"
+              required
+              value={reason}
+              onchange={changeReason}
+            ></lightning-textarea>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              label="Cancel"
+              onclick={closeReject}
+            ></lightning-button
+            ><lightning-button
+              class="slds-m-left_small"
+              variant="brand"
+              label="Reject application"
+              onclick={reject}
+              disabled={working}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    <template lwc:if={approving}
+      ><section
+        role="dialog"
+        tabindex="-1"
+        aria-modal="true"
+        aria-labelledby="approve-heading"
+        class="slds-modal slds-fade-in-open"
+      >
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <h2 id="approve-heading" class="slds-text-heading_medium">
+              Approve application
+            </h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium">
+            <template lwc:if={isExternalAuth}
+              >This activates the existing Member record. No Salesforce User
+              will be created.</template
+            ><template lwc:else
+              >This legacy application will continue through the existing
+              Experience Cloud provisioning workflow.</template
+            >
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              label="Cancel"
+              onclick={closeApprove}
+            ></lightning-button
+            ><lightning-button
+              class="slds-m-left_small"
+              variant="brand"
+              label="Approve"
+              onclick={confirmApprove}
+              disabled={working}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div
+    ></template>
+  </lightning-card>
 </template>

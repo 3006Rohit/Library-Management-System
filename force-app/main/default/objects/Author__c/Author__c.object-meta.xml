@@ -1,8 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <label>Author</label><pluralLabel>Authors</pluralLabel>
     <nameField><label>Author Name</label><type>Text</type></nameField>
-    <deploymentStatus>Deployed</deploymentStatus><sharingModel>Read</sharingModel>
-    <fields><fullName>Biography__c</fullName><label>Biography</label><length>32768</length><type>LongTextArea</type><visibleLines>5</visibleLines></fields>
-    <fields><fullName>Country__c</fullName><label>Country</label><length>100</length><type>Text</type></fields>
+    <deploymentStatus>Deployed</deploymentStatus><sharingModel
+  >Read</sharingModel><externalSharingModel>Read</externalSharingModel>
+    <fields><fullName>Biography__c</fullName><label>Biography</label><length
+    >32768</length><type>LongTextArea</type><visibleLines
+    >5</visibleLines></fields>
+    <fields><fullName>Country__c</fullName><label>Country</label><length
+    >100</length><type>Text</type></fields>
 </CustomObject>

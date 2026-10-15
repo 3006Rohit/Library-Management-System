@@ -1,0 +1,15 @@
+<template>
+  <template lwc:if={isGuestUser}>
+    <div class="redirect" role="status">
+      <lightning-spinner
+        alternative-text="Opening registration"
+        size="small"
+      ></lightning-spinner>
+      <p>Opening registration…</p>
+      <a href="/library/register">Continue to registration</a>
+    </div>
+  </template>
+  <template lwc:else>
+    <c-library-member-shell></c-library-member-shell>
+  </template>
+</template>

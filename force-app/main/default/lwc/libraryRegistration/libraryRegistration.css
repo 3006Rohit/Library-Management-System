@@ -1,0 +1,269 @@
+:host {
+  display: block;
+  font-family: Inter, "Salesforce Sans", Arial, sans-serif;
+  color: #0a2340;
+}
+.registration-page {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  min-height: 680px;
+  background: #f6f9fd;
+}
+.portal-nav {
+  padding: 20px 13px;
+  background: linear-gradient(180deg, #062f50, #03243e);
+  color: #fff;
+}
+.brand {
+  padding: 3px 9px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 750;
+}
+.portal-nav a {
+  display: flex;
+  gap: 11px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 5px;
+  color: #e8f2fb;
+  text-decoration: none;
+}
+.portal-nav a:first-of-type {
+  margin-top: 20px;
+  background: #0b72df;
+}
+.registration-main header {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  background: #fff;
+  border-bottom: 1px solid #dce5ef;
+}
+.registration-main header a {
+  color: #0877eb;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.header-search {
+  width: min(460px, 60%);
+  padding: 9px 13px;
+  border: 1px solid #d6e0eb;
+  border-radius: 5px;
+  color: #7a8ca0;
+  font-size: 11px;
+}
+.registration-content {
+  padding: 27px 34px;
+}
+.heading h1 {
+  font-size: 23px;
+  margin: 0;
+}
+.heading p {
+  color: #64748b;
+  font-size: 12px;
+  margin: 4px 0 18px;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid #dae4ef;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+.step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  color: #7a8b9e;
+  font-size: 11px;
+  border-right: 1px solid #e4ebf2;
+}
+.step:last-child {
+  border: 0;
+}
+.step span {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #eef2f6;
+}
+.step.active {
+  color: #0877eb;
+}
+.step.active span {
+  background: #0877eb;
+  color: #fff;
+}
+.form-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 0.75fr;
+  gap: 18px;
+  margin-top: 15px;
+}
+.registration-form,
+.benefits,
+.result-card {
+  position: relative;
+  padding: 20px;
+  border: 1px solid #dce5ef;
+  border-radius: 7px;
+  background: #fff;
+}
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+}
+.field-grid .full {
+  grid-column: 1/-1;
+}
+.submit-button,
+.primary-link {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  border: 0;
+  border-radius: 5px;
+  background: #0877eb;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.submit-button:disabled {
+  opacity: 0.6;
+}
+.form-error {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 4px;
+  background: #fff0f1;
+  color: #b52230;
+  font-size: 11px;
+}
+.benefits h2 {
+  font-size: 15px;
+  margin: 0 0 15px;
+}
+.benefits > div {
+  display: flex;
+  gap: 11px;
+  margin: 14px 0;
+}
+.benefits > div > span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 29px;
+  height: 29px;
+  border-radius: 50%;
+  background: #e9f3ff;
+  color: #0877eb;
+}
+.benefits p {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+.benefits strong {
+  font-size: 10px;
+}
+.benefits small {
+  color: #75869a;
+  font-size: 9px;
+  margin-top: 2px;
+}
+.login-prompt {
+  text-align: center;
+  color: #63758a;
+  font-size: 11px;
+}
+.login-prompt a {
+  color: #0877eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+.result-card {
+  max-width: 650px;
+  margin: 100px auto;
+  text-align: center;
+  padding: 55px;
+}
+.result-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: auto;
+  border-radius: 50%;
+  background: #e3f8ec;
+  color: #119456;
+  font-size: 24px;
+}
+.result-card h1 {
+  font-size: 22px;
+  margin: 17px 0 7px;
+}
+.result-card p {
+  color: #64748b;
+  line-height: 1.6;
+  font-size: 12px;
+}
+.result-card .primary-link {
+  width: 160px;
+  margin: 20px auto 0;
+}
+@media (max-width: 760px) {
+  .registration-page {
+    display: block;
+  }
+  .portal-nav {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+  }
+  .portal-nav .brand {
+    border: 0;
+    padding: 0 12px 0 0;
+  }
+  .portal-nav a {
+    margin: 0 2px;
+    padding: 8px;
+  }
+  .portal-nav a span {
+    display: none;
+  }
+  .registration-main header {
+    padding: 0 15px;
+  }
+  .registration-content {
+    padding: 20px 14px;
+  }
+  .form-layout {
+    grid-template-columns: 1fr;
+  }
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+  .field-grid .full {
+    grid-column: auto;
+  }
+  .step strong {
+    display: none;
+  }
+  .result-card {
+    margin: 50px auto;
+    padding: 35px 20px;
+  }
+}

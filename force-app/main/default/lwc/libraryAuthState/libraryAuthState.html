@@ -1,0 +1,29 @@
+<template>
+  <div class="state-page">
+    <section class="state-hero" style={heroStyle}>
+      <div class="shade"></div>
+      <div class="brand"><span>▥</span> Library</div>
+      <div class="hero-copy">
+        <p>Your Next</p>
+        <h1>Chapter Awaits</h1>
+        <span
+          >Join our library and explore thousands of books, resources and
+          more.</span
+        >
+      </div>
+    </section>
+    <section class="state-content">
+      <div class="state-card">
+        <div class={iconClass}>{icon}</div>
+        <h1>{title}</h1>
+        <p>{message}</p>
+        <template if:true={hasActionUrl}
+          ><a href={actionUrl}>{actionLabel}</a></template
+        >
+        <template if:false={hasActionUrl}
+          ><button onclick={handleAction}>{actionLabel}</button></template
+        >
+      </div>
+    </section>
+  </div>
+</template>

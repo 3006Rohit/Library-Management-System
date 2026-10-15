@@ -1,0 +1,108 @@
+:host {
+  display: block;
+}
+
+.auth-hero {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  padding: 40px;
+  overflow: hidden;
+  color: #fff;
+  background-position: center;
+  background-size: cover;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 18, 31, 0.3),
+    rgba(2, 18, 31, 0.72)
+  );
+}
+
+.brand,
+.copy {
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.brand span {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 6px;
+  color: #0877eb;
+  background: #fff;
+}
+
+.copy {
+  position: absolute;
+  right: 42px;
+  bottom: 72px;
+  left: 42px;
+  max-width: 350px;
+}
+
+.copy p,
+.copy h1 {
+  margin: 0;
+}
+
+.copy p {
+  font-size: 27px;
+  font-weight: 600;
+}
+
+.copy h1 {
+  font-size: 39px;
+  line-height: 1.05;
+}
+
+.copy span {
+  display: block;
+  margin-top: 17px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+  .auth-hero {
+    width: 100%;
+    min-height: 245px;
+    height: 245px;
+    padding: 22px;
+  }
+
+  .copy {
+    right: 22px;
+    bottom: 24px;
+    left: 22px;
+  }
+
+  .copy p {
+    font-size: 18px;
+  }
+
+  .copy h1 {
+    font-size: 29px;
+  }
+
+  .copy span {
+    margin-top: 8px;
+    font-size: 12px;
+  }
+}

@@ -13,6 +13,8 @@ tmp/
 tmp-*/
 test-results/
 .tmp-*/
+.audit-*/
+.playwright-mcp/
 
 # LWC VSCode autocomplete
 **/lwc/jsconfig.json

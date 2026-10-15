@@ -1,23 +1,83 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomObject xmlns="http://soap.salesforce.com/2006/04/metadata">
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <label>Member</label><pluralLabel>Members</pluralLabel>
-    <nameField><displayFormat>MEM-{00000}</displayFormat><label>Member Number</label><type>AutoNumber</type></nameField>
-    <deploymentStatus>Deployed</deploymentStatus><sharingModel>Private</sharingModel>
-    <fields><fullName>Contact__c</fullName><description>The Salesforce Contact associated with the member's Experience Cloud identity.</description><label>Contact</label><relationshipLabel>Library Member</relationshipLabel><relationshipName>Library_Members</relationshipName><type>Lookup</type><referenceTo>Contact</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
-    <fields><fullName>User__c</fullName><description>The Experience Cloud Salesforce User associated with this library member.</description><label>User</label><relationshipLabel>Library Member</relationshipLabel><relationshipName>Library_Members</relationshipName><type>Lookup</type><referenceTo>User</referenceTo></fields>
-    <fields><fullName>First_Name__c</fullName><label>First Name</label><length>80</length><type>Text</type></fields>
-    <fields><fullName>Last_Name__c</fullName><label>Last Name</label><length>80</length><type>Text</type></fields>
-    <fields><fullName>Email__c</fullName><label>Email</label><type>Email</type></fields>
-    <fields><fullName>Normalized_Email__c</fullName><label>Normalized Email</label><length>255</length><type>Text</type><unique>true</unique><caseSensitive>false</caseSensitive></fields>
-    <fields><fullName>Phone__c</fullName><label>Phone</label><type>Phone</type></fields>
-    <fields><fullName>Date_of_Birth__c</fullName><label>Date of Birth</label><type>Date</type></fields>
-    <fields><fullName>Address__c</fullName><label>Address</label><length>32768</length><type>LongTextArea</type><visibleLines>4</visibleLines></fields>
-    <fields><fullName>Membership_Plan__c</fullName><label>Membership Plan</label><relationshipLabel>Members</relationshipLabel><relationshipName>Members</relationshipName><type>Lookup</type><referenceTo>Membership_Plan__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
-    <fields><fullName>Membership_Start_Date__c</fullName><label>Membership Start Date</label><type>Date</type></fields>
-    <fields><fullName>Membership_End_Date__c</fullName><label>Membership End Date</label><type>Date</type></fields>
-    <fields><fullName>Status__c</fullName><label>Status</label><type>Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value><fullName>Active</fullName><default>true</default><label>Active</label></value><value><fullName>Suspended</fullName><default>false</default><label>Suspended</label></value><value><fullName>Expired</fullName><default>false</default><label>Expired</label></value><value><fullName>Closed</fullName><default>false</default><label>Closed</label></value></valueSetDefinition></valueSet></fields>
-    <fields><fullName>Registration_Date__c</fullName><label>Registration Date</label><type>Date</type></fields>
-    <fields><fullName>Max_Borrow_Limit__c</fullName><label>Max Borrow Limit</label><precision>18</precision><scale>0</scale><type>Number</type></fields>
-    <validationRules><fullName>Membership_End_After_Start</fullName><active>true</active><errorConditionFormula>AND(NOT(ISBLANK(Membership_Start_Date__c)), NOT(ISBLANK(Membership_End_Date__c)), Membership_End_Date__c &lt; Membership_Start_Date__c)</errorConditionFormula><errorMessage>Membership end date cannot be earlier than membership start date.</errorMessage></validationRules>
-    <validationRules><fullName>Borrow_Limit_Nonnegative</fullName><active>true</active><errorConditionFormula>Max_Borrow_Limit__c &lt; 0</errorConditionFormula><errorMessage>Maximum borrow limit cannot be negative.</errorMessage></validationRules>
+    <nameField><displayFormat>MEM-{00000}</displayFormat><label
+    >Member Number</label><type>AutoNumber</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus><sharingModel
+  >Private</sharingModel>
+    <fields><fullName>Contact__c</fullName><description
+    >The Salesforce Contact associated with the member's Experience Cloud identity.</description><label
+    >Contact</label><relationshipLabel
+    >Library Member</relationshipLabel><relationshipName
+    >Library_Members</relationshipName><type>Lookup</type><referenceTo
+    >Contact</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>User__c</fullName><description
+    >The Experience Cloud Salesforce User associated with this library member.</description><label
+    >User</label><relationshipLabel
+    >Library Member</relationshipLabel><relationshipName
+    >Library_Members</relationshipName><type>Lookup</type><referenceTo
+    >User</referenceTo></fields>
+    <fields><fullName>First_Name__c</fullName><label>First Name</label><length
+    >80</length><type>Text</type></fields>
+    <fields><fullName>Last_Name__c</fullName><label>Last Name</label><length
+    >80</length><type>Text</type></fields>
+    <fields><fullName>Email__c</fullName><label>Email</label><type
+    >Email</type></fields>
+    <fields><fullName>Normalized_Email__c</fullName><label
+    >Normalized Email</label><length>255</length><type>Text</type><unique
+    >true</unique><caseSensitive>false</caseSensitive></fields>
+    <fields><fullName>Phone__c</fullName><label>Phone</label><type
+    >Phone</type></fields>
+    <fields><fullName>Date_of_Birth__c</fullName><label
+    >Date of Birth</label><type>Date</type></fields>
+    <fields><fullName>Address__c</fullName><label>Address</label><length
+    >32768</length><type>LongTextArea</type><visibleLines
+    >4</visibleLines></fields>
+    <fields><fullName>Interests__c</fullName><label
+    >Member Interests</label><length>255</length><type>Text</type></fields>
+    <fields><fullName>Membership_Plan__c</fullName><label
+    >Membership Plan</label><relationshipLabel
+    >Members</relationshipLabel><relationshipName
+    >Members</relationshipName><type>Lookup</type><referenceTo
+    >Membership_Plan__c</referenceTo><deleteConstraint
+    >Restrict</deleteConstraint></fields>
+    <fields><fullName>Membership_Start_Date__c</fullName><label
+    >Membership Start Date</label><type>Date</type></fields>
+    <fields><fullName>Membership_End_Date__c</fullName><label
+    >Membership End Date</label><type>Date</type></fields>
+    <fields><fullName>Status__c</fullName><label>Status</label><type
+    >Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value
+        ><fullName>Active</fullName><default>true</default><label
+          >Active</label></value><value><fullName>Suspended</fullName><default
+          >false</default><label>Suspended</label></value><value><fullName
+          >Expired</fullName><default>false</default><label
+          >Expired</label></value><value><fullName>Closed</fullName><default
+          >false</default><label
+          >Closed</label></value></valueSetDefinition></valueSet></fields>
+    <fields><fullName>Registration_Date__c</fullName><label
+    >Registration Date</label><type>Date</type></fields>
+    <fields><fullName>Max_Borrow_Limit__c</fullName><label
+    >Max Borrow Limit</label><precision>18</precision><scale>0</scale><type
+    >Number</type></fields>
+    <fields><fullName>Member_Type__c</fullName><description
+    >Durable governance classification controlling Data Cloud inclusion, analytics governance, test/demo separation, and future Agentforce grounding eligibility. This is not an operational membership or account status.</description><label
+    >Member Type</label><type>Picklist</type><valueSet><valueSetDefinition
+      ><sorted>false</sorted><value><fullName>Production</fullName><default
+          >false</default><label>Production</label></value><value><fullName
+          >Test</fullName><default>false</default><label
+          >Test</label></value><value><fullName>Demo</fullName><default
+          >false</default><label>Demo</label></value><value><fullName
+          >UAT</fullName><default>false</default><label
+          >UAT</label></value><value><fullName>Legacy</fullName><default
+          >false</default><label>Legacy</label></value><value><fullName
+          >Staff</fullName><default>false</default><label
+          >Staff</label></value></valueSetDefinition></valueSet></fields>
+    <validationRules><fullName>Membership_End_After_Start</fullName><active
+    >true</active><errorConditionFormula
+    >AND(NOT(ISBLANK(Membership_Start_Date__c)), NOT(ISBLANK(Membership_End_Date__c)), Membership_End_Date__c &lt; Membership_Start_Date__c)</errorConditionFormula><errorMessage
+    >Membership end date cannot be earlier than membership start date.</errorMessage></validationRules>
+    <validationRules><fullName>Borrow_Limit_Nonnegative</fullName><active
+    >true</active><errorConditionFormula
+    >Max_Borrow_Limit__c &lt; 0</errorConditionFormula><errorMessage
+    >Maximum borrow limit cannot be negative.</errorMessage></validationRules>
 </CustomObject>

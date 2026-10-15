@@ -1,0 +1,19 @@
+<template>
+  <article class="book-card">
+    <div class="cover-wrap">
+      <template if:true={hasCover}
+        ><img src={book.coverUrl} alt={book.Name} class="cover"
+      /></template>
+      <template if:false={hasCover}
+        ><div class="cover placeholder" aria-hidden="true">▥</div></template
+      >
+    </div>
+    <div class="book-content">
+      <h3 title={book.Name}>{book.Name}</h3>
+      <p class="author" title={book.authors}>{book.authors}</p>
+      <p class="category" title={book.categories}>{book.categories}</p>
+      <span class={book.availabilityClass}>{book.availabilityMeta}</span>
+    </div>
+    <button class="view-button" onclick={handleAction}>{actionLabel}</button>
+  </article>
+</template>

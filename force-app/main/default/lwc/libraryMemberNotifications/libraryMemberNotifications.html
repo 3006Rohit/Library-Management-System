@@ -1,0 +1,32 @@
+<template
+  ><lightning-card title="Notifications" icon-name="standard:announcement"
+    ><template if:true={loading}
+      ><lightning-spinner
+        alternative-text="Loading notifications"
+      ></lightning-spinner
+    ></template>
+    <div class="slds-p-around_medium">
+      <template if:true={notifications.length}
+        ><template for:each={notifications} for:item="item"
+          ><article key={item.Id} class="slds-box slds-m-bottom_small">
+            <p class="slds-text-heading_small">{item.Subject__c}</p>
+            <p class="slds-text-color_weak">
+              {item.Type__c} · {item.CreatedDate}
+            </p>
+            <p class="slds-m-top_x-small">{item.Message__c}</p>
+            <template if:true={item.canMarkRead}
+              ><lightning-button
+                class="slds-m-top_small"
+                label="Mark read"
+                data-id={item.Id}
+                onclick={markRead}
+              ></lightning-button
+            ></template></article></template></template
+      ><template if:false={notifications.length}
+        ><p>No notifications yet.</p></template
+      ><template if:true={error}
+        ><p class="slds-text-color_error" role="alert">{error}</p></template
+      >
+    </div></lightning-card
+  ></template
+>

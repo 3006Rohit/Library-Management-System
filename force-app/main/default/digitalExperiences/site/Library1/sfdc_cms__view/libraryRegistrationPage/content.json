@@ -1,0 +1,82 @@
+{
+  "type": "sfdc_cms__view",
+  "title": "Library Registration",
+  "contentBody": {
+    "component": {
+      "children": [
+        {
+          "children": [
+            {
+              "attributes": {
+                "backgroundImageConfig": "",
+                "backgroundImageOverlay": "rgba(0,0,0,0)",
+                "componentSpacerSize": "",
+                "dxpStyle": {},
+                "layoutDirectionDesktop": "row",
+                "layoutDirectionMobile": "column",
+                "layoutDirectionTablet": "column",
+                "maxContentWidth": "",
+                "sectionColumnGutterWidth": "",
+                "sectionConfig": "{\"UUID\":\"93f54b21-32a3-463b-bc1a-1ac725466fcc\",\"columns\":[{\"UUID\":\"18d8ac2d-c5ba-4387-959c-d6dc044838d1\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "",
+                "sectionVerticalAlign": "flex-start"
+              },
+              "children": [
+                {
+                  "children": [
+                    {
+                      "attributes": {
+                        "dxpStyle": {}
+                      },
+                      "definition": "c:libraryRegistration",
+                      "id": "01c72f10-da8a-4d62-ab49-48de1574ad07",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "18d8ac2d-c5ba-4387-959c-d6dc044838d1",
+                  "name": "col1",
+                  "title": "Column 1",
+                  "type": "region"
+                }
+              ],
+              "definition": "community_layout:section",
+              "id": "93f54b21-32a3-463b-bc1a-1ac725466fcc",
+              "type": "component"
+            }
+          ],
+          "id": "67d9fc52-1cc5-40fd-910a-cfb56a5bcff5",
+          "name": "content",
+          "title": "Content",
+          "type": "region"
+        },
+        {
+          "children": [
+            {
+              "attributes": {
+                "customHeadTags": "",
+                "description": "Apply for Library membership.",
+                "dxpStyle": {},
+                "pageTitle": "Library Registration",
+                "recordId": "{!recordId}"
+              },
+              "definition": "community_builder:seoAssistant",
+              "id": "fe5b084a-3ce2-4f0f-91b0-0ae845118503",
+              "type": "component"
+            }
+          ],
+          "id": "4c20d77f-322c-45a7-85bf-89ca3e27dd0d",
+          "name": "sfdcHiddenRegion",
+          "title": "sfdcHiddenRegion",
+          "type": "region"
+        }
+      ],
+      "definition": "community_layout:sldsFlexibleLayout",
+      "id": "3c4bc85d-b5f6-4ff8-90c7-6dcce1f3151a",
+      "type": "component"
+    },
+    "dataProviders": [],
+    "themeLayoutType": "Inner",
+    "viewType": "custom-library-registration"
+  },
+  "urlName": "library-registration"
+}

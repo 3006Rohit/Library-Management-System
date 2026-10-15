@@ -1,24 +1,161 @@
 <template>
-    <lightning-card title="Library membership application" icon-name="standard:contact">
-        <div class="slds-p-around_medium">
-            <template lwc:if={submitted}>
-                <div class="slds-notify slds-notify_alert slds-theme_success" role="status">{successMessage}</div>
-            </template>
-            <template lwc:else>
-                <form onsubmit={handleSubmit} novalidate>
-                    <div class="slds-grid slds-wrap slds-gutters_small">
-                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"><lightning-input name="firstName" data-field="firstName" label="First Name" required onchange={handleChange}></lightning-input></div>
-                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"><lightning-input name="lastName" data-field="lastName" label="Last Name" required onchange={handleChange}></lightning-input></div>
-                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"><lightning-input name="email" data-field="email" type="email" label="Email" required onchange={handleChange}></lightning-input></div>
-                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"><lightning-input name="phone" data-field="phone" type="tel" label="Phone" pattern="[+0-9() .-]{7,25}" message-when-pattern-mismatch="Enter a valid phone number." onchange={handleChange}></lightning-input></div>
-                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"><lightning-input name="dateOfBirth" data-field="dateOfBirth" type="date" label="Date of Birth" max={today} onchange={handleChange}></lightning-input></div>
-                        <div class="slds-col slds-size_1-of-1"><lightning-textarea name="address" data-field="address" label="Address" onchange={handleChange}></lightning-textarea></div>
-                        <div class="slds-col slds-size_1-of-1"><lightning-combobox name="requestedPlanId" data-field="requestedPlanId" label="Requested Membership Plan" options={planOptions} required onchange={handleChange}></lightning-combobox></div>
-                    </div>
-                    <template lwc:if={errorMessage}><div class="slds-text-color_error slds-m-top_small" role="alert">{errorMessage}</div></template>
-                    <div class="slds-m-top_medium"><lightning-button type="submit" variant="brand" label="Submit application" disabled={loading}></lightning-button><template lwc:if={loading}><lightning-spinner alternative-text="Submitting application" size="small"></lightning-spinner></template></div>
-                </form>
-            </template>
-        </div>
-    </lightning-card>
+  <template if:true={submitted}>
+    <c-library-auth-state
+      title="Registration Submitted!"
+      message={successMessage}
+      action-label="Back to Home"
+      action-url="/library/login"
+      icon="◷"
+      variant="pending"
+    ></c-library-auth-state>
+  </template>
+  <template if:false={submitted}>
+    <div class="registration-page">
+      <aside class="portal-nav">
+        <div class="brand">▥ <span>Library</span></div>
+        <a href="/library/">⌂ <span>Home</span></a>
+        <a href="/library/explore-books">▣ <span>Explore Books</span></a>
+        <a href="/library/login">♙ <span>Login</span></a>
+      </aside>
+      <main class="registration-main">
+        <header>
+          <div class="header-search">
+            ⌕ <span>Search books, authors, or categories...</span>
+          </div>
+          <a href="/library/login">Sign in</a>
+        </header>
+        <section class="registration-content">
+          <div class="heading">
+            <h1>New Registration</h1>
+            <p>Create your library account</p>
+          </div>
+          <div class="steps">
+            <div class="step active">
+              <span>1</span><strong>Basic Details</strong>
+            </div>
+            <div class="step"><span>2</span><strong>Verify Email</strong></div>
+            <div class="step"><span>3</span><strong>Complete</strong></div>
+          </div>
+          <div class="form-layout">
+            <form class="registration-form" onsubmit={handleSubmit} novalidate>
+              <div class="field-grid">
+                <lightning-input
+                  name="firstName"
+                  data-field="firstName"
+                  label="First Name"
+                  required
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-input
+                  name="lastName"
+                  data-field="lastName"
+                  label="Last Name"
+                  required
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-input
+                  name="email"
+                  data-field="email"
+                  type="email"
+                  label="Email"
+                  required
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-input
+                  name="phone"
+                  data-field="phone"
+                  type="tel"
+                  label="Phone Number"
+                  pattern="[+0-9() .-]{7,25}"
+                  message-when-pattern-mismatch="Enter a valid phone number."
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-input
+                  name="dateOfBirth"
+                  data-field="dateOfBirth"
+                  type="date"
+                  label="Date of Birth"
+                  max={today}
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-combobox
+                  name="requestedPlanId"
+                  data-field="requestedPlanId"
+                  label="Membership Plan"
+                  options={planOptions}
+                  required
+                  onchange={handleChange}
+                ></lightning-combobox>
+                <lightning-textarea
+                  class="full"
+                  name="interests"
+                  data-field="interests"
+                  label="Book Interests"
+                  placeholder="e.g. Technology, Fiction, History"
+                  maxlength="255"
+                  message-when-too-long="Please keep your interests under 255 characters."
+                  onchange={handleChange}
+                ></lightning-textarea>
+                <lightning-textarea
+                  class="full"
+                  name="address"
+                  data-field="address"
+                  label="Address"
+                  onchange={handleChange}
+                ></lightning-textarea>
+              </div>
+              <template if:true={errorMessage}
+                ><div class="form-error" role="alert">
+                  {errorMessage}
+                </div></template
+              >
+              <button class="submit-button" type="submit" disabled={loading}>
+                Submit Registration
+              </button>
+              <template if:true={loading}
+                ><lightning-spinner
+                  alternative-text="Submitting application"
+                  size="small"
+                ></lightning-spinner
+              ></template>
+            </form>
+            <aside class="benefits">
+              <h2>Why join our library?</h2>
+              <div>
+                <span>▣</span>
+                <p>
+                  <strong>Access thousands of books</strong
+                  ><small>Browse a growing physical catalog</small>
+                </p>
+              </div>
+              <div>
+                <span>▤</span>
+                <p>
+                  <strong>Manage your loans online</strong
+                  ><small>Track due dates and renewals</small>
+                </p>
+              </div>
+              <div>
+                <span>♡</span>
+                <p>
+                  <strong>Reserve your favorite books</strong
+                  ><small>Join live reservation queues</small>
+                </p>
+              </div>
+              <div>
+                <span>✓</span>
+                <p>
+                  <strong>Get personalized access</strong
+                  ><small>Your activity stays tied to your account</small>
+                </p>
+              </div>
+            </aside>
+          </div>
+          <p class="login-prompt">
+            Already have an account? <a href="/library/login">Sign in</a>
+          </p>
+        </section>
+      </main>
+    </div>
+  </template>
 </template>

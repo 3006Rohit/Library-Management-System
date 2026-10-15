@@ -1,0 +1,81 @@
+<template>
+  <div class="catalog-page">
+    <aside class="portal-nav">
+      <div class="brand"><span>▥</span> Library</div>
+      <div class="rule"></div>
+      <a href="/library/">⌂ <span>Home</span></a>
+      <a class="active" href="/library/explore-books"
+        >▣ <span>Explore Books</span></a
+      >
+      <a href="/library/login">♙ <span>Login</span></a>
+    </aside>
+    <main>
+      <header>
+        <div class="top-search">⌕ Search books, authors, or categories...</div>
+        <a href="/library/login">Sign in</a>
+      </header>
+      <section class="content">
+        <div class="heading">
+          <div>
+            <h1>Explore Books</h1>
+            <p>Discover new books, authors, and categories</p>
+          </div>
+          <a class="login-button" href="/library/login">Member Login</a>
+        </div>
+        <div class="search-row">
+          <input
+            aria-label="Search catalog"
+            placeholder="Search by title, author, ISBN, category, or publisher..."
+            value={query}
+            oninput={handleQuery}
+            onkeydown={handleKeydown}
+          />
+          <button type="button" onclick={loadBooks}>Search</button>
+        </div>
+        <p class="result-count">{resultLabel}</p>
+        <template if:true={loading}
+          ><lightning-spinner
+            alternative-text="Loading books"
+            size="medium"
+          ></lightning-spinner
+        ></template>
+        <template if:true={errorMessage}
+          ><div class="message error" role="alert">
+            {errorMessage}
+          </div></template
+        >
+        <template if:true={hasBooks}>
+          <div class="book-grid">
+            <template for:each={books} for:item="book">
+              <article class="book-card" key={book.id}>
+                <div class="cover-wrap">
+                  <template if:true={book.coverUrl}
+                    ><img src={book.coverUrl} alt={book.title}
+                  /></template>
+                  <template if:false={book.coverUrl}
+                    ><div class="cover-placeholder">▥</div></template
+                  >
+                </div>
+                <div class="book-copy">
+                  <h2>{book.title}</h2>
+                  <p class="author">{book.authors}</p>
+                  <span class="category">{book.categories}</span>
+                  <p class="publisher">{book.publisher}{book.yearLabel}</p>
+                  <span class={book.availabilityClass}
+                    >● {book.availabilityLabel}</span
+                  >
+                  <a href="/library/login">Login to Borrow</a>
+                </div>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={loading}>
+          <template if:false={hasBooks}
+            ><div class="message">No books match your search.</div></template
+          >
+        </template>
+      </section>
+    </main>
+  </div>
+</template>

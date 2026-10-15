@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Membership_End_After_Start</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Membership_Start_Date__c)), NOT(ISBLANK(Membership_End_Date__c)), Membership_End_Date__c &lt; Membership_Start_Date__c)</errorConditionFormula>
+    <errorMessage
+  >Membership end date cannot be earlier than membership start date.</errorMessage>
+</ValidationRule>

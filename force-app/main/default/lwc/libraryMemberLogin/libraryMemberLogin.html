@@ -1,0 +1,35 @@
+<template
+  ><article class="login-card">
+    <h1>Member sign in</h1>
+    <p>Sign in with your library email and password.</p>
+    <template lwc:if={error}
+      ><div class="error" role="alert">{error}</div></template
+    ><lightning-input
+      name="email"
+      type="email"
+      label="Email"
+      value={email}
+      onchange={handleInput}
+      required
+    ></lightning-input
+    ><lightning-input
+      name="password"
+      type="password"
+      label="Password"
+      value={password}
+      onchange={handleInput}
+      required
+    ></lightning-input
+    ><lightning-button
+      variant="brand"
+      label="Sign In"
+      onclick={submit}
+      disabled={busy}
+    ></lightning-button>
+    <div class="links">
+      <button type="button" onclick={forgot}>Forgot Password</button
+      ><button type="button" onclick={activate}>Activate Account</button
+      ><button type="button" onclick={signup}>Create Account</button>
+    </div>
+  </article></template
+>

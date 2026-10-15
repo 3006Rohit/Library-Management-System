@@ -1,0 +1,12 @@
+{
+  "type": "sfdc_cms__route",
+  "title": "Explore Books",
+  "contentBody": {
+    "activeViewId": "publicExploreBooks",
+    "configurationTags": [],
+    "pageAccess": "Public",
+    "routeType": "custom-public-explore-books",
+    "urlPrefix": "explore-books"
+  },
+  "urlName": "public-explore-books"
+}

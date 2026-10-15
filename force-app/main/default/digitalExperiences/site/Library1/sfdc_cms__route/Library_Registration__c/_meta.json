@@ -1,0 +1,5 @@
+{
+  "apiName": "Library_Registration__c",
+  "type": "sfdc_cms__route",
+  "path": "routes"
+}

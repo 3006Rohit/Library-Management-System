@@ -1,4 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
-    <sharingCriteriaRules><fullName>Share_With_Librarians</fullName><accessLevel>Edit</accessLevel><label>Share With Librarians</label><sharedTo><group>Library_Librarians</group></sharedTo><criteriaItems><field>Name</field><operation>notEqual</operation><value></value></criteriaItems></sharingCriteriaRules>
+    <sharingGuestRules>
+        <fullName>Active_Books_For_Library_Guests</fullName>
+        <accessLevel>Read</accessLevel>
+        <label>Active Books for Library Guests</label>
+        <sharedTo><guestUser>Library</guestUser></sharedTo>
+        <criteriaItems><field>Status__c</field><operation
+      >equals</operation><value>Active</value></criteriaItems>
+        <includeHVUOwnedRecords>false</includeHVUOwnedRecords>
+    </sharingGuestRules>
 </SharingRules>

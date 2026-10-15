@@ -27,6 +27,16 @@ function Export-SheetRows($sheetName) {
     } finally { $book.Close($false); $excel.Quit() }
 }
 
+function Assert-Columns($rows,[string]$sheet,[string[]]$required) {
+    if (-not $rows -or @($rows).Count -eq 0) { throw "Sheet '$sheet' is empty." }
+    $available=@($rows[0].PSObject.Properties.Name)
+    foreach($column in $required) { if($available -notcontains $column) { throw "Sheet '$sheet' is missing required column '$column'." } }
+}
+function Assert-UniqueValues($rows,[string]$sheet,[string]$column) {
+    $duplicates=@($rows | Group-Object -Property $column | Where-Object {$_.Name -and $_.Count -gt 1})
+    if($duplicates.Count -gt 0) { throw "Sheet '$sheet' contains duplicate values in '$column': $($duplicates.Name -join ', ')." }
+}
+
 function Run-BulkImport([string]$objectName, [string]$filePath) {
     if (-not (Test-Path $filePath)) { return }
     $result = & sf data import bulk --target-org $org --sobject $objectName --file $filePath --line-ending CRLF --wait 10 --json
@@ -49,6 +59,16 @@ $books = Export-SheetRows 'Books'
 $authorLinks = Export-SheetRows 'Book_Author_Links'
 $categoryLinks = Export-SheetRows 'Book_Category_Links'
 $copies = Export-SheetRows 'Book_Copies'
+Assert-Columns $authors 'Authors' @('Author_Name')
+Assert-Columns $categories 'Categories' @('Category_Name','Active')
+Assert-Columns $books 'Books' @('Title','ISBN','Status','Total_Copies','Available_Copies')
+Assert-Columns $authorLinks 'Book_Author_Links' @('Book_ISBN','Author_Name')
+Assert-Columns $categoryLinks 'Book_Category_Links' @('Book_ISBN','Category_Name')
+Assert-Columns $copies 'Book_Copies' @('Book_ISBN','Barcode','Status')
+Assert-UniqueValues $books 'Books' 'ISBN'
+Assert-UniqueValues $copies 'Book_Copies' 'Barcode'
+if(@($books | Where-Object {[string]::IsNullOrWhiteSpace($_.Title) -or [string]::IsNullOrWhiteSpace($_.ISBN)}).Count){throw 'Books contains a row without Title or ISBN.'}
+if(@($copies | Where-Object {[string]::IsNullOrWhiteSpace($_.Book_ISBN) -or [string]::IsNullOrWhiteSpace($_.Barcode)}).Count){throw 'Book_Copies contains a row without Book_ISBN or Barcode.'}
 
 $existingAuthors = @(Invoke-SfQuery 'SELECT Id,Name FROM Author__c')
 $existingAuthorNames = @{}; foreach ($r in $existingAuthors) { $existingAuthorNames[$r.Name] = $r.Id }

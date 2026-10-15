@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Library Member Classification Admin</label>
+    <description
+  >Administrator-only governance access to Member Type classification. Do not assign to external members, guests, or general portal users.</description>
+    <fieldPermissions>
+        <field>Member__c.Member_Type__c</field>
+        <editable>true</editable>
+        <readable>true</readable>
+    </fieldPermissions>
+</PermissionSet>

@@ -1,0 +1,12 @@
+{
+  "type": "sfdc_cms__route",
+  "title": "Logged Out",
+  "contentBody": {
+    "activeViewId": "loggedOut",
+    "configurationTags": [],
+    "pageAccess": "Public",
+    "routeType": "custom-logged-out",
+    "urlPrefix": "logout"
+  },
+  "urlName": "logged-out"
+}

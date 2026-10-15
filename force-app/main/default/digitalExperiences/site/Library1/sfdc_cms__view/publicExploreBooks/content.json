@@ -1,0 +1,80 @@
+{
+  "type": "sfdc_cms__view",
+  "title": "Explore Books",
+  "contentBody": {
+    "component": {
+      "children": [
+        {
+          "children": [
+            {
+              "attributes": {
+                "backgroundImageConfig": "",
+                "backgroundImageOverlay": "rgba(0,0,0,0)",
+                "componentSpacerSize": "",
+                "dxpStyle": {},
+                "layoutDirectionDesktop": "row",
+                "layoutDirectionMobile": "column",
+                "layoutDirectionTablet": "column",
+                "maxContentWidth": "",
+                "sectionColumnGutterWidth": "",
+                "sectionConfig": "{\"UUID\":\"a7650ff4-93fa-4ce7-a764-f44a1bbf2401\",\"columns\":[{\"UUID\":\"73670492-3305-441e-8b42-8bd592ece521\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "",
+                "sectionVerticalAlign": "flex-start"
+              },
+              "children": [
+                {
+                  "children": [
+                    {
+                      "attributes": { "dxpStyle": {} },
+                      "definition": "c:libraryPublicCatalog",
+                      "id": "aa9ac60a-c80d-42c9-92f7-228153719507",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "73670492-3305-441e-8b42-8bd592ece521",
+                  "name": "col1",
+                  "title": "Column 1",
+                  "type": "region"
+                }
+              ],
+              "definition": "community_layout:section",
+              "id": "a7650ff4-93fa-4ce7-a764-f44a1bbf2401",
+              "type": "component"
+            }
+          ],
+          "id": "0f343789-ea8b-42aa-9f44-2fb2bc9b7cf4",
+          "name": "content",
+          "title": "Content",
+          "type": "region"
+        },
+        {
+          "children": [
+            {
+              "attributes": {
+                "customHeadTags": "",
+                "description": "Browse the public library catalog.",
+                "dxpStyle": {},
+                "pageTitle": "Explore Books",
+                "recordId": "{!recordId}"
+              },
+              "definition": "community_builder:seoAssistant",
+              "id": "30170e37-c989-4e22-9a2f-7b63be697740",
+              "type": "component"
+            }
+          ],
+          "id": "703284b1-577a-4ce0-b1b1-048e420bcf51",
+          "name": "sfdcHiddenRegion",
+          "title": "sfdcHiddenRegion",
+          "type": "region"
+        }
+      ],
+      "definition": "community_layout:sldsFlexibleLayout",
+      "id": "93f3a64e-6255-4e88-8f21-5b77ecdc4455",
+      "type": "component"
+    },
+    "dataProviders": [],
+    "themeLayoutType": "Inner",
+    "viewType": "custom-public-explore-books"
+  },
+  "urlName": "public-explore-books"
+}

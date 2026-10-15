@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Member_Type__c</fullName>
+    <description
+  >Durable governance classification controlling Data Cloud inclusion, analytics governance, test/demo separation, and future Agentforce grounding eligibility. This is not an operational membership or account status.</description>
+    <label>Member Type</label>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Production</fullName><default>false</default><label
+        >Production</label></value>
+            <value><fullName>Test</fullName><default>false</default><label
+        >Test</label></value>
+            <value><fullName>Demo</fullName><default>false</default><label
+        >Demo</label></value>
+            <value><fullName>UAT</fullName><default>false</default><label
+        >UAT</label></value>
+            <value><fullName>Legacy</fullName><default>false</default><label
+        >Legacy</label></value>
+            <value><fullName>Staff</fullName><default>false</default><label
+        >Staff</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

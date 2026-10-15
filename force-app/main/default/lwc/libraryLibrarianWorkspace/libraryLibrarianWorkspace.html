@@ -1,27 +1,2368 @@
 <template>
-    <lightning-card title="Library Librarian Workspace" icon-name="standard:education">
-        <div class="workspace-shell">
-        <header class="workspace-header">
-            <div>
-                <p class="workspace-eyebrow">INTERNAL OPERATIONS</p>
-                <h1>Librarian workspace</h1>
-                <p class="workspace-subtitle">Keep the collection moving, members supported, and every loan accounted for.</p>
-            </div>
-            <div class="workspace-status"><span class="status-dot"></span>Live library operations</div>
-        </header>
-        <nav class="workspace-nav" aria-label="Librarian sections"><template for:each={navItems} for:item="item"><button key={item.value} class={item.className} data-section={item.value} aria-pressed={item.active} onclick={selectSection}>{item.label}</button></template></nav>
-        <template if:true={loading}><lightning-spinner alternative-text="Working"></lightning-spinner></template><template if:true={error}><div class="slds-notify slds-notify_alert slds-theme_error slds-m-around_medium">{error}</div></template>
-        <div class="section-heading"><div><p class="section-kicker">{section}</p><h2>{sectionHeading}</h2><p>{sectionDescription}</p></div><template if:true={isDashboard}><div class="quick-actions"><button class="quick-action" data-section="Books" onclick={openDashboardSection}>Add or manage books</button><button class="quick-action quick-action_primary" data-section="Borrowing" onclick={openDashboardSection}>Open borrowing desk</button></div></template></div>
-        <template if:true={isDashboard}><div class="slds-grid slds-wrap slds-gutters slds-p-around_medium"><template for:each={dashboardCards} for:item="card"><div key={card.label} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"><button class="metric metric-button" data-section={card.section} onclick={openDashboardSection}><span>{card.label}</span><strong>{card.value}</strong></button></div></template></div><div class="recent-loans-panel"><div class="recent-loans-heading"><div><p class="section-kicker">ACTIVITY</p><h2>Recent loans</h2><p>Keep track of the latest circulation activity.</p></div><button class="quick-action" data-section="Borrowing" onclick={openDashboardSection}>Open borrowing desk</button></div><template if:true={hasRecentLoans}><div class="loan-list"><template for:each={decoratedRecentLoans} for:item="loan"><article key={loan.Id} class="loan-card"><div class="loan-icon">▣</div><div class="loan-main"><div class="loan-title-row"><strong>{loan.bookTitle}</strong><span class={loan.statusClass}>{loan.Status__c}</span></div><p>{loan.memberName}</p><small>{loan.Name} · {loan.Book_Copy__r.Name} · {loan.dueLabel}</small></div><div class="loan-actions"><button class="loan-action return-action" data-id={loan.Id} onclick={doReturn}>Return</button><button class="loan-action" data-id={loan.Id} onclick={doRenew}>Renew</button></div></article></template></div></template><template if:false={hasRecentLoans}><div class="empty-state"><span class="empty-icon">✓</span><div><strong>No recent loans</strong><p>New circulation activity will appear here.</p></div></div></template></div></template>
-        <template if:true={isBooks}><div class="books-section"><div class="books-toolbar"><div class="books-filter-grid"><lightning-input name="bookSearch" label="Search books" placeholder="Title, ISBN, author, or publisher" value={bookSearch} onchange={handleInput}></lightning-input><lightning-combobox name="bookStatus" label="Status" value={bookStatus} options={bookStatusOptions} onchange={handleInput}></lightning-combobox><lightning-combobox name="bookCategory" label="Category" value={bookCategory} options={categoryOptions} onchange={handleInput}></lightning-combobox></div><div class="books-actions"><lightning-button label="Search" variant="neutral" onclick={searchBooksNow}></lightning-button><lightning-button label="Add Book" variant="brand" onclick={openAddBook}></lightning-button></div></div><div class="books-table-card"><lightning-datatable key-field="Id" data={books} columns={bookColumns} hide-checkbox-column onrowaction={bookAction}></lightning-datatable></div><div class="books-pagination"><lightning-button label="Previous" onclick={previousBooks} disabled={isFirstBookPage}></lightning-button><span>Page <strong>{bookPage}</strong></span><lightning-button label="Next" onclick={nextBooks}></lightning-button></div></div></template>
-        <template if:true={isMembers}><div class="slds-p-around_medium"><div class="slds-grid slds-wrap slds-gutters"><div class="slds-col slds-size_1-of-1 slds-large-size_2-of-3"><lightning-input name="memberSearch" label="Member ID, name, email, or phone" value={memberSearch} onchange={handleInput}></lightning-input></div><div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3"><lightning-combobox name="memberStatus" label="Status" value={memberStatus} options={memberStatusOptions} onchange={handleInput}></lightning-combobox></div></div><lightning-button class="slds-m-top_small" label="Search" onclick={loadMembers}></lightning-button><lightning-datatable class="slds-m-top_medium" key-field="Id" data={members} columns={memberColumns} hide-checkbox-column onrowaction={viewMember}></lightning-datatable><template if:true={memberDetail}><article class="slds-box slds-m-top_medium"><h2 class="slds-text-heading_medium">{memberDetail.member.Name} — {memberDetail.member.First_Name__c} {memberDetail.member.Last_Name__c}</h2><p>{memberDetail.member.Email__c} | {memberDetail.member.Phone__c} | {memberDetail.member.Status__c} | {memberDetail.member.Membership_Plan__r.Name}</p><p>{memberDetail.member.Membership_Start_Date__c} to {memberDetail.member.Membership_End_Date__c} | Outstanding balance: {memberDetail.outstandingBalance}</p><h3 class="slds-text-heading_small slds-m-top_medium">Loans</h3><template for:each={memberDetail.loans} for:item="loan"><div key={loan.Id} class="row">{loan.Name} — {loan.Book_Copy__r.Book__r.Name} — {loan.Book_Copy__r.Name} — Due {loan.Due_Date__c} — {loan.Status__c}<lightning-button-group class="slds-float_right"><lightning-button label="Return" data-id={loan.Id} onclick={doReturn}></lightning-button><lightning-button label="Renew" data-id={loan.Id} onclick={doRenew}></lightning-button></lightning-button-group></div></template><h3 class="slds-text-heading_small slds-m-top_medium">Borrowing history</h3><template for:each={memberDetail.loans} for:item="loan"><div key={loan.Id} class="row">{loan.Book_Copy__r.Book__r.Name} — Borrowed {loan.Borrow_Date__c} — Returned {loan.Return_Date__c} — {loan.Status__c}</div></template><h3 class="slds-text-heading_small slds-m-top_medium">Reservations</h3><template for:each={memberDetail.reservations} for:item="reservation"><div key={reservation.Id} class="row">{reservation.Book__r.Name} — Queue {reservation.Queue_Position__c} — {reservation.Status__c} — {reservation.Ready_Date__c}</div></template><h3 class="slds-text-heading_small slds-m-top_medium">Fines</h3><template for:each={memberDetail.fines} for:item="fine"><div key={fine.Id} class="row">{fine.Name} — {fine.Fine_Type__c} — Amount {fine.Amount__c} — Balance {fine.Balance__c} — {fine.Status__c}</div></template></article></template></div></template>
-        <template if:true={isBorrowing}><div class="borrowing-section"><div class="borrowing-intro"><div><p class="section-kicker">CIRCULATION DESK</p><h2>Borrowing & checkout</h2><p>Choose a member, find an available copy, and complete a controlled checkout.</p></div><span class="desk-status"><i></i>Ready for checkout</span></div><div class="checkout-card"><div class="checkout-card-heading"><div class="step-number">1</div><div><h3>Select member and book</h3><p>Choose who is borrowing and which title they are receiving.</p></div></div><div class="borrowing-select-grid"><lightning-combobox name="selectedMemberId" label="Member" placeholder="Select a member" value={selectedMemberId} options={memberOptions} onchange={handleBorrowingInput}></lightning-combobox><lightning-combobox name="selectedBookId" label="Book" placeholder="Select a book" value={selectedBookId} options={bookOptions} onchange={handleBorrowingInput}></lightning-combobox></div><div class="copy-search-row"><lightning-input name="copySearch" label="Search library copies" placeholder="Search title, barcode, or copy name" value={copySearch} onchange={handleInput}></lightning-input><lightning-button class="copy-search-button" label="Search copies" variant="neutral" onclick={searchCopiesNow}></lightning-button></div><div class="copy-table"><lightning-datatable key-field="Id" data={copies} columns={borrowingCopyColumns} hide-checkbox-column onrowaction={chooseCopy}></lightning-datatable></div><div class="copy-pagination"><lightning-button label="Previous" onclick={previousCopies} disabled={isFirstCopyPage}></lightning-button><span>Page <strong>{copyPage}</strong></span><lightning-button label="Next" onclick={nextCopies} disabled={copyHasNext}></lightning-button></div></div><div class="checkout-action-card"><div class="checkout-card-heading"><div class="step-number">2</div><div><h3>Complete checkout</h3><p>Select a member and an available copy before checking out.</p></div></div><div class="selection-summary"><span>Selected member <strong>{selectedMemberId}</strong></span><span>Selected copy <strong>{selectedCopyId}</strong></span></div><lightning-button label="Checkout selected copy" variant="brand" onclick={doCheckout}></lightning-button></div><div class="borrowing-history-card"><div class="borrowing-card-heading"><div><p class="section-kicker">RECENT ACTIVITY</p><h3>Recent loans</h3><p>Return or renew the latest circulation records.</p></div><button class="quick-action" data-section="Dashboard" onclick={openDashboardSection}>View dashboard</button></div><template if:true={hasRecentLoans}><div class="loan-list"><template for:each={decoratedRecentLoans} for:item="loan"><article key={loan.Id} class="loan-card"><div class="loan-icon">▣</div><div class="loan-main"><div class="loan-title-row"><strong>{loan.bookTitle}</strong><span class={loan.statusClass}>{loan.Status__c}</span></div><p>{loan.memberName}</p><small>{loan.Name} · {loan.Book_Copy__r.Name} · {loan.dueLabel}</small></div><div class="loan-actions"><button class="loan-action return-action" data-id={loan.Id} onclick={doReturn}>Return</button><button class="loan-action" data-id={loan.Id} onclick={doRenew}>Renew</button></div></article></template></div></template><template if:false={hasRecentLoans}><div class="empty-state"><span class="empty-icon">✓</span><div><strong>No recent loans</strong><p>New circulation activity will appear here.</p></div></div></template></div></div></template>
-        <template if:true={isRegistrations}><div class="slds-p-around_medium"><lightning-combobox name="registrationStatus" label="Status" value={registrationStatus} options={registrationStatusOptions} onchange={handleInput}></lightning-combobox><lightning-input name="rejectReason" label="Reject reason" value={rejectReason} onchange={handleInput}></lightning-input><lightning-button class="slds-m-top_small" label="Refresh" onclick={loadRegistrations}></lightning-button><lightning-datatable class="slds-m-top_medium" key-field="Id" data={registrations} columns={registrationColumns} hide-checkbox-column onrowaction={registrationAction}></lightning-datatable></div></template>
-        <template if:true={isReservations}><div class="slds-p-around_medium"><div class="slds-grid slds-wrap slds-gutters"><div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3"><lightning-combobox name="reservationMemberId" label="Member" value={reservationMemberId} options={memberOptions} onchange={handleInput}></lightning-combobox></div><div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3"><lightning-combobox name="reservationBookId" label="Book" value={reservationBookId} options={bookOptions} onchange={handleInput}></lightning-combobox></div></div><lightning-button class="slds-m-top_small" label="Create Reservation" variant="brand" onclick={createReservationNow}></lightning-button><lightning-combobox class="slds-m-top_small" name="reservationStatus" label="Status filter" value={reservationStatus} options={reservationStatusOptions} onchange={handleInput}></lightning-combobox><lightning-button class="slds-m-top_small" label="Refresh" onclick={loadReservations}></lightning-button><lightning-button class="slds-m-top_small slds-m-left_small" label="Process expired holds" onclick={processExpired}></lightning-button><lightning-datatable class="slds-m-top_medium" key-field="Id" data={reservations} columns={reservationColumns} hide-checkbox-column onrowaction={reservationAction}></lightning-datatable></div></template>
-        <template if:true={isFines}><div class="slds-p-around_medium"><lightning-combobox name="fineStatus" label="Status" value={fineStatus} options={fineStatusOptions} onchange={handleInput}></lightning-combobox><lightning-button class="slds-m-top_small" label="Refresh" onclick={loadFines}></lightning-button><lightning-datatable class="slds-m-top_medium" key-field="Id" data={fines} columns={fineColumns} hide-checkbox-column onrowaction={fineAction}></lightning-datatable><div class="slds-box slds-m-top_medium"><lightning-input name="paymentAmount" type="number" label="Payment amount" value={paymentAmount} onchange={handleInput}></lightning-input><lightning-button class="slds-m-top_small" label="Record Payment" onclick={payFine}></lightning-button><lightning-input name="waiverReason" label="Waiver reason" value={waiverReason} onchange={handleInput}></lightning-input><lightning-button class="slds-m-top_small" label="Waive Selected Fine" variant="destructive" onclick={waiveSelectedFine}></lightning-button></div></div></template>
-        <template if:true={showBookModal}><section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open"><div class="slds-modal__container"><header class="slds-modal__header"><h2 class="slds-text-heading_medium">{editingBook ? 'Edit Book' : 'Add Book'}</h2></header><div class="slds-modal__content slds-p-around_medium"><lightning-input name="book.title" label="Title" value={bookForm.title} onchange={handleInput} required></lightning-input><lightning-input name="book.isbn" label="ISBN" value={bookForm.isbn} onchange={handleInput} required></lightning-input><lightning-input name="book.publisher" label="Publisher" value={bookForm.publisher} onchange={handleInput}></lightning-input><lightning-input name="book.publicationYear" type="number" label="Publication Year" value={bookForm.publicationYear} onchange={handleInput}></lightning-input><lightning-input name="book.edition" label="Edition" value={bookForm.edition} onchange={handleInput}></lightning-input><lightning-input name="book.language" label="Language" value={bookForm.language} onchange={handleInput}></lightning-input><lightning-textarea name="book.description" label="Description" value={bookForm.description} onchange={handleInput}></lightning-textarea><lightning-input name="book.coverUrl" label="Cover Image URL" value={bookForm.coverUrl} onchange={handleInput}></lightning-input><lightning-dual-listbox name="authors" label="Authors" source-label="Available" selected-label="Selected" options={authorOptions} value={selectedAuthorIds} onchange={handleBookSelect}></lightning-dual-listbox><lightning-dual-listbox name="categories" label="Categories" source-label="Available" selected-label="Selected" options={categoryOptions} value={selectedCategoryIds} onchange={handleCategorySelect}></lightning-dual-listbox></div><footer class="slds-modal__footer"><lightning-button label="Cancel" onclick={closeModals}></lightning-button><lightning-button class="slds-m-left_small" variant="brand" label="Save" onclick={saveBook}></lightning-button></footer></div></section><div class="slds-backdrop slds-backdrop_open"></div></template>
-        <template if:true={showBookDetail}><section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open book-detail-modal"><div class="slds-modal__container"><header class="slds-modal__header book-detail-header"><p class="section-kicker">BOOK DETAILS</p><h2>{bookDetail.Name}</h2><p class="book-detail-subtitle">Library title and physical copy management</p></header><div class="slds-modal__content book-detail-content"><div class="book-meta-grid"><div><span>ISBN</span><strong>{bookDetail.ISBN__c}</strong></div><div><span>Publisher</span><strong>{bookDetail.Publisher__c}</strong></div><div><span>Language</span><strong>{bookDetail.Language__c}</strong></div></div><div class="book-info-block"><p><b>Authors</b><span><template for:each={bookDetail.Book_Authors__r} for:item="a">{a.Author__r.Name} </template></span></p><p><b>Categories</b><span><template for:each={bookDetail.Book_Category_Links__r} for:item="c">{c.Book_Category__r.Name} </template></span></p><p class="book-description">{bookDetail.Description__c}</p></div><div class="copies-heading"><div><p class="section-kicker">INVENTORY</p><h3>Physical copies</h3><p>Manage availability, shelf location, and copy condition.</p></div><lightning-button label="Add Copy" variant="brand" onclick={openAddCopy}></lightning-button></div><div class="copies-table"><lightning-datatable key-field="Id" data={bookDetail.Book_Copies__r} columns={copyColumns} hide-checkbox-column onrowaction={copyAction}></lightning-datatable></div></div><footer class="slds-modal__footer book-detail-footer"><lightning-button label="Edit Book" onclick={openEditBook}></lightning-button><lightning-button class="slds-m-left_small" label="Close" onclick={closeModals}></lightning-button></footer></div></section><div class="slds-backdrop slds-backdrop_open"></div></template>
-        <template if:true={showCopyModal}><section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open"><div class="slds-modal__container"><header class="slds-modal__header"><h2 class="slds-text-heading_medium">Manage Copy</h2></header><div class="slds-modal__content slds-p-around_medium"><template if:false={selectedCopyId}><lightning-input name="copy.barcode" label="Barcode" value={copyForm.barcode} onchange={handleInput} required></lightning-input></template><lightning-input name="copy.shelf" label="Shelf Location" value={copyForm.shelf} onchange={handleInput}></lightning-input><lightning-input name="copy.acquisitionDate" type="date" label="Acquisition Date" value={copyForm.acquisitionDate} onchange={handleInput}></lightning-input><lightning-input name="copy.condition" label="Condition" value={copyForm.condition} onchange={handleInput}></lightning-input><lightning-input name="copy.price" type="number" label="Price" value={copyForm.price} onchange={handleInput}></lightning-input><lightning-combobox name="copy.status" label="Status" value={copyForm.status} options={copyStatusOptions} onchange={handleInput}></lightning-combobox></div><footer class="slds-modal__footer"><lightning-button label="Cancel" onclick={closeModals}></lightning-button><template if:true={selectedCopyId}><lightning-button class="slds-m-left_small" variant="brand" label="Save" onclick={saveExistingCopy}></lightning-button></template><template if:false={selectedCopyId}><lightning-button class="slds-m-left_small" variant="brand" label="Save" onclick={saveCopy}></lightning-button></template></footer></div></section><div class="slds-backdrop slds-backdrop_open"></div></template>
+  <div class={shellClass}>
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark"
+          ><lightning-icon
+            icon-name="utility:knowledge_base"
+            size="x-small"
+          ></lightning-icon></span
+        ><span>Library Management</span>
+      </div>
+      <nav aria-label="Librarian navigation">
+        <template for:each={navItems} for:item="item">
+          <button
+            key={item.value}
+            class={item.className}
+            data-section={item.value}
+            onclick={selectSection}
+            aria-current={item.active}
+          >
+            <lightning-icon
+              icon-name={item.icon}
+              size="xx-small"
+            ></lightning-icon
+            ><span>{item.label}</span>
+          </button>
+        </template>
+      </nav>
+    </aside>
+
+    <div class="main-frame">
+      <header class="topbar">
+        <button
+          class="menu-button"
+          onclick={toggleSidebar}
+          aria-label="Toggle navigation"
+        >
+          <lightning-icon
+            icon-name="utility:rows"
+            size="small"
+          ></lightning-icon>
+        </button>
+        <label class="global-search"
+          ><lightning-icon
+            icon-name="utility:search"
+            size="xx-small"
+          ></lightning-icon
+          ><input
+            type="search"
+            placeholder="Search..."
+            value={globalSearch}
+            oninput={handleGlobalSearch}
+        /></label>
+        <div class="top-actions">
+          <button
+            class="icon-button"
+            title="Notifications"
+            aria-label="Notifications"
+            aria-expanded={notificationsOpen}
+            onclick={toggleNotifications}
+          >
+            <lightning-icon
+              icon-name="utility:notification"
+              size="x-small"
+            ></lightning-icon
+            ><template if:true={hasNotifications}
+              ><span class="notification-dot"></span
+            ></template>
+          </button>
+          <template if:true={notificationsOpen}>
+            <section
+              class="librarian-notification-panel"
+              role="dialog"
+              aria-label="Library notifications"
+            >
+              <div class="notification-panel-header">
+                <strong>Notifications</strong>
+                <span>{librarianNotifications.length} alerts</span>
+              </div>
+              <div class="notification-list">
+                <template for:each={librarianNotifications} for:item="notice">
+                  <button
+                    key={notice.key}
+                    class="librarian-notification"
+                    data-section={notice.section}
+                    onclick={openNotification}
+                  >
+                    <span class={notice.iconClass}>
+                      <lightning-icon
+                        icon-name={notice.icon}
+                        size="xx-small"
+                      ></lightning-icon>
+                    </span>
+                    <span class="notification-copy">
+                      <strong>{notice.title}</strong>
+                      <span>{notice.message}</span>
+                    </span>
+                    <lightning-icon
+                      icon-name="utility:chevronright"
+                      size="xx-small"
+                    ></lightning-icon>
+                  </button>
+                </template>
+                <template if:false={hasNotifications}>
+                  <p class="notification-empty">You’re all caught up.</p>
+                </template>
+              </div>
+            </section>
+          </template>
+          <div class="avatar">{userInitials}</div>
+          <div class="profile">
+            <strong>{userName}</strong><span>Librarian</span>
+          </div>
+          <lightning-icon
+            icon-name="utility:down"
+            size="xx-small"
+          ></lightning-icon>
         </div>
-    </lightning-card>
+      </header>
+      <main class="content">
+        <template if:true={loading}
+          ><div class="loading">
+            <lightning-spinner
+              alternative-text="Loading library data"
+              size="small"
+            ></lightning-spinner></div
+        ></template>
+        <template if:true={error}
+          ><div class="error-banner" role="alert">
+            <lightning-icon
+              icon-name="utility:error"
+              size="x-small"
+            ></lightning-icon
+            >{error}
+          </div></template
+        >
+        <template if:false={isLibrarianAssistant}>
+          <div class="page-heading">
+            <div>
+              <h1>{pageTitle}</h1>
+              <p>{pageSubtitle}</p>
+            </div>
+          </div>
+        </template>
+
+        <template if:true={isLibrarianAssistant}>
+          <section class="lib-assistant-page" aria-label="Librarian Assistant">
+            <section class="lib-assistant-hero">
+              <div class="lib-assistant-hero-art" aria-hidden="true">🤖</div>
+              <div>
+                <h1>Librarian Assistant</h1>
+                <p>Your AI assistant for library management</p>
+                <span
+                  >Contextual AI over governed Salesforce operational data and
+                  Data Cloud insights for safe, read-only decisions.</span
+                >
+              </div>
+              <div class="lib-assistant-hero-books" aria-hidden="true">
+                ▥ ✦ ▥
+              </div>
+            </section>
+            <div class="lib-assistant-workspace">
+              <section class="lib-assistant-help-card">
+                <h2>What can I help you with?</h2>
+                <p>Ask questions or try one of the examples below.</p>
+                <div class="lib-assistant-topic-grid">
+                  <button
+                    class="lib-assistant-topic blue-topic"
+                    data-question="Find available copies of this book"
+                    onclick={useAssistantPrompt}
+                  >
+                    <span>▣</span><strong>Manage Books</strong
+                    ><small
+                      >Find books, copies, availability, and demand.</small
+                    >
+                  </button>
+                  <button
+                    class="lib-assistant-topic green-topic"
+                    data-question="Give me this member's borrowing history"
+                    onclick={useAssistantPrompt}
+                  >
+                    <span>♟</span><strong>Member Management</strong
+                    ><small
+                      >Review authorized member summaries and history.</small
+                    >
+                  </button>
+                  <button
+                    class="lib-assistant-topic purple-topic"
+                    data-question="Show overdue loans"
+                    onclick={useAssistantPrompt}
+                  >
+                    <span>↔</span><strong>Circulation</strong
+                    ><small
+                      >Review overdue loans and today's circulation
+                      activity.</small
+                    >
+                  </button>
+                  <button
+                    class="lib-assistant-topic red-topic"
+                    data-question="Show pending reservations"
+                    onclick={useAssistantPrompt}
+                  >
+                    <span>▦</span><strong>Reservations</strong
+                    ><small
+                      >View pending reservation requests and queues.</small
+                    >
+                  </button>
+                  <button
+                    class="lib-assistant-topic gold-topic"
+                    data-question="Show unpaid fines"
+                    onclick={useAssistantPrompt}
+                  >
+                    <span>₹</span><strong>Fines &amp; Payments</strong
+                    ><small
+                      >Check fines, receive payments, and generate
+                      reports.</small
+                    >
+                  </button>
+                  <button
+                    class="lib-assistant-topic cyan-topic"
+                    data-question="Which books have high demand?"
+                    onclick={useAssistantPrompt}
+                  >
+                    <span>▥</span><strong>Reports &amp; Insights</strong
+                    ><small
+                      >Use Data Cloud metrics for demand and activity
+                      insights.</small
+                    >
+                  </button>
+                </div>
+                <div class="lib-assistant-examples">
+                  <strong>💡 Example Questions</strong>
+                  <div>
+                    <template for:each={assistantQuestions} for:item="question"
+                      ><button
+                        key={question}
+                        data-question={question}
+                        onclick={useAssistantPrompt}
+                      >
+                        {question}
+                      </button></template
+                    >
+                  </div>
+                </div>
+              </section>
+              <section class="lib-assistant-chat-card">
+                <header class="lib-assistant-chat-header">
+                  <span class="lib-assistant-bot-avatar">✦</span>
+                  <div>
+                    <strong>Librarian Assistant</strong
+                    ><small>● Inline Agentforce</small>
+                  </div>
+                  <button
+                    type="button"
+                    onclick={clearAssistantChat}
+                    disabled={assistantBusy}
+                  >
+                    ▱ &nbsp; Clear Chat
+                  </button>
+                </header>
+                <div class="lib-assistant-messages">
+                  <template for:each={assistantMessages} for:item="message"
+                    ><div key={message.id} class={message.className}>
+                      {message.text}
+                    </div></template
+                  >
+                </div>
+                <form
+                  class="lib-assistant-composer"
+                  onsubmit={sendAssistantMessage}
+                >
+                  <span aria-hidden="true">⌕</span
+                  ><input
+                    value={assistantInput}
+                    oninput={handleAssistantInput}
+                    placeholder="Type your question here..."
+                    aria-label="Ask the librarian assistant"
+                    disabled={assistantBusy}
+                  /><button
+                    type="submit"
+                    aria-label="Send question"
+                    disabled={assistantBusy}
+                  >
+                    {assistantSendLabel}
+                  </button>
+                </form>
+              </section>
+            </div>
+          </section>
+        </template>
+
+        <template if:true={isDashboard}>
+          <section
+            class="panel data-cloud-panel"
+            aria-label="Data Cloud analytics"
+          >
+            <div class="analytics-panel-header">
+              <div class="analytics-title-lockup">
+                <span class="analytics-panel-icon" aria-hidden="true">✦</span>
+                <div>
+                  <h2>Data Cloud Analytics</h2>
+                  <p>{analyticsCadence}</p>
+                </div>
+              </div>
+              <template if:true={analyticsAvailable}>
+                <span class="analytics-status connected"
+                  ><span aria-hidden="true"></span>Connected</span
+                >
+              </template>
+              <template if:false={analyticsAvailable}>
+                <span class="analytics-status unavailable"
+                  ><span aria-hidden="true"></span>Unavailable</span
+                >
+              </template>
+            </div>
+            <template if:true={analyticsAvailable}>
+              <div class="analytics-summary-grid">
+                <template for:each={copyAnalytics} for:item="metric">
+                  <article class={metric.cardClass} key={metric.label}>
+                    <span class="analytics-stat-icon" aria-hidden="true"
+                      >{metric.icon}</span
+                    >
+                    <span class="analytics-stat-copy"
+                      ><small>{metric.label}</small
+                      ><strong>{metric.value}</strong></span
+                    >
+                  </article>
+                </template>
+                <template for:each={loanAnalytics} for:item="metric">
+                  <article class={metric.cardClass} key={metric.label}>
+                    <span class="analytics-stat-icon" aria-hidden="true"
+                      >{metric.icon}</span
+                    >
+                    <span class="analytics-stat-copy"
+                      ><small>{metric.label}</small
+                      ><strong>{metric.value}</strong></span
+                    >
+                  </article>
+                </template>
+                <template for:each={reservationAnalytics} for:item="metric">
+                  <article class={metric.cardClass} key={metric.label}>
+                    <span class="analytics-stat-icon" aria-hidden="true"
+                      >{metric.icon}</span
+                    >
+                    <span class="analytics-stat-copy"
+                      ><small>{metric.label}</small
+                      ><strong>{metric.value}</strong></span
+                    >
+                  </article>
+                </template>
+                <template for:each={fineAnalytics} for:item="metric">
+                  <article class={metric.cardClass} key={metric.label}>
+                    <span class="analytics-stat-icon" aria-hidden="true"
+                      >{metric.icon}</span
+                    >
+                    <span class="analytics-stat-copy"
+                      ><small>{metric.label}</small
+                      ><strong>{metric.value}</strong></span
+                    >
+                  </article>
+                </template>
+              </div>
+              <div class="analytics-lists">
+                <div>
+                  <h3>Top Borrowed Books</h3>
+                  <template
+                    for:each={analytics.topBorrowedBooks}
+                    for:item="book"
+                  >
+                    <div class="analytics-row" key={book.bookId}>
+                      <span>{book.bookName}</span
+                      ><strong>{book.borrowCount}</strong>
+                    </div>
+                  </template>
+                </div>
+                <div>
+                  <h3>Reservation Demand</h3>
+                  <template
+                    for:each={analytics.reservationDemand}
+                    for:item="book"
+                  >
+                    <div class="analytics-row" key={book.bookId}>
+                      <span>{book.bookName}</span
+                      ><strong>{book.totalReservations}</strong>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+            <template if:false={analyticsAvailable}>
+              <div class="empty">{analyticsMessage}</div>
+            </template>
+          </section>
+        </template>
+
+        <template if:true={isBooks}>
+          <div class="toolbar top-actions-row">
+            <div class="toolbar-buttons">
+              <label class="file-button"
+                >Import<input
+                  type="file"
+                  accept=".csv"
+                  onchange={handleImport} /></label
+              ><button class="button secondary" onclick={exportBooks}>
+                Export</button
+              ><button class="button primary" onclick={openAddBook}>
+                ＋ Add Book
+              </button>
+            </div>
+          </div>
+          <div class="filter-row">
+            <lightning-input
+              variant="label-hidden"
+              name="bookSearch"
+              type="search"
+              placeholder="Search by title, author, ISBN..."
+              value={bookSearch}
+              onchange={handleInput}
+            ></lightning-input
+            ><lightning-combobox
+              variant="label-hidden"
+              name="bookCategory"
+              value={bookCategory}
+              options={categoryFilterOptions}
+              placeholder="Category"
+              onchange={handleInput}
+            ></lightning-combobox
+            ><lightning-combobox
+              variant="label-hidden"
+              name="bookStatus"
+              value={bookStatus}
+              options={allStatusOptions}
+              placeholder="Status"
+              onchange={handleInput}
+            ></lightning-combobox
+            ><button class="button secondary" onclick={searchBooksNow}>
+              Search
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>ISBN</th>
+                    <th>Total Copies</th>
+                    <th>Available</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={books} for:item="book"
+                    ><tr key={book.Id}>
+                      <td>
+                        <button
+                          class="text-link"
+                          data-id={book.Id}
+                          onclick={viewBook}
+                        >
+                          {book.Name}
+                        </button>
+                      </td>
+                      <td>{book.authorNames}</td>
+                      <td>{book.categoryNames}</td>
+                      <td>{book.ISBN__c}</td>
+                      <td>{book.Total_Copies__c}</td>
+                      <td>{book.Available_Copies__c}</td>
+                      <td>
+                        <span class={book.statusClass}>{book.Status__c}</span>
+                      </td>
+                      <td>
+                        <button
+                          class="action-link"
+                          data-id={book.Id}
+                          onclick={openEditBook}
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    </tr></template
+                  >
+                </tbody>
+              </table>
+            </div>
+            <template if:false={hasBooks}
+              ><div class="empty">No books found</div></template
+            >
+            <div class="pagination">
+              <span>Showing page {bookPage}</span>
+              <div>
+                <button
+                  class="page-button"
+                  onclick={previousBooks}
+                  disabled={isFirstBookPage}
+                >
+                  ‹</button
+                ><span class="page-current">{bookPage}</span
+                ><button class="page-button" onclick={nextBooks}>›</button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template if:true={isBookCopies}>
+          <div class="toolbar top-actions-row">
+            <button class="button primary" onclick={openAddCopy}>
+              ＋ Add Copy
+            </button>
+          </div>
+          <div class="filter-row copies-filter">
+            <lightning-input
+              variant="label-hidden"
+              name="copySearch"
+              type="search"
+              placeholder="Search by book title, barcode..."
+              value={copySearch}
+              onchange={handleInput}
+            ></lightning-input
+            ><lightning-combobox
+              variant="label-hidden"
+              name="copyStatus"
+              value={copyStatus}
+              options={copyStatusOptions}
+              placeholder="Status"
+              onchange={handleInput}
+            ></lightning-combobox
+            ><lightning-combobox
+              variant="label-hidden"
+              name="copyLocation"
+              value={copyLocation}
+              options={copyLocationOptions}
+              placeholder="Location"
+              onchange={filterCopyLocation}
+            ></lightning-combobox
+            ><button class="button secondary" onclick={searchCopiesNow}>
+              Search
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Copy ID</th>
+                    <th>Book Title</th>
+                    <th>Barcode</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Condition</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={copies} for:item="copy"
+                    ><tr key={copy.Id}>
+                      <td><span class="text-link">{copy.Name}</span></td>
+                      <td>{copy.bookName}</td>
+                      <td>{copy.Barcode__c}</td>
+                      <td>{copy.Shelf_Location__c}</td>
+                      <td>
+                        <span class={copy.statusClass}>{copy.Status__c}</span>
+                      </td>
+                      <td>{copy.Condition__c}</td>
+                      <td>
+                        <button
+                          class="action-link"
+                          data-id={copy.Id}
+                          onclick={openEditCopy}
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    </tr></template
+                  >
+                </tbody>
+              </table>
+            </div>
+            <template if:false={hasCopies}
+              ><div class="empty">No book copies found</div></template
+            >
+            <div class="pagination">
+              <span>Showing page {copyPage}</span>
+              <div>
+                <button
+                  class="page-button"
+                  onclick={previousCopies}
+                  disabled={isFirstCopyPage}
+                >
+                  ‹</button
+                ><span class="page-current">{copyPage}</span
+                ><button class="page-button" onclick={nextCopies}>›</button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template if:true={showMemberList}>
+          <div class="toolbar members-toolbar">
+            <div class="filter-row member-filters">
+              <lightning-input
+                variant="label-hidden"
+                name="memberSearch"
+                type="search"
+                placeholder="Search by name, email, member ID..."
+                value={memberSearch}
+                onchange={handleInput}
+              ></lightning-input
+              ><lightning-combobox
+                variant="label-hidden"
+                name="memberStatus"
+                value={memberStatus}
+                options={memberStatusOptions}
+                placeholder="Status"
+                onchange={handleInput}
+              ></lightning-combobox
+              ><button class="button secondary" onclick={searchMembersNow}>
+                Search
+              </button>
+            </div>
+            <button class="button primary" onclick={openAddMember}>
+              <span class="plus">＋</span> Add Member
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Member ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Membership</th>
+                    <th>Status</th>
+                    <th>Join Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={members} for:item="member"
+                    ><tr key={member.Id}>
+                      <td><span class="text-link">{member.Name}</span></td>
+                      <td>{member.fullName}</td>
+                      <td>{member.Email__c}</td>
+                      <td>{member.planName}</td>
+                      <td>
+                        <span class={member.statusClass}
+                          >{member.Status__c}</span
+                        >
+                      </td>
+                      <td>{member.Membership_Start_Date__c}</td>
+                      <td>
+                        <button
+                          class="action-link"
+                          data-id={member.Id}
+                          onclick={viewMember}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr></template
+                  >
+                </tbody>
+              </table>
+            </div>
+            <template if:false={hasMembers}
+              ><div class="empty">No members found</div></template
+            >
+            <div class="pagination">
+              <span
+                >Showing {memberStart}–{memberEnd} of {memberCount}
+                members</span
+              >
+              <div>
+                <button
+                  class="page-button"
+                  onclick={previousMembers}
+                  disabled={isFirstMemberPage}
+                >
+                  ‹
+                </button>
+                <span class="page-current">{memberPage}</span>
+                <button
+                  class="page-button"
+                  onclick={nextMembers}
+                  disabled={isLastMemberPage}
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template if:true={showMemberDetails}>
+          <div class="member-detail-actions">
+            <button class="button secondary" onclick={closeMemberDetail}>
+              ← Members
+            </button>
+            <div>
+              <button class="button secondary" onclick={openEditMember}>
+                Edit
+              </button>
+              <template if:true={canSuspendSelectedMember}>
+                <button
+                  class="button secondary"
+                  data-status="Suspended"
+                  onclick={updateMemberAccountStatus}
+                >
+                  Suspend
+                </button>
+              </template>
+              <template if:true={canActivateSelectedMember}>
+                <button
+                  class="button primary"
+                  data-status="Active"
+                  onclick={updateMemberAccountStatus}
+                >
+                  Activate
+                </button>
+              </template>
+              <button
+                class="button secondary"
+                onclick={resetSelectedMemberPassword}
+              >
+                Reset Password
+              </button>
+            </div>
+          </div>
+          <section class="member-profile-card">
+            <div class="member-profile-main">
+              <div class="member-avatar member-avatar-large">
+                {memberInitials}
+              </div>
+              <div class="member-identity">
+                <div class="member-name-row">
+                  <h2>{selectedMemberName}</h2>
+                  <span class={selectedMemberStatusClass}
+                    >{memberDetail.member.Account_Status__c}</span
+                  >
+                </div>
+                <p>▣ Member ID: {memberDetail.member.Name}</p>
+                <p>✉ {memberDetail.member.Email__c}</p>
+                <p>⌕ {memberDetail.member.Phone__c}</p>
+                <p>◷ Joined: {memberDetail.member.Registration_Date__c}</p>
+              </div>
+            </div>
+            <aside class="membership-summary">
+              <span>Membership</span>
+              <strong>{memberDetail.member.Membership_Plan__r.Name}</strong>
+              <small
+                >Valid till {memberDetail.member.Membership_End_Date__c}</small
+              >
+              <button class="button primary" onclick={renewSelectedMember}>
+                Renew
+              </button>
+            </aside>
+          </section>
+          <nav class="member-tabs" aria-label="Member information">
+            <template for:each={memberTabs} for:item="tab">
+              <button
+                key={tab.value}
+                class={tab.className}
+                data-value={tab.value}
+                onclick={selectMemberTab}
+              >
+                {tab.label}
+              </button>
+            </template>
+          </nav>
+          <template if:true={isMemberOverview}>
+            <div class="member-overview-grid">
+              <article>
+                <span>Active Loans</span><strong>{activeMemberLoans}</strong
+                ><button
+                  data-value="Borrowing History"
+                  onclick={selectMemberTab}
+                >
+                  View Details
+                </button>
+              </article>
+              <article>
+                <span>Reservations</span
+                ><strong>{selectedMemberReservations}</strong
+                ><button data-value="Reservations" onclick={selectMemberTab}>
+                  View Details
+                </button>
+              </article>
+              <article>
+                <span>Outstanding Fines</span
+                ><strong class="fine-value">{selectedMemberOutstanding}</strong
+                ><button data-value="Fines" onclick={selectMemberTab}>
+                  View Details
+                </button>
+              </article>
+              <article>
+                <span>Total Books Borrowed</span
+                ><strong>{selectedMemberBorrowed}</strong
+                ><button
+                  data-value="Borrowing History"
+                  onclick={selectMemberTab}
+                >
+                  View Details
+                </button>
+              </article>
+            </div>
+          </template>
+          <template if:true={isMemberLoans}>
+            <div class="table-card member-tab-panel">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Transaction ID</th>
+                      <th>Book</th>
+                      <th>Issue Date</th>
+                      <th>Due Date</th>
+                      <th>Return Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={memberDetail.loans} for:item="row"
+                      ><tr key={row.Id}>
+                        <td class="text-link">{row.Name}</td>
+                        <td>{row.Book_Copy__r.Book__r.Name}</td>
+                        <td>{row.Borrow_Date__c}</td>
+                        <td>{row.Due_Date__c}</td>
+                        <td>{row.Return_Date__c}</td>
+                        <td>{row.Status__c}</td>
+                      </tr></template
+                    >
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </template>
+          <template if:true={isMemberReservations}>
+            <div class="table-card member-tab-panel">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Reservation ID</th>
+                      <th>Book</th>
+                      <th>Reserved On</th>
+                      <th>Queue Position</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template
+                      for:each={memberDetail.reservations}
+                      for:item="row"
+                      ><tr key={row.Id}>
+                        <td class="text-link">{row.Name}</td>
+                        <td>{row.Book__r.Name}</td>
+                        <td>{row.Reservation_Date__c}</td>
+                        <td>{row.Queue_Position__c}</td>
+                        <td>{row.Status__c}</td>
+                      </tr></template
+                    >
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </template>
+          <template if:true={isMemberFines}>
+            <div class="table-card member-tab-panel">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fine ID</th>
+                      <th>Reason</th>
+                      <th>Amount</th>
+                      <th>Balance</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={memberDetail.fines} for:item="row"
+                      ><tr key={row.Id}>
+                        <td class="text-link">{row.Name}</td>
+                        <td>{row.Fine_Type__c}</td>
+                        <td>{row.Amount__c}</td>
+                        <td>{row.Balance__c}</td>
+                        <td>{row.Generated_Date__c}</td>
+                        <td>{row.Status__c}</td>
+                      </tr></template
+                    >
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </template>
+          <template if:true={isMemberPayments}>
+            <div class="table-card member-tab-panel">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Payment ID</th>
+                      <th>Plan</th>
+                      <th>Amount</th>
+                      <th>Payment Date</th>
+                      <th>Method</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={memberDetail.payments} for:item="row"
+                      ><tr key={row.Id}>
+                        <td class="text-link">{row.Name}</td>
+                        <td>{row.New_Plan__r.Name}</td>
+                        <td>{row.Amount__c}</td>
+                        <td>{row.Payment_Date__c}</td>
+                        <td>{row.Payment_Method__c}</td>
+                        <td>{row.Status__c}</td>
+                      </tr></template
+                    >
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </template>
+          <template if:true={isMemberActivity}>
+            <div class="member-activity-panel">
+              <h3>Recent Activity</h3>
+              <p>
+                {selectedMemberName} has {selectedMemberBorrowed} borrowing
+                transaction(s) and {memberDetail.reservations.length}
+                reservation(s) on record.
+              </p>
+            </div>
+          </template>
+        </template>
+
+        <template if:true={isRegistrations}>
+          <div class="registration-tabs">
+            <template for:each={registrationTabs} for:item="option"
+              ><button
+                key={option.value}
+                data-value={option.value}
+                class={option.className}
+                name="registrationStatus"
+                onclick={filterRegistrations}
+              >
+                {option.label}
+              </button></template
+            >
+          </div>
+          <div class="table-card registrations-table">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Applied On</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={registrations} for:item="registration"
+                    ><tr key={registration.Id}>
+                      <td>{registration.applicant}</td>
+                      <td>{registration.Email__c}</td>
+                      <td>{registration.Registration_Date__c}</td>
+                      <td>
+                        <span class={registration.statusClass}
+                          >{registration.Status__c}</span
+                        >
+                      </td>
+                      <td class="row-actions">
+                        <button
+                          class="action-link"
+                          data-id={registration.Id}
+                          onclick={viewRegistration}
+                        >
+                          View</button
+                        ><template if:true={registration.canDecide}
+                          ><button
+                            class="action-link approve-link"
+                            data-id={registration.Id}
+                            data-action="approve"
+                            onclick={registrationAction}
+                          >
+                            Approve</button
+                          ><button
+                            class="action-link danger-link"
+                            data-id={registration.Id}
+                            data-action="reject"
+                            onclick={registrationAction}
+                          >
+                            Reject
+                          </button></template
+                        >
+                      </td>
+                    </tr></template
+                  >
+                </tbody>
+              </table>
+            </div>
+            <template if:false={hasRegistrations}
+              ><div class="empty">
+                No registrations in this status
+              </div></template
+            >
+          </div>
+        </template>
+
+        <template if:true={isBorrowing}>
+          <div class="tabs">
+            <template for:each={loanTabs} for:item="option"
+              ><button
+                key={option.value}
+                class={option.className}
+                data-value={option.value}
+                onclick={filterLoans}
+              >
+                {option.label}
+              </button></template
+            >
+          </div>
+          <div class="issue-panel">
+            <lightning-combobox
+              label="Member"
+              name="selectedMemberId"
+              value={selectedMemberId}
+              options={memberOptions}
+              onchange={handleInput}
+            ></lightning-combobox
+            ><lightning-combobox
+              label="Book"
+              name="selectedBookId"
+              value={selectedBookId}
+              options={bookOptions}
+              onchange={selectBorrowBook}
+            ></lightning-combobox
+            ><lightning-combobox
+              label="Available Copy"
+              name="selectedCopyId"
+              value={selectedCopyId}
+              options={copyOptions}
+              onchange={handleInput}
+            ></lightning-combobox
+            ><button class="button primary issue-button" onclick={doCheckout}>
+              ＋ Issue Book
+            </button>
+          </div>
+          <div class="filter-row">
+            <lightning-combobox
+              variant="label-hidden"
+              name="loanStatus"
+              value={loanStatus}
+              options={loanStatusOptions}
+              onchange={handleInput}
+            ></lightning-combobox
+            ><button class="button secondary" onclick={filterLoans}>
+              Refresh
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Member</th>
+                    <th>Book Title</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={loans} for:item="loan"
+                    ><tr key={loan.Id}>
+                      <td><span class="text-link">{loan.Name}</span></td>
+                      <td>{loan.memberName}</td>
+                      <td>{loan.bookName}</td>
+                      <td>{loan.Borrow_Date__c}</td>
+                      <td>{loan.Due_Date__c}</td>
+                      <td>
+                        <span class={loan.statusClass}>{loan.Status__c}</span>
+                      </td>
+                      <td class="row-actions">
+                        <template if:true={loan.canAct}
+                          ><button
+                            class="action-link"
+                            data-id={loan.Id}
+                            onclick={doReturn}
+                          >
+                            Return</button
+                          ><button
+                            class="action-link"
+                            data-id={loan.Id}
+                            onclick={doRenew}
+                          >
+                            Renew
+                          </button></template
+                        >
+                      </td>
+                    </tr></template
+                  >
+                </tbody>
+              </table>
+            </div>
+            <template if:false={hasLoans}
+              ><div class="empty">
+                No borrowing transactions found
+              </div></template
+            >
+          </div>
+        </template>
+
+        <template if:true={isReservations}>
+          <div class="reservation-tabs">
+            <template for:each={reservationTabs} for:item="tab">
+              <button
+                key={tab.value}
+                class={tab.className}
+                data-value={tab.value}
+                onclick={filterReservations}
+              >
+                {tab.label}
+              </button>
+            </template>
+          </div>
+          <label class="reservation-search">
+            <lightning-icon
+              icon-name="utility:search"
+              size="xx-small"
+            ></lightning-icon>
+            <input
+              type="search"
+              placeholder="Search by member or book..."
+              value={reservationSearch}
+              oninput={handleReservationSearch}
+            />
+          </label>
+          <div class="table-card reservations-table">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Reservation ID</th>
+                    <th>Member</th>
+                    <th>Book Title</th>
+                    <th>Reserved On</th>
+                    <th>Status</th>
+                    <th>Queue Position</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={reservations} for:item="reservation"
+                    ><tr key={reservation.Id}>
+                      <td><span class="text-link">{reservation.Name}</span></td>
+                      <td>{reservation.memberName}</td>
+                      <td>{reservation.bookName}</td>
+                      <td>{reservation.Reservation_Date__c}</td>
+                      <td>
+                        <span class={reservation.statusClass}
+                          >{reservation.displayStatus}</span
+                        >
+                      </td>
+                      <td>{reservation.queuePosition}</td>
+                      <td>
+                        <button
+                          class="action-link"
+                          data-id={reservation.Id}
+                          onclick={viewReservation}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr></template
+                  >
+                </tbody>
+              </table>
+            </div>
+            <template if:false={hasReservations}
+              ><div class="empty">No reservations found</div></template
+            >
+          </div>
+        </template>
+
+        <template if:true={isFines}>
+          <div class="fine-controls">
+            <div class="fine-tabs">
+              <template for:each={fineTabs} for:item="option"
+                ><button
+                  key={option.value}
+                  class={option.className}
+                  data-value={option.value}
+                  onclick={filterFines}
+                >
+                  {option.label}
+                </button></template
+              >
+            </div>
+            <label class="fine-search">
+              <lightning-icon
+                icon-name="utility:search"
+                size="xx-small"
+              ></lightning-icon>
+              <input
+                type="search"
+                placeholder="Search by member or transaction..."
+                value={fineSearch}
+                oninput={handleFineSearch}
+              />
+            </label>
+          </div>
+          <div class="table-card fines-table">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fine ID</th>
+                    <th>Member</th>
+                    <th>Related Transaction</th>
+                    <th>Amount</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={fines} for:item="fine"
+                    ><tr key={fine.Id}>
+                      <td>{fine.Name}</td>
+                      <td>{fine.memberName}</td>
+                      <td><span class="text-link">{fine.loanName}</span></td>
+                      <td>{fine.amountLabel}</td>
+                      <td>{fine.reasonLabel}</td>
+                      <td>
+                        <span class={fine.statusClass}>{fine.Status__c}</span>
+                      </td>
+                      <td>
+                        <template if:true={fine.canCollect}
+                          ><button
+                            class="action-link"
+                            data-id={fine.Id}
+                            onclick={selectFine}
+                          >
+                            Collect
+                          </button></template
+                        >
+                      </td>
+                    </tr></template
+                  >
+                </tbody>
+              </table>
+            </div>
+            <template if:false={hasFines}
+              ><div class="empty">No fines found</div></template
+            >
+          </div>
+        </template>
+
+        <template if:true={isMemberships}>
+          <div class="toolbar membership-toolbar">
+            <button class="button primary" onclick={openAddPlan}>
+              ＋ Add Plan
+            </button>
+          </div>
+          <div class="tabs">
+            <template for:each={membershipTabs} for:item="option"
+              ><button
+                key={option.value}
+                class={option.className}
+                data-value={option.value}
+                onclick={selectMembershipTab}
+              >
+                {option.label}
+              </button></template
+            >
+          </div>
+          <template if:true={isPlansTab}>
+            <div class="table-card memberships-table">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Plan Name</th>
+                      <th>Description</th>
+                      <th>Duration</th>
+                      <th>Borrow Limit</th>
+                      <th>Price</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={plans} for:item="plan"
+                      ><tr key={plan.Id}>
+                        <td>{plan.Name}</td>
+                        <td>{plan.Description__c}</td>
+                        <td>{plan.durationLabel}</td>
+                        <td>{plan.borrowLimitLabel}</td>
+                        <td>{plan.priceLabel}</td>
+                        <td>
+                          <span class={plan.statusClass}
+                            >{plan.statusLabel}</span
+                          >
+                        </td>
+                        <td>
+                          <button
+                            class="mini-action"
+                            data-id={plan.Id}
+                            onclick={openEditPlan}
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      </tr></template
+                    >
+                  </tbody>
+                </table>
+              </div>
+              <template if:false={hasPlans}
+                ><div class="empty">
+                  No membership plans configured
+                </div></template
+              >
+            </div>
+          </template>
+          <template if:true={isSubscriptionsTab}>
+            <div class="table-card memberships-table">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Member ID</th>
+                      <th>Member</th>
+                      <th>Plan</th>
+                      <th>Start Date</th>
+                      <th>Valid Until</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={allMembers} for:item="member"
+                      ><tr key={member.Id}>
+                        <td><span class="text-link">{member.Name}</span></td>
+                        <td>{member.fullName}</td>
+                        <td>{member.planName}</td>
+                        <td>{member.Membership_Start_Date__c}</td>
+                        <td>{member.Membership_End_Date__c}</td>
+                        <td>
+                          <span class={member.statusClass}
+                            >{member.Status__c}</span
+                          >
+                        </td>
+                      </tr></template
+                    >
+                  </tbody>
+                </table>
+              </div>
+              <template if:false={hasMembers}
+                ><div class="empty">No subscriptions found</div></template
+              >
+            </div>
+          </template>
+        </template>
+
+        <template if:true={isPayments}>
+          <div class="payment-controls">
+            <div class="tabs payment-tabs">
+              <template for:each={paymentTabs} for:item="option"
+                ><button
+                  key={option.value}
+                  class={option.className}
+                  data-value={option.value}
+                  onclick={filterPayments}
+                >
+                  {option.label}
+                </button></template
+              >
+            </div>
+            <div class="payment-filter-row">
+              <lightning-input
+                class="payment-search"
+                variant="label-hidden"
+                type="search"
+                placeholder="Search by member or payment ID..."
+                value={paymentSearch}
+                oninput={handlePaymentSearch}
+              ></lightning-input
+              ><lightning-combobox
+                variant="label-hidden"
+                name="paymentType"
+                value={paymentType}
+                options={paymentTypeOptions}
+                onchange={handlePaymentFilter}
+              ></lightning-combobox
+              ><lightning-combobox
+                variant="label-hidden"
+                name="paymentStatus"
+                value={paymentStatus}
+                options={paymentStatusOptions}
+                onchange={handlePaymentFilter}
+              ></lightning-combobox>
+            </div>
+          </div>
+          <div class="table-card payments-table">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Payment ID</th>
+                    <th>Member</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Payment Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={payments} for:item="payment"
+                    ><tr key={payment.id}>
+                      <td><span class="text-link">{payment.name}</span></td>
+                      <td>{payment.memberName}</td>
+                      <td>{payment.paymentType}</td>
+                      <td>{payment.amountLabel}</td>
+                      <td>{payment.displayDate}</td>
+                      <td>
+                        <span class={payment.statusClass}
+                          >{payment.status}</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="action-link"
+                          data-id={payment.id}
+                          onclick={viewPayment}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr></template
+                  >
+                </tbody>
+              </table>
+            </div>
+            <template if:false={hasPayments}
+              ><div class="empty">No payments found</div></template
+            >
+          </div>
+        </template>
+
+        <template if:true={isReports}>
+          <section class="report-grid">
+            <template for:each={metrics} for:item="metric"
+              ><article class="report-card" key={metric.label}>
+                <span>{metric.label}</span><strong>{metric.value}</strong>
+              </article></template
+            >
+          </section>
+          <section class="panel report-panel">
+            <h2>Collection & circulation summary</h2>
+            <div class="report-lines">
+              <div>
+                <span>Available copies</span
+                ><strong>{dashboard.availableCopies}</strong>
+              </div>
+              <div>
+                <span>Borrowed copies</span
+                ><strong>{dashboard.borrowedCopies}</strong>
+              </div>
+              <div>
+                <span>Pending registrations</span
+                ><strong>{dashboard.pendingRegistrations}</strong>
+              </div>
+              <div>
+                <span>Active members</span
+                ><strong>{dashboard.activeMembers}</strong>
+              </div>
+            </div>
+          </section>
+        </template>
+
+        <template if:true={isSettings}>
+          <div class="toolbar settings-toolbar">
+            <button class="button primary" onclick={saveSettings}>
+              Save Settings
+            </button>
+          </div>
+          <section class="settings-grid settings-form">
+            <article class="settings-card editable-settings-card">
+              <div class="settings-card-heading">
+                <span class="settings-icon"
+                  ><lightning-icon
+                    icon-name="utility:company"
+                    size="small"
+                  ></lightning-icon
+                ></span>
+                <div>
+                  <h2>General</h2>
+                  <p>Library identity and inventory defaults</p>
+                </div>
+              </div>
+              <div class="settings-fields">
+                <lightning-input
+                  class="settings-field"
+                  name="settings.libraryName"
+                  label="Library Name"
+                  value={settings.libraryName}
+                  onchange={handleInput}
+                  required
+                ></lightning-input>
+                <lightning-input
+                  name="settings.contactEmail"
+                  type="email"
+                  label="Contact Email"
+                  value={settings.contactEmail}
+                  onchange={handleInput}
+                ></lightning-input>
+                <lightning-input
+                  name="settings.defaultShelfPrefix"
+                  label="Default Shelf Prefix"
+                  value={settings.defaultShelfPrefix}
+                  onchange={handleInput}
+                ></lightning-input>
+                <lightning-input
+                  class="settings-field"
+                  name="settings.maxSearchResults"
+                  type="number"
+                  min="10"
+                  label="Maximum Search Results"
+                  value={settings.maxSearchResults}
+                  onchange={handleInput}
+                  required
+                ></lightning-input>
+              </div>
+            </article>
+
+            <article class="settings-card editable-settings-card">
+              <div class="settings-card-heading">
+                <span class="settings-icon"
+                  ><lightning-icon
+                    icon-name="utility:knowledge_base"
+                    size="small"
+                  ></lightning-icon
+                ></span>
+                <div>
+                  <h2>Circulation & Reservations</h2>
+                  <p>Hold duration and automated queue handling</p>
+                </div>
+              </div>
+              <div class="settings-fields">
+                <lightning-input
+                  class="settings-field"
+                  name="settings.reservationHoldDays"
+                  type="number"
+                  min="1"
+                  label="Reservation Hold Days"
+                  value={settings.reservationHoldDays}
+                  onchange={handleInput}
+                  required
+                ></lightning-input>
+                <lightning-input
+                  name="settings.autoProcessExpiredHolds"
+                  type="checkbox"
+                  label="Automatically Process Expired Holds"
+                  checked={settings.autoProcessExpiredHolds}
+                  onchange={handleInput}
+                ></lightning-input>
+                <p class="settings-help">
+                  Loan duration, borrow limits and renewal limits remain
+                  controlled by the {plans.length} membership plans.
+                </p>
+              </div>
+            </article>
+
+            <article class="settings-card editable-settings-card">
+              <div class="settings-card-heading">
+                <span class="settings-icon"
+                  ><lightning-icon
+                    icon-name="utility:notification"
+                    size="small"
+                  ></lightning-icon
+                ></span>
+                <div>
+                  <h2>Notifications</h2>
+                  <p>Control the messages sent to members</p>
+                </div>
+              </div>
+              <div class="settings-fields">
+                <lightning-input
+                  class="settings-field"
+                  name="settings.dueReminderDays"
+                  type="number"
+                  min="0"
+                  label="Due Reminder Days"
+                  value={settings.dueReminderDays}
+                  onchange={handleInput}
+                  required
+                ></lightning-input>
+                <lightning-input
+                  name="settings.sendDueReminders"
+                  type="checkbox"
+                  label="Send Due-Date Reminders"
+                  checked={settings.sendDueReminders}
+                  onchange={handleInput}
+                ></lightning-input>
+                <lightning-input
+                  name="settings.sendOverdueNotices"
+                  type="checkbox"
+                  label="Send Overdue Notices"
+                  checked={settings.sendOverdueNotices}
+                  onchange={handleInput}
+                ></lightning-input>
+                <lightning-input
+                  name="settings.sendReservationNotifications"
+                  type="checkbox"
+                  label="Send Reservation-Ready Notifications"
+                  checked={settings.sendReservationNotifications}
+                  onchange={handleInput}
+                ></lightning-input>
+              </div>
+            </article>
+
+            <article class="settings-card editable-settings-card">
+              <div class="settings-card-heading">
+                <span class="settings-icon"
+                  ><lightning-icon
+                    icon-name="utility:groups"
+                    size="small"
+                  ></lightning-icon
+                ></span>
+                <div>
+                  <h2>Members & Finance</h2>
+                  <p>Registration safeguards and payment controls</p>
+                </div>
+              </div>
+              <div class="settings-fields settings-checkboxes">
+                <lightning-input
+                  name="settings.allowSelfRegistration"
+                  type="checkbox"
+                  label="Allow Member Self-Registration"
+                  checked={settings.allowSelfRegistration}
+                  onchange={handleInput}
+                ></lightning-input>
+                <lightning-input
+                  name="settings.requireEmailVerification"
+                  type="checkbox"
+                  label="Require Email Verification"
+                  checked={settings.requireEmailVerification}
+                  onchange={handleInput}
+                ></lightning-input>
+                <lightning-input
+                  name="settings.finePaymentEnabled"
+                  type="checkbox"
+                  label="Enable Fine Collection"
+                  checked={settings.finePaymentEnabled}
+                  onchange={handleInput}
+                ></lightning-input>
+              </div>
+            </article>
+          </section>
+
+          <section class="settings-tools panel">
+            <div class="settings-tools-heading">
+              <div>
+                <h2>Operational Tools</h2>
+                <p>Open common administration areas or run maintenance now.</p>
+              </div>
+              <span class="security-note">Permission protected</span>
+            </div>
+            <div class="settings-actions">
+              <button
+                class="button secondary"
+                data-section="Memberships"
+                onclick={openSettingsSection}
+              >
+                Manage Membership Plans
+              </button>
+              <button
+                class="button secondary"
+                data-section="Registrations"
+                onclick={openSettingsSection}
+              >
+                Review Registrations
+              </button>
+              <button
+                class="button secondary"
+                data-section="Fines"
+                onclick={openSettingsSection}
+              >
+                Manage Fines
+              </button>
+              <button class="button secondary" onclick={processExpired}>
+                Process Expired Holds
+              </button>
+            </div>
+          </section>
+        </template>
+      </main>
+    </div>
+  </div>
+
+  <template if:true={showBookModal}>
+    <section
+      class="modal book-page-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label={modalTitle}
+    >
+      <div class="modal-card book-modal book-page-card">
+        <header>
+          <div>
+            <h2>{modalTitle}</h2>
+            <p>Enter book details and save to the library</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body book-form">
+          <div class="form-fields">
+            <lightning-input
+              class="book-field"
+              name="book.title"
+              label="Title"
+              value={bookForm.title}
+              onchange={handleInput}
+              required
+            ></lightning-input
+            ><lightning-combobox
+              class="book-field"
+              name="primaryAuthor"
+              label="Author"
+              placeholder="Select an author"
+              options={authorOptions}
+              value={primaryAuthorId}
+              onchange={handlePrimaryAuthor}
+              required
+            ></lightning-combobox
+            ><lightning-input
+              class="book-field"
+              name="book.isbn"
+              label="ISBN"
+              value={bookForm.isbn}
+              onchange={handleInput}
+              required
+            ></lightning-input
+            ><lightning-combobox
+              class="book-field"
+              name="primaryCategory"
+              label="Category"
+              placeholder="Select a category"
+              options={categoryOptions}
+              value={primaryCategoryId}
+              onchange={handlePrimaryCategory}
+              required
+            ></lightning-combobox>
+            <div class="two-cols">
+              <lightning-input
+                name="book.publisher"
+                label="Publisher"
+                value={bookForm.publisher}
+                onchange={handleInput}
+              ></lightning-input
+              ><lightning-input
+                name="book.publicationYear"
+                type="number"
+                label="Publication Year"
+                value={bookForm.publicationYear}
+                onchange={handleInput}
+              ></lightning-input>
+            </div>
+            <div class="two-cols">
+              <lightning-input
+                name="book.edition"
+                label="Edition"
+                value={bookForm.edition}
+                onchange={handleInput}
+              ></lightning-input
+              ><lightning-input
+                name="book.language"
+                label="Language"
+                value={bookForm.language}
+                onchange={handleInput}
+              ></lightning-input>
+            </div>
+            <lightning-textarea
+              name="book.description"
+              label="Description"
+              value={bookForm.description}
+              onchange={handleInput}
+            ></lightning-textarea>
+          </div>
+          <aside class="cover-preview">
+            <span>Book Cover</span>
+            <div class="cover-art">
+              <template if:true={hasBookCover}
+                ><img
+                  src={bookForm.coverUrl}
+                  alt="Book cover preview" /></template
+              ><template if:false={hasBookCover}
+                ><lightning-icon
+                  icon-name="utility:knowledge_base"
+                  size="large"
+                ></lightning-icon
+                ><strong>{bookForm.title}</strong></template
+              >
+            </div>
+            <button
+              class="button secondary change-cover"
+              onclick={focusCoverUrl}
+            >
+              Change Cover
+            </button>
+            <lightning-input
+              class="cover-url"
+              name="book.coverUrl"
+              label="Cover Image URL"
+              value={bookForm.coverUrl}
+              onchange={handleInput}
+            ></lightning-input>
+          </aside>
+        </div>
+        <footer>
+          <button class="button secondary" onclick={closeModals}>Cancel</button
+          ><button class="button primary" onclick={saveBook}>
+            {bookSaveLabel}
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop book-page-backdrop"></div>
+  </template>
+
+  <template if:true={showCopyModal}>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Manage book copy"
+    >
+      <div class="modal-card">
+        <header>
+          <div>
+            <h2>{copyModalTitle}</h2>
+            <p>Enter copy details and save to the library</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body copy-form">
+          <lightning-combobox
+            class="copy-field copy-book-field"
+            name="selectedBookId"
+            label="Book Title"
+            placeholder="Select a book"
+            value={selectedBookId}
+            options={bookOptions}
+            onchange={handleInput}
+            required
+            disabled={selectedCopyId}
+          ></lightning-combobox>
+          <lightning-input
+            class="copy-field"
+            name="copy.barcode"
+            label="Barcode"
+            value={copyForm.barcode}
+            onchange={handleInput}
+            required
+            disabled={selectedCopyId}
+          ></lightning-input
+          ><lightning-input
+            class="copy-field"
+            name="copy.shelf"
+            label="Shelf Location"
+            value={copyForm.shelf}
+            onchange={handleInput}
+            required
+          ></lightning-input
+          ><lightning-input
+            name="copy.acquisitionDate"
+            type="date"
+            label="Acquisition Date"
+            value={copyForm.acquisitionDate}
+            onchange={handleInput}
+          ></lightning-input
+          ><lightning-input
+            name="copy.condition"
+            label="Condition"
+            value={copyForm.condition}
+            onchange={handleInput}
+          ></lightning-input
+          ><lightning-input
+            name="copy.price"
+            type="number"
+            label="Price"
+            value={copyForm.price}
+            onchange={handleInput}
+          ></lightning-input
+          ><lightning-combobox
+            name="copy.status"
+            label="Status"
+            value={copyForm.status}
+            options={copyStatusOptions}
+            onchange={handleInput}
+          ></lightning-combobox>
+        </div>
+        <footer>
+          <button class="button secondary" onclick={closeModals}>Cancel</button
+          ><button class="button primary" onclick={saveCopy}>Save Copy</button>
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop"></div>
+  </template>
+
+  <template if:true={showMemberModal}>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Manage member"
+    >
+      <div class="modal-card member-modal-card">
+        <header>
+          <div>
+            <h2>{memberModalTitle}</h2>
+            <p>Enter member details and membership information</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body member-form">
+          <lightning-input
+            class="member-field"
+            name="member.firstName"
+            label="First Name"
+            value={memberForm.firstName}
+            onchange={handleInput}
+            required
+          ></lightning-input>
+          <lightning-input
+            class="member-field"
+            name="member.lastName"
+            label="Last Name"
+            value={memberForm.lastName}
+            onchange={handleInput}
+            required
+          ></lightning-input>
+          <lightning-input
+            class="member-field"
+            type="email"
+            name="member.email"
+            label="Email"
+            value={memberForm.email}
+            onchange={handleInput}
+            required
+          ></lightning-input>
+          <lightning-input
+            name="member.phone"
+            label="Phone"
+            value={memberForm.phone}
+            onchange={handleInput}
+          ></lightning-input>
+          <lightning-combobox
+            class="member-field member-plan-field"
+            name="member.planId"
+            label="Membership Plan"
+            value={memberForm.planId}
+            options={membershipPlanOptions}
+            onchange={handleInput}
+            required
+          ></lightning-combobox>
+        </div>
+        <footer>
+          <button class="button secondary" onclick={closeModals}>Cancel</button
+          ><button class="button primary" onclick={saveMember}>
+            {memberSaveLabel}
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop"></div>
+  </template>
+
+  <template if:true={showRegistrationModal}>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Registration details"
+    >
+      <div class="modal-card registration-detail-modal">
+        <header>
+          <div>
+            <h2>Registration Details</h2>
+            <p>Review the member application before taking action</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body registration-detail-grid">
+          <div>
+            <span>Name</span><strong>{selectedRegistration.applicant}</strong>
+          </div>
+          <div>
+            <span>Email</span><strong>{selectedRegistration.Email__c}</strong>
+          </div>
+          <div>
+            <span>Phone</span><strong>{selectedRegistration.Phone__c}</strong>
+          </div>
+          <div>
+            <span>Applied On</span
+            ><strong>{selectedRegistration.Registration_Date__c}</strong>
+          </div>
+          <div>
+            <span>Membership Plan</span
+            ><strong>{selectedRegistration.planName}</strong>
+          </div>
+          <div>
+            <span>Status</span><strong>{selectedRegistration.Status__c}</strong>
+          </div>
+        </div>
+        <footer>
+          <button class="button secondary" onclick={closeModals}>Close</button>
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop"></div>
+  </template>
+
+  <template if:true={showReservationModal}>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Reservation details"
+    >
+      <div class="modal-card registration-detail-modal">
+        <header>
+          <div>
+            <h2>Reservation Details</h2>
+            <p>{selectedReservation.Name}</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body registration-detail-grid">
+          <div>
+            <span>Member</span><strong>{selectedReservation.memberName}</strong>
+          </div>
+          <div>
+            <span>Book Title</span
+            ><strong>{selectedReservation.bookName}</strong>
+          </div>
+          <div>
+            <span>Reserved On</span
+            ><strong>{selectedReservation.Reservation_Date__c}</strong>
+          </div>
+          <div>
+            <span>Status</span
+            ><strong>{selectedReservation.displayStatus}</strong>
+          </div>
+          <div>
+            <span>Queue Position</span
+            ><strong>{selectedReservation.queuePosition}</strong>
+          </div>
+          <div>
+            <span>Expires On</span
+            ><strong>{selectedReservation.Expiry_Date__c}</strong>
+          </div>
+        </div>
+        <footer>
+          <button class="button secondary" onclick={closeModals}>Close</button>
+          <template if:true={selectedReservation.canPrepare}
+            ><button
+              class="button primary prepare-reservation-button"
+              onclick={prepareSelectedReservation}
+            >
+              Prepare for Pickup
+            </button></template
+          >
+          <template if:true={selectedReservation.canIssue}
+            ><button
+              class="button primary issue-reservation-button"
+              onclick={issueReadyReservation}
+            >
+              ＋ Issue Book
+            </button></template
+          >
+          <template if:true={selectedReservation.canCancel}
+            ><button
+              class="button danger"
+              data-id={selectedReservation.Id}
+              onclick={cancelReservationNow}
+            >
+              Cancel Reservation
+            </button></template
+          >
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop"></div>
+  </template>
+
+  <template if:true={showFineModal}>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Collect fine"
+    >
+      <div class="modal-card fine-modal-card">
+        <header>
+          <div>
+            <h2>Collect Fine</h2>
+            <p>{selectedFine.Name} · {selectedFine.memberName}</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body fine-collection-form">
+          <div class="fine-summary">
+            <span>Related Transaction</span
+            ><strong>{selectedFine.loanName}</strong>
+          </div>
+          <div class="fine-summary">
+            <span>Outstanding Amount</span
+            ><strong>{selectedFine.amountLabel}</strong>
+          </div>
+          <lightning-input
+            name="paymentAmount"
+            type="number"
+            min="0.01"
+            label="Payment Amount"
+            value={paymentAmount}
+            onchange={handleInput}
+            required
+          ></lightning-input>
+          <lightning-input
+            name="waiverReason"
+            label="Waiver Reason (optional)"
+            value={waiverReason}
+            onchange={handleInput}
+          ></lightning-input>
+        </div>
+        <footer>
+          <button class="button secondary" onclick={closeModals}>Cancel</button>
+          <button class="button danger" onclick={waiveSelectedFine}>
+            Waive Fine
+          </button>
+          <button class="button primary" onclick={payFine}>
+            Record Payment
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop"></div>
+  </template>
+
+  <template if:true={showPlanModal}>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label={planModalTitle}
+    >
+      <div class="modal-card plan-modal-card">
+        <header>
+          <div>
+            <h2>{planModalTitle}</h2>
+            <p>Configure membership access, limits and pricing</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body plan-form">
+          <lightning-input
+            class="plan-field"
+            name="plan.name"
+            label="Plan Name"
+            value={planForm.name}
+            onchange={handleInput}
+            required
+          ></lightning-input>
+          <lightning-input
+            class="plan-field"
+            name="plan.durationDays"
+            type="number"
+            min="1"
+            label="Duration (Days)"
+            value={planForm.durationDays}
+            onchange={handleInput}
+            required
+          ></lightning-input>
+          <lightning-textarea
+            class="plan-description"
+            name="plan.description"
+            label="Description"
+            value={planForm.description}
+            onchange={handleInput}
+          ></lightning-textarea>
+          <lightning-input
+            class="plan-field"
+            name="plan.borrowLimit"
+            type="number"
+            min="1"
+            label="Borrow Limit"
+            value={planForm.borrowLimit}
+            onchange={handleInput}
+            required
+          ></lightning-input>
+          <lightning-input
+            name="plan.loanDurationDays"
+            type="number"
+            min="1"
+            label="Loan Duration (Days)"
+            value={planForm.loanDurationDays}
+            onchange={handleInput}
+          ></lightning-input>
+          <lightning-input
+            name="plan.reservationLimit"
+            type="number"
+            min="0"
+            label="Reservation Limit"
+            value={planForm.reservationLimit}
+            onchange={handleInput}
+          ></lightning-input>
+          <lightning-input
+            name="plan.renewalLimit"
+            type="number"
+            min="0"
+            label="Renewal Limit"
+            value={planForm.renewalLimit}
+            onchange={handleInput}
+          ></lightning-input>
+          <lightning-input
+            name="plan.finePerDay"
+            type="number"
+            min="0"
+            label="Fine Per Day (₹)"
+            value={planForm.finePerDay}
+            onchange={handleInput}
+          ></lightning-input>
+          <lightning-input
+            class="plan-field"
+            name="plan.fee"
+            type="number"
+            min="0"
+            label="Price (₹)"
+            value={planForm.fee}
+            onchange={handleInput}
+            required
+          ></lightning-input>
+          <lightning-input
+            class="plan-active"
+            name="plan.active"
+            type="checkbox"
+            label="Active"
+            checked={planForm.active}
+            onchange={handleInput}
+          ></lightning-input>
+        </div>
+        <footer>
+          <button class="button secondary" onclick={closeModals}>Cancel</button
+          ><button class="button primary" onclick={savePlan}>
+            {planSaveLabel}
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop"></div>
+  </template>
+
+  <template if:true={showPaymentModal}>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Payment details"
+    >
+      <div class="modal-card payment-detail-modal">
+        <header>
+          <div>
+            <h2>Payment Details</h2>
+            <p>{selectedPayment.name}</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body payment-detail-grid">
+          <div>
+            <span>Member</span><strong>{selectedPayment.memberName}</strong>
+          </div>
+          <div>
+            <span>Type</span><strong>{selectedPayment.paymentType}</strong>
+          </div>
+          <div>
+            <span>Amount</span><strong>{selectedPayment.amountLabel}</strong>
+          </div>
+          <div>
+            <span>Payment Date</span
+            ><strong>{selectedPayment.displayDate}</strong>
+          </div>
+          <div>
+            <span>Status</span><strong>{selectedPayment.status}</strong>
+          </div>
+          <div>
+            <span>Reference</span><strong>{selectedPayment.reference}</strong>
+          </div>
+        </div>
+        <footer>
+          <button class="button primary" onclick={closeModals}>Close</button>
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop"></div>
+  </template>
+
+  <template if:true={showBookDetail}>
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Book details"
+    >
+      <div class="modal-card">
+        <header>
+          <div>
+            <h2>{bookDetail.Name}</h2>
+            <p>{bookDetail.ISBN__c} · {bookDetail.Publisher__c}</p>
+          </div>
+          <button class="modal-close" onclick={closeModals}>×</button>
+        </header>
+        <div class="modal-body">
+          <div class="detail-stats">
+            <div>
+              <span>Total Copies</span
+              ><strong>{bookDetail.Total_Copies__c}</strong>
+            </div>
+            <div>
+              <span>Available</span
+              ><strong>{bookDetail.Available_Copies__c}</strong>
+            </div>
+            <div>
+              <span>Status</span><strong>{bookDetail.Status__c}</strong>
+            </div>
+          </div>
+          <p class="description">{bookDetail.Description__c}</p>
+        </div>
+        <footer>
+          <button class="button secondary" onclick={closeModals}>Close</button
+          ><button class="button primary" onclick={openEditBook}>
+            Edit Book</button
+          ><button
+            class="button primary"
+            data-id={bookDetail.Id}
+            onclick={openAddCopy}
+          >
+            Add Copy
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="backdrop"></div>
+  </template>
 </template>

@@ -1,0 +1,57 @@
+html,
+body {
+  height: 100%;
+}
+
+html {
+  background: #f4f8fc;
+}
+
+body {
+  margin: 0;
+  color: #09213d;
+  font-family: Inter, "Salesforce Sans", Arial, sans-serif;
+}
+
+/* Keep the Salesforce login, reset-password and verification services in
+ * control of credentials; these rules only give those native components the
+ * same visual shell as the member portal. */
+body:has([data-f6-region-name="content"]) {
+  background: #eef4fb;
+}
+
+[data-f6-region-name="content"] {
+  position: relative;
+  z-index: 3;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: #eef4fb;
+}
+
+[data-f6-region-name="content"] button,
+[data-f6-region-name="content"] .slds-button_brand {
+  border-color: #0877eb;
+  border-radius: 5px;
+  background: #0877eb;
+}
+
+[data-f6-region-name="content"] input {
+  min-height: 40px;
+  border-color: #d5e0ec;
+  border-radius: 5px;
+}
+
+@media (max-width: 700px) {
+  body:has([data-f6-region-name="content"]) {
+    background: #f4f8fc;
+  }
+
+  [data-f6-region-name="content"] {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}

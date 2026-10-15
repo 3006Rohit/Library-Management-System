@@ -1,0 +1,80 @@
+{
+  "type": "sfdc_cms__view",
+  "title": "Member Portal",
+  "contentBody": {
+    "component": {
+      "children": [
+        {
+          "children": [
+            {
+              "attributes": {
+                "backgroundImageConfig": "",
+                "backgroundImageOverlay": "rgba(0,0,0,0)",
+                "componentSpacerSize": "",
+                "dxpStyle": {},
+                "layoutDirectionDesktop": "row",
+                "layoutDirectionMobile": "column",
+                "layoutDirectionTablet": "column",
+                "maxContentWidth": "",
+                "sectionColumnGutterWidth": "0",
+                "sectionConfig": "{\"UUID\":\"c1111111-c111-4111-8111-111111111111\",\"columns\":[{\"UUID\":\"c2222222-c222-4222-8222-222222222222\",\"columnName\":\"Content\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "100vh",
+                "sectionVerticalAlign": "center"
+              },
+              "children": [
+                {
+                  "children": [
+                    {
+                      "attributes": {},
+                      "definition": "c:libraryMemberPage",
+                      "id": "c3333333-c333-4333-8333-333333333333",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "c2222222-c222-4222-8222-222222222222",
+                  "name": "col1",
+                  "title": "Content",
+                  "type": "region"
+                }
+              ],
+              "definition": "community_layout:section",
+              "id": "c1111111-c111-4111-8111-111111111111",
+              "type": "component"
+            }
+          ],
+          "id": "c4444444-c444-4444-8444-444444444444",
+          "name": "content",
+          "title": "Content",
+          "type": "region"
+        },
+        {
+          "children": [
+            {
+              "attributes": {
+                "customHeadTags": "",
+                "description": "Library member portal.",
+                "dxpStyle": {},
+                "pageTitle": "Member Portal",
+                "recordId": "{!recordId}"
+              },
+              "definition": "community_builder:seoAssistant",
+              "id": "c6666666-c666-4666-8666-666666666666",
+              "type": "component"
+            }
+          ],
+          "id": "c7777777-c777-4777-8777-777777777777",
+          "name": "sfdcHiddenRegion",
+          "title": "sfdcHiddenRegion",
+          "type": "region"
+        }
+      ],
+      "definition": "community_layout:sldsFlexibleLayout",
+      "id": "c5555555-c555-4555-8555-555555555555",
+      "type": "component"
+    },
+    "dataProviders": [],
+    "themeLayoutType": "Inner",
+    "viewType": "custom-member-portal"
+  },
+  "urlName": "member"
+}

@@ -1,0 +1,43 @@
+<template
+  ><lightning-card title="Damage and replacement" icon-name="standard:case"
+    ><template if:true={loading}
+      ><lightning-spinner alternative-text="Working"></lightning-spinner
+    ></template>
+    <div class="slds-p-around_medium">
+      <p>
+        Report a damaged copy, then assign an available copy of the same book.
+      </p>
+      <lightning-textarea
+        name="notes"
+        label="Damage notes"
+        value={notes}
+        onchange={change}
+      ></lightning-textarea
+      ><lightning-button
+        class="slds-m-top_small"
+        label="Report damaged copy"
+        onclick={report}
+      ></lightning-button
+      ><lightning-combobox
+        class="slds-m-top_medium"
+        name="selectedCopyId"
+        label="Available replacement copy"
+        placeholder="Select a copy"
+        value={selectedCopyId}
+        options={copies}
+        onchange={change}
+      ></lightning-combobox
+      ><lightning-button
+        class="slds-m-top_small"
+        variant="brand"
+        label="Assign replacement"
+        onclick={replace}
+      ></lightning-button
+      ><template if:true={error}
+        ><div class="slds-text-color_error slds-m-top_small" role="alert">
+          {error}
+        </div></template
+      >
+    </div></lightning-card
+  ></template
+>

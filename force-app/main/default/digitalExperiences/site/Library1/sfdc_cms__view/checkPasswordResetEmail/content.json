@@ -1,0 +1,99 @@
+{
+  "type": "sfdc_cms__view",
+  "title": "Check Password",
+  "contentBody": {
+    "component": {
+      "children": [
+        {
+          "children": [
+            {
+              "attributes": {
+                "backgroundImageConfig": "",
+                "backgroundImageOverlay": "rgba(0,0,0,0)",
+                "componentSpacerSize": "",
+                "dxpStyle": {},
+                "layoutDirectionDesktop": "row",
+                "layoutDirectionMobile": "column",
+                "layoutDirectionTablet": "column",
+                "maxContentWidth": "",
+                "sectionColumnGutterWidth": "0",
+                "sectionConfig": "{\"UUID\":\"b070491d-4d83-4b4a-bead-d146b4a85a0f\",\"columns\":[{\"UUID\":\"9936457c-f93b-4aee-a820-e8a0a79aecb7\",\"columnName\":\"Hero\",\"columnKey\":\"col1\",\"columnWidth\":\"5\",\"seedComponents\":null},{\"UUID\":\"d7370caa-64da-4c7d-8127-a16b81976777\",\"columnName\":\"Message\",\"columnKey\":\"col2\",\"columnWidth\":\"7\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "100vh",
+                "sectionVerticalAlign": "center"
+              },
+              "children": [
+                {
+                  "children": [
+                    {
+                      "attributes": {},
+                      "definition": "c:libraryAuthHero",
+                      "id": "eb521fd8-917f-4b2a-9b60-dcd786305e03",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "9936457c-f93b-4aee-a820-e8a0a79aecb7",
+                  "name": "col1",
+                  "title": "Hero",
+                  "type": "region"
+                },
+                {
+                  "children": [
+                    {
+                      "attributes": {
+                        "checkEmailMessage": "Check the email account associated with your username for the link to reset your password. If you didn't get an email, check your Spam folder. Or contact your administrator.",
+                        "dxpStyle": {},
+                        "returnButtonLabel": "Back to login",
+                        "titleLabel": "Now check your email"
+                      },
+                      "definition": "community_login:checkEmail",
+                      "id": "fa038966-8bb2-483a-875a-513163f69a6f",
+                      "type": "component"
+                    }
+                  ],
+                  "id": "d7370caa-64da-4c7d-8127-a16b81976777",
+                  "name": "col2",
+                  "title": "Message",
+                  "type": "region"
+                }
+              ],
+              "definition": "community_layout:section",
+              "id": "b070491d-4d83-4b4a-bead-d146b4a85a0f",
+              "type": "component"
+            }
+          ],
+          "id": "bc386dc5-4d24-478b-85bb-7766a162c1c2",
+          "name": "content",
+          "title": "Content",
+          "type": "region"
+        },
+        {
+          "children": [
+            {
+              "attributes": {
+                "customHeadTags": "",
+                "description": "",
+                "dxpStyle": {},
+                "pageTitle": "Check Password",
+                "recordId": "{!recordId}"
+              },
+              "definition": "community_builder:seoAssistant",
+              "id": "f9991155-d220-48cf-84ad-88c5846aa013",
+              "type": "component"
+            }
+          ],
+          "id": "f812c037-75ed-456e-a438-58ca6a6c9798",
+          "name": "sfdcHiddenRegion",
+          "title": "sfdcHiddenRegion",
+          "type": "region"
+        }
+      ],
+      "definition": "community_layout:sldsFlexibleLayout",
+      "id": "bce5225a-01c8-461b-8db9-66e74d042872",
+      "type": "component"
+    },
+    "dataProviders": [],
+    "themeLayoutType": "Inner",
+    "viewType": "check-password"
+  },
+  "urlName": "check-password"
+}

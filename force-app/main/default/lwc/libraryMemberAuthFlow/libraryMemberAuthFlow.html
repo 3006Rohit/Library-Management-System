@@ -1,0 +1,78 @@
+<template
+  ><article class="flow-card">
+    <h1>{title}</h1>
+    <p>{description}</p>
+    <template lwc:if={error}
+      ><div class="error" role="alert">{error}</div></template
+    ><template lwc:if={message}
+      ><div class="success" role="status">{message}</div></template
+    ><template lwc:if={isForgot}
+      ><lightning-input
+        name="email"
+        type="email"
+        label="Email"
+        value={email}
+        onchange={handleInput}
+        required
+      ></lightning-input></template
+    ><template lwc:if={isActivate}
+      ><lightning-input
+        name="token"
+        label="Activation token"
+        value={token}
+        onchange={handleInput}
+        required
+      ></lightning-input></template
+    ><template lwc:if={isReset}
+      ><lightning-input
+        name="token"
+        label="Reset token"
+        value={token}
+        onchange={handleInput}
+        required
+      ></lightning-input></template
+    ><template lwc:if={isActivate}
+      ><lightning-input
+        name="password"
+        type="password"
+        label="New password"
+        value={password}
+        onchange={handleInput}
+        required
+      ></lightning-input
+      ><lightning-input
+        name="confirmation"
+        type="password"
+        label="Confirm password"
+        value={confirmation}
+        onchange={handleInput}
+        required
+      ></lightning-input></template
+    ><template lwc:if={isReset}
+      ><lightning-input
+        name="password"
+        type="password"
+        label="New password"
+        value={password}
+        onchange={handleInput}
+        required
+      ></lightning-input
+      ><lightning-input
+        name="confirmation"
+        type="password"
+        label="Confirm password"
+        value={confirmation}
+        onchange={handleInput}
+        required
+      ></lightning-input></template
+    ><lightning-button
+      variant="brand"
+      label="Continue"
+      onclick={submit}
+      disabled={busy}
+    ></lightning-button
+    ><button class="back" type="button" onclick={backToLogin}>
+      Back to login
+    </button>
+  </article></template
+>

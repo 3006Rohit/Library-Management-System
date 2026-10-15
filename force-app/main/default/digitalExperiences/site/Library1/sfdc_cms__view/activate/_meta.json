@@ -1,0 +1,6 @@
+{
+  "apiName": "activate",
+  "label": "Activate Membership",
+  "type": "sfdc_cms__view",
+  "path": "views"
+}

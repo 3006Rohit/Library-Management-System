@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Library Authentication State</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="title" type="String" label="Title" />
+            <property name="message" type="String" label="Message" />
+            <property name="actionLabel" type="String" label="Action Label" />
+            <property name="actionUrl" type="String" label="Action URL" />
+            <property name="icon" type="String" label="Icon" />
+            <property name="variant" type="String" label="Variant" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

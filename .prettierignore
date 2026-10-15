@@ -9,3 +9,7 @@
 .vscode
 
 coverage/
+
+# Salesforce-retrieved Agentforce graph payloads are base64-encoded metadata,
+# not source JSON, and must not be formatted as ordinary JSON.
+force-app/main/default/aiAgentDefinitionVersions/**

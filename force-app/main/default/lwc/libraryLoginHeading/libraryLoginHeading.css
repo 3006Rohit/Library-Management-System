@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  box-sizing: border-box;
+  width: min(100%, 440px);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.heading {
+  margin: 0 0 17px;
+  color: #09213d;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 12px;
+}

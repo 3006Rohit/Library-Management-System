@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Contact__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description
+  >Contact inherited from the owning Member for Experience Cloud sharing. Maintained by LibraryTransactionContactService.</description>
+    <label>Contact</label>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Library Member Notifications</relationshipLabel>
+    <relationshipName>Library_Member_Notifications</relationshipName>
+    <type>Lookup</type>
+</CustomField>

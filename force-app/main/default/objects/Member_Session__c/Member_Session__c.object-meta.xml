@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>Member Session</label><pluralLabel>Member Sessions</pluralLabel>
+  <nameField><displayFormat>SES-{000000}</displayFormat><label
+    >Session Number</label><type>AutoNumber</type></nameField>
+  <deploymentStatus>Deployed</deploymentStatus><sharingModel
+  >Private</sharingModel>
+  <fields><fullName>Member__c</fullName><label>Member</label><type
+    >Lookup</type><referenceTo>Member__c</referenceTo><relationshipLabel
+    >Sessions</relationshipLabel><relationshipName
+    >Sessions</relationshipName><deleteConstraint
+    >Restrict</deleteConstraint></fields>
+  <fields><fullName>Token_Hash__c</fullName><label>Token Hash</label><type
+    >Text</type><length>128</length><unique>true</unique></fields>
+  <fields><fullName>Created_At__c</fullName><label>Created At</label><type
+    >DateTime</type></fields>
+  <fields><fullName>Expires_At__c</fullName><label>Expires At</label><type
+    >DateTime</type></fields>
+  <fields><fullName>Last_Used_At__c</fullName><label>Last Used At</label><type
+    >DateTime</type></fields>
+  <fields><fullName>Revoked__c</fullName><label>Revoked</label><type
+    >Checkbox</type><defaultValue>false</defaultValue></fields>
+  <fields><fullName>IPAddress__c</fullName><label>IP Address</label><type
+    >Text</type><length>64</length></fields>
+  <fields><fullName>User_Agent__c</fullName><label>User Agent</label><type
+    >Text</type><length>255</length></fields>
+</CustomObject>

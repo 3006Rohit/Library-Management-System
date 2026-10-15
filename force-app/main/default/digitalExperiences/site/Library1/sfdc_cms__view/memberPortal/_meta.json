@@ -1,0 +1,6 @@
+{
+  "apiName": "memberPortal",
+  "label": "Member Portal",
+  "type": "sfdc_cms__view",
+  "path": "views"
+}

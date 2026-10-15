@@ -1,0 +1,6 @@
+{
+  "apiName": "resetPassword",
+  "label": "Reset Password",
+  "type": "sfdc_cms__view",
+  "path": "views"
+}

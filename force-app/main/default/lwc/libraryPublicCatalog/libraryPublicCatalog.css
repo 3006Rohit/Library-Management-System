@@ -1,0 +1,264 @@
+:host {
+  display: block;
+  color: #0b2545;
+  font-family: Inter, "Salesforce Sans", Arial, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+.catalog-page {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: #f5f8fc;
+}
+.portal-nav {
+  padding: 28px 18px;
+  color: #fff;
+  background: linear-gradient(180deg, #063b65, #022d4e);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 22px;
+  font-size: 19px;
+  font-weight: 750;
+}
+.brand > span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  color: #0877eb;
+  background: #fff;
+}
+.rule {
+  height: 1px;
+  margin: 0 5px 18px;
+  background: rgba(255, 255, 255, 0.13);
+}
+.portal-nav a {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 6px 0;
+  padding: 12px 13px;
+  border-radius: 6px;
+  color: #fff;
+  text-decoration: none;
+}
+.portal-nav a.active {
+  background: #0877eb;
+}
+main {
+  min-width: 0;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 78px;
+  padding: 16px 34px;
+  border-bottom: 1px solid #dbe4ef;
+  background: #fff;
+}
+header a {
+  color: #0877eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+.top-search {
+  width: min(520px, 60%);
+  padding: 11px 14px;
+  border: 1px solid #d5e0ec;
+  border-radius: 6px;
+  color: #71839b;
+}
+.content {
+  position: relative;
+  padding: 30px 34px 50px;
+}
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+h1 {
+  font-size: 27px;
+}
+.heading p {
+  margin-top: 5px;
+  color: #64748b;
+}
+.login-button,
+.book-copy > a {
+  padding: 10px 16px;
+  border-radius: 5px;
+  color: #fff;
+  background: #0877eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr 105px;
+  gap: 10px;
+  margin-top: 24px;
+}
+.search-row input {
+  min-height: 43px;
+  padding: 0 14px;
+  border: 1px solid #ced9e7;
+  border-radius: 6px;
+  font: inherit;
+}
+.search-row button {
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  background: #0877eb;
+  font-weight: 700;
+  cursor: pointer;
+}
+.result-count {
+  margin: 13px 0;
+  color: #64748b;
+  font-size: 13px;
+}
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+  gap: 16px;
+}
+.book-card {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  min-height: 190px;
+  padding: 14px;
+  border: 1px solid #dce5ef;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 45, 75, 0.05);
+}
+.cover-wrap {
+  width: 86px;
+  height: 130px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #e9f1fa;
+}
+.cover-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #0877eb;
+  font-size: 32px;
+}
+.book-copy {
+  min-width: 0;
+}
+.book-copy h2 {
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.author,
+.publisher {
+  margin-top: 5px;
+  color: #62748c;
+  font-size: 12px;
+}
+.category {
+  display: inline-block;
+  margin-top: 9px;
+  padding: 4px 7px;
+  border-radius: 10px;
+  color: #1266c3;
+  background: #edf5ff;
+  font-size: 10px;
+}
+.availability {
+  display: block;
+  margin: 10px 0 17px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.available {
+  color: #159447;
+}
+.unavailable {
+  color: #c2413a;
+}
+.book-copy > a {
+  display: inline-block;
+  padding: 7px 10px;
+  font-size: 11px;
+}
+.message {
+  padding: 28px;
+  border: 1px solid #dce5ef;
+  border-radius: 8px;
+  text-align: center;
+  background: #fff;
+}
+.message.error {
+  color: #b42318;
+}
+@media (max-width: 760px) {
+  .catalog-page {
+    grid-template-columns: 1fr;
+  }
+  .portal-nav {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 10px;
+  }
+  .brand {
+    padding: 0 8px;
+  }
+  .rule {
+    display: none;
+  }
+  .portal-nav a {
+    margin: 0;
+    padding: 9px;
+  }
+  .portal-nav a span {
+    display: none;
+  }
+  header {
+    padding: 12px 16px;
+  }
+  .top-search {
+    display: none;
+  }
+  .content {
+    padding: 22px 16px;
+  }
+  .heading {
+    align-items: flex-start;
+  }
+  .search-row {
+    grid-template-columns: 1fr;
+  }
+  .book-grid {
+    grid-template-columns: 1fr;
+  }
+}

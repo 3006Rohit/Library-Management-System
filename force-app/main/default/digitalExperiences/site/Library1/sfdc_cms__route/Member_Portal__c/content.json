@@ -1,0 +1,12 @@
+{
+  "type": "sfdc_cms__route",
+  "title": "Member Portal",
+  "contentBody": {
+    "activeViewId": "memberPortal",
+    "configurationTags": [],
+    "pageAccess": "Public",
+    "routeType": "custom-member-portal",
+    "urlPrefix": "member"
+  },
+  "urlName": "member"
+}

@@ -1,0 +1,52 @@
+name: Salesforce validation
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run lint
+
+  salesforce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+      - name: Require Salesforce validation configuration
+        env:
+          VALIDATION_ORG: ${{ vars.SALESFORCE_VALIDATION_ORG }}
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          if [ -z "$VALIDATION_ORG" ]; then
+            echo "SALESFORCE_VALIDATION_ORG repository variable is required."
+            exit 1
+          fi
+          if [ -z "$SFDX_AUTH_URL" ]; then
+            echo "SFDX_AUTH_URL repository secret is required."
+            exit 1
+          fi
+      - name: Authenticate validation org
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: sf org login sfdx-url --sfdx-url-stdin --alias validation-org <<< "$SFDX_AUTH_URL"
+      - name: Validate deployment package structure
+        shell: pwsh
+        run: ./scripts/validate-deployment-package.ps1
+      - name: Validate deployment
+        run: ./scripts/deploy-library.ps1 -TargetOrg validation-org -ValidateOnly
