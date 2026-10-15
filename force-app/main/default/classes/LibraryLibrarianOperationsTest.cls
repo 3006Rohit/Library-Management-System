@@ -9,6 +9,8 @@ private class LibraryLibrarianOperationsTest {
     Book_Copy__c copy;
   }
   private static void authorizeLibrarian() {
+    LibraryPolicyService.testPermissionOverrideEnabled = true;
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
     LibraryPolicyService.testGrantedPermissions = new Set<String>{
       'Manage_Library_Catalog',
       'Manage_Library_Circulation',
@@ -632,7 +634,9 @@ private class LibraryLibrarianOperationsTest {
   @IsTest
   static void unauthorizedInternalUserCannotUseLibrarianEndpoints() {
     LibraryPolicyService.testGrantedPermissions.clear();
+    LibraryPolicyService.testPermissionOverrideEnabled = false;
     LibraryRegistrationService.testLibrarianAuthorized = false;
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = false;
     Boolean dashboardDenied = false;
     try {
       LibraryLibrarianController.getDashboard();
