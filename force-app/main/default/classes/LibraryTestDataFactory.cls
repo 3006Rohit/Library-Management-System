@@ -15,9 +15,9 @@ public class LibraryTestDataFactory {
     public static Library_Registration__c registration(Membership_Plan__c plan, String email, String state) {
         String key = email.trim().toLowerCase();
         Library_Registration__c value = new Library_Registration__c(
-            First_Name__c='Test', Last_Name__c='Member', Email__c=key, Registration_Email_Key__c=key,
+            First_Name__c='Test', Last_Name__c='Member', Email__c=key, Normalized_Email__c=key,
             Phone__c='+91 9876543210', Requested_Plan__c=plan.Id, Registration_Date__c=System.now(),
-            Status__c='Pending', Provisioning_State__c=state);
+            Status__c='Pending', Provisioning_Status__c=state);
         insert value;
         return value;
     }
