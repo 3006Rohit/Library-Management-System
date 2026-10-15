@@ -81,7 +81,7 @@ Both records already have an active `Member__c` with `Member_Type__c = Test`, a 
 | `Member__c.User__c`                       | Legacy bridge and session response scrubbing | Not required by active custom-session login | KEEP_TEMPORARILY / MIGRATE                      |
 | `LibraryRegistrationUserQueueable`        | Legacy Salesforce User provisioning          | No active caller found                      | SAFE_TO_REMOVE candidate; do not delete blindly |
 | `LibraryRegistrationFinalizeQueueable`    | Legacy finalization path and direct tests    | Test/compatibility dependency               | KEEP_TEMPORARILY                                |
-| `External_User__c`, `Provisioned_User__c` | Registration metadata/UI history             | Legacy review and compatibility surfaces    | KEEP_TEMPORARILY / MIGRATE                      |
+| `Provisioned_User__c`, `Provisioned_User__c` | Registration metadata/UI history             | Legacy review and compatibility surfaces    | KEEP_TEMPORARILY / MIGRATE                      |
 
 The active registration path does not create Salesforce Users. No authentication redesign was made.
 
