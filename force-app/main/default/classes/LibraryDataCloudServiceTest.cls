@@ -1,5 +1,42 @@
 @IsTest
 private class LibraryDataCloudServiceTest {
+  private static Id testBookId;
+  private static Id testMemberId;
+
+  private static Id analyticsBookId() {
+    if (testBookId == null) {
+      Book__c book = new Book__c(
+        Name = 'Analytics Test Book',
+        ISBN__c = 'ANALYTICS-TEST',
+        Status__c = 'Active',
+        Total_Copies__c = 1,
+        Available_Copies__c = 1
+      );
+      insert book;
+      testBookId = book.Id;
+    }
+    return testBookId;
+  }
+
+  private static Id analyticsMemberId() {
+    if (testMemberId == null) {
+      Membership_Plan__c plan = LibraryTestDataFactory.plan('Analytics Test Plan');
+      Account account = LibraryTestDataFactory.communityAccount();
+      Contact contact = LibraryTestDataFactory.contact(
+        account,
+        'analytics-member@example.com'
+      );
+      Member__c member = LibraryTestDataFactory.member(
+        contact,
+        plan,
+        'analytics-member@example.com'
+      );
+      member.Account_Status__c = 'Active';
+      update member;
+      testMemberId = member.Id;
+    }
+    return testMemberId;
+  }
   @IsTest
   static void mapsLibrarianInsightsAndMissingRowsSafely() {
     LibraryDataCloudService.testRows = new Map<String, List<Map<String, Object>>>{
@@ -39,7 +76,7 @@ private class LibraryDataCloudServiceTest {
       },
       'Library_Book_Popularity__cio' => new List<Map<String, Object>>{
         new Map<String, Object>{
-          'book_id__c' => 'a05gK00008TH2ILQA1',
+          'book_id__c' => String.valueOf(analyticsBookId()),
           'total_borrow_count__c' => 3,
           'active_borrow_count__c' => 1,
           'returned_borrow_count__c' => 2
@@ -47,7 +84,7 @@ private class LibraryDataCloudServiceTest {
       },
       'Library_Reservation_Demand__cio' => new List<Map<String, Object>>{
         new Map<String, Object>{
-          'book_id__c' => 'a05gK00008TH2ILQA1',
+          'book_id__c' => String.valueOf(analyticsBookId()),
           'total_reservation_count__c' => 2,
           'fulfilled_reservation_count__c' => 1,
           'cancelled_reservation_count__c' => 1,
@@ -71,7 +108,7 @@ private class LibraryDataCloudServiceTest {
 
   @IsTest
   static void mapsMemberInsightRowsAndDefaultsMissingRows() {
-    Id memberId = 'a09gK00000QpiUnQAJ';
+    Id memberId = analyticsMemberId();
     LibraryDataCloudService.testRows = new Map<String, List<Map<String, Object>>>{
       'Library_Member_Loan_Activity__cio' => new List<Map<String, Object>>{
         new Map<String, Object>{
@@ -114,7 +151,7 @@ private class LibraryDataCloudServiceTest {
       }
     };
     LibraryDataCloudService.MemberAnalyticsDTO result = LibraryDataCloudService.getMemberAnalytics(
-      'a09gK00000QpiUnQAJ'
+      String.valueOf(analyticsMemberId())
     );
     System.assertEquals(3, result.totalReservations);
     System.assertEquals(2, result.activeReservationCount);
@@ -154,7 +191,7 @@ private class LibraryDataCloudServiceTest {
   static void returnsSafeMemberFailureState() {
     LibraryDataCloudService.forceFailure = true;
     LibraryDataCloudService.MemberAnalyticsDTO result = LibraryDataCloudService.getMemberAnalytics(
-      'a09gK00000QpiUnQAJ'
+      String.valueOf(analyticsMemberId())
     );
     System.assertEquals(false, result.available);
     System.assert(result.message.contains('temporarily unavailable'));
@@ -168,7 +205,7 @@ private class LibraryDataCloudServiceTest {
     for (Integer index = 0; index < 11; index++) {
       popularity.add(
         new Map<String, Object>{
-          'book_id__c' => 'a05gK00008TH2ILQA1',
+          'book_id__c' => String.valueOf(analyticsBookId()),
           'total_borrow_count__c' => index,
           'active_borrow_count__c' => 0,
           'returned_borrow_count__c' => index
@@ -176,7 +213,7 @@ private class LibraryDataCloudServiceTest {
       );
       demand.add(
         new Map<String, Object>{
-          'book_id__c' => 'a05gK00008TH2ILQA1',
+          'book_id__c' => String.valueOf(analyticsBookId()),
           'total_reservation_count__c' => index,
           'fulfilled_reservation_count__c' => 0,
           'cancelled_reservation_count__c' => index,
