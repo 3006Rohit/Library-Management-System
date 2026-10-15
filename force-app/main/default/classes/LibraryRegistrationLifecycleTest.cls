@@ -2,6 +2,8 @@
 private class LibraryRegistrationLifecycleTest {
   @IsTest
   static void runtimeFieldsAndSubmissionStateAreCorrect() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Lifecycle Plan');
     LibraryRegistrationController.RegistrationInput input = new LibraryRegistrationController.RegistrationInput();
     input.firstName = ' Test ';
@@ -33,6 +35,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void missingSharedAccountFailsSafely() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Failure Plan');
     Library_Registration__c value = LibraryTestDataFactory.registration(
       plan,
@@ -60,6 +64,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void finalizationIsIdempotentAndCompletesRegistration() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Finalize Plan');
     Account account = LibraryTestDataFactory.communityAccount();
     Contact contact = LibraryTestDataFactory.contact(
@@ -110,6 +116,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void retryOnlyAllowsFailedState() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Retry Plan');
     Library_Registration__c value = LibraryTestDataFactory.registration(
@@ -135,6 +143,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void controllerAndGuestSurfacesUseCanonicalFields() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Controller Plan');
     LibraryRegistrationController.RegistrationInput input = new LibraryRegistrationController.RegistrationInput();
@@ -163,6 +173,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void guestCatalogReturnsActiveBooksAndSupportsSearch() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     insert new List<Book__c>{
       new Book__c(
         Name = 'Public Catalog Book',
@@ -194,6 +206,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void approvalAndRejectionFollowStateRules() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Decision Plan');
     Library_Registration__c approved = LibraryTestDataFactory.registration(
@@ -233,6 +247,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void provisioningReusesExistingContactAndMember() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Reuse Plan');
     Account account = LibraryTestDataFactory.communityAccount();
     Contact contact = LibraryTestDataFactory.contact(
@@ -275,6 +291,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void configurationAndNormalizationHelpersAreSafe() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     System.assertEquals(
       'sample@example.com',
       LibraryRegistrationService.normalizeEmail('  SAMPLE@example.com ')
@@ -296,6 +314,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void failedProvisioningCanBeRetriedSafely() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Retryable Plan');
     Library_Registration__c value = LibraryTestDataFactory.registration(
@@ -321,6 +341,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void completedRegistrationCannotBeApprovedAgain() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Completed Plan');
     Library_Registration__c value = LibraryTestDataFactory.registration(
@@ -349,6 +371,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void inputValidationRejectsUnsafeValues() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan('Validation Plan');
     LibraryRegistrationController.RegistrationInput input = new LibraryRegistrationController.RegistrationInput();
     input.firstName = 'Valid';
@@ -384,6 +408,8 @@ private class LibraryRegistrationLifecycleTest {
 
   @IsTest
   static void queuedFailureHandlerStoresSafeMessage() {
+    LibraryRegistrationService.testAuthorizationOverrideEnabled = true;
+    LibraryRegistrationService.testLibrarianAuthorized = true;
     Membership_Plan__c plan = LibraryTestDataFactory.plan(
       'Queued Failure Plan'
     );
