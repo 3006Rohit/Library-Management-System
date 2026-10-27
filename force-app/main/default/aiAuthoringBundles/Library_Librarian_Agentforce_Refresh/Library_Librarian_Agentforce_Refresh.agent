@@ -61,25 +61,43 @@ knowledge:
     citations_url: ""
     rag_feature_config_id: ""
 
-start_agent agent_router:
-    label: "Agent Router"
-    description: "Welcome the librarian and determine the appropriate subagent based on user input"
+start_agent circulation_information:
+    label: "Circulation Information"
+    description: "Retrieve circulation analytics"
+
+    actions:
+        get_circulation_analytics:
+            description: "Get circulation data"
+            label: "Get Data"
+            require_user_confirmation: False
+            include_in_progress_indicator: True
+            progress_indicator_message: "Loading"
+            source: "LibraryAgentAnalyticsAction"
+            target: "apex://LibraryAgentAnalyticsAction"
+            inputs:
+                requestContext: string
+                    description: "Context"
+                    label: "Context"
+                    is_required: False
+                    is_user_input: False
+            outputs:
+                overdueLoans: number
+                    description: "Overdue"
+                    label: "Overdue"
+                    is_displayable: True
+                    filter_from_agent: False
+                activeLoans: number
+                    description: "Active"
+                    label: "Active"
+                    is_displayable: True
+                    filter_from_agent: False
 
     reasoning:
         instructions: ->
-            | Route immediately based on the message content without asking clarifying questions.
-              Keywords: "overdue|overdue items|pending|circulation|loans|reservations|fines|returns" → circulation_information
-              Keywords: "search|find|book|author|title|catalog" → catalog_search
-              Keywords: "member|user|borrower|patron" → member_lookup
-              Keywords: "analytics|statistics|counts|popularity|demand|trending" → library_analytics
-              Otherwise: Go to off_topic for escalation.
+            | Invoke get_circulation_analytics immediately. Display results directly.
         actions:
-            route_to_circulation: @utils.transition to @subagent.circulation_information
-            route_to_catalog: @utils.transition to @subagent.catalog_search
-            route_to_member: @utils.transition to @subagent.member_lookup
-            route_to_analytics: @utils.transition to @subagent.library_analytics
-            route_to_off_topic: @utils.transition to @subagent.off_topic
-            escalate: @utils.escalate
+            get_data: @actions.get_circulation_analytics
+                with requestContext=...
 
 subagent escalation:
     label: "Escalation"
