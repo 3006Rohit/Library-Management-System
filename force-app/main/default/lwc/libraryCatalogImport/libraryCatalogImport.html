@@ -1,0 +1,70 @@
+<template>
+  <section class="import-panel" aria-label="Bulk catalog import">
+    <div class="header">
+      <div>
+        <p class="eyebrow">Catalog quality workflow</p>
+        <h2>Bulk catalog import</h2>
+        <p>
+          Upload CSV text with title and ISBN columns. Preview validates every
+          row before any book is created.
+        </p>
+      </div>
+      <div class="actions">
+        <button type="button" onclick={preview} disabled={loading}>
+          Preview</button
+        ><button
+          type="button"
+          class="secondary"
+          onclick={commit}
+          disabled={commitDisabled}
+        >
+          Commit valid rows
+        </button>
+      </div>
+    </div>
+    <label class="key-label"
+      >Stable import key<input
+        value={importKey}
+        oninput={captureKey}
+        placeholder="e.g. vendor-batch-2026-10-16"
+    /></label>
+    <textarea
+      class="csv-input"
+      oninput={captureCsv}
+      placeholder="title,isbn,publisher,publicationYear&#10;Example Book,ISBN-001,Press,2024"
+      aria-label="Catalog CSV input"
+    ></textarea>
+    <template if:true={loading}
+      ><div class="message">Validating rows…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Row</th>
+              <th>Title</th>
+              <th>ISBN</th>
+              <th>Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row"
+              ><tr key={row.rowNumber}>
+                <td>{row.rowNumber}</td>
+                <td>{row.title}</td>
+                <td>{row.isbn}</td>
+                <td>{row.status}</td>
+                <td>{row.error}</td>
+              </tr></template
+            >
+          </tbody>
+        </table>
+      </div>
+    </template>
+  </section>
+</template>

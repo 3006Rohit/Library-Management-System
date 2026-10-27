@@ -1,0 +1,13 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "loanId": { "title": "loanId", "description": "Loan identifier for internal reasoning only.", "lightning:type": "lightning__textType", "lightning:isPII": true, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "bookTitle": { "title": "bookTitle", "description": "Borrowed book title.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "borrowDate": { "title": "borrowDate", "description": "Loan start date.", "lightning:type": "lightning__dateTimeType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "dueDate": { "title": "dueDate", "description": "Loan due date.", "lightning:type": "lightning__dateTimeType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "returnDate": { "title": "returnDate", "description": "Loan return date when returned.", "lightning:type": "lightning__dateTimeType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "status": { "title": "status", "description": "Loan lifecycle status.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "renewalCount": { "title": "renewalCount", "description": "Number of renewals used.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true }
+  },
+  "lightning:type": "lightning__objectType"
+}

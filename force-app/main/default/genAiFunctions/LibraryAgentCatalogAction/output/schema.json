@@ -1,0 +1,12 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "bookId": { "title": "Book Id", "description": "Book record identifier.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "status": { "title": "Status", "description": "Book status.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "title": { "title": "Title", "description": "Book title.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "totalCopies": { "title": "Total Copies", "description": "Total copies for the catalog book.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "availableCopies": { "title": "Available Copies", "description": "Available copies for the catalog book.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "message": { "title": "Message", "description": "Safe catalog result message.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true }
+  },
+  "lightning:type": "lightning__objectType"
+}

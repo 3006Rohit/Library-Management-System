@@ -1,0 +1,8 @@
+{
+  "required": ["memberLookup"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "memberLookup": { "title": "Member Lookup", "description": "Authorized lookup value supplied by the librarian.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isUserInput": false }
+  },
+  "lightning:type": "lightning__objectType"
+}

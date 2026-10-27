@@ -1,0 +1,79 @@
+<template>
+  <section class="privacy-review" aria-label="Privacy request review">
+    <div class="review-header">
+      <div>
+        <p class="eyebrow">Governed privacy workflow</p>
+        <h2>Privacy requests</h2>
+        <p>
+          Review corrections and closure requests. Exports are generated from an
+          allowlist and never expose authentication secrets.
+        </p>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading privacy requests…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}
+      ><div class="responsive-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Request</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row"
+              ><tr key={row.id}>
+                <td>{row.memberName}</td>
+                <td>{row.requestType}</td>
+                <td>{row.reason}</td>
+                <td><span class="status">{row.status}</span></td>
+                <td>
+                  <textarea
+                    data-id={row.id}
+                    onchange={captureReason}
+                    placeholder="Decision reason"
+                  ></textarea>
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="approve"
+                      data-id={row.id}
+                      data-status="Approved"
+                      onclick={decide}
+                      disabled={row.disabled}
+                    >
+                      Approve</button
+                    ><button
+                      type="button"
+                      class="reject"
+                      data-id={row.id}
+                      data-status="Rejected"
+                      onclick={decide}
+                      disabled={row.disabled}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </td>
+              </tr></template
+            >
+          </tbody>
+        </table>
+      </div></template
+    >
+    <template if:false={hasRows}
+      ><div class="empty">
+        No privacy requests have been submitted.
+      </div></template
+    >
+  </section>
+</template>

@@ -5,7 +5,7 @@ public without sharing class LibraryMemberBorrowService {
     if (bookId == null)
       throw new AuraHandledException('A book must be selected.');
     Member__c member = [
-      SELECT Id, Contact__c, Status__c
+      SELECT Id, Contact__c, Status__c, Email__c
       FROM Member__c
       WHERE Id = :resolvedMember.Id
       FOR UPDATE
@@ -46,6 +46,15 @@ public without sharing class LibraryMemberBorrowService {
     );
     insert request;
     update new Book_Copy__c(Id = copies[0].Id, Status__c = 'Reserved');
+    LibraryMemberNotificationService.create(
+      member.Id,
+      'Borrow Request',
+      'Borrow request submitted',
+      'Your borrowing request is awaiting librarian approval.',
+      request.Id,
+      'BORROW-REQUEST-' + request.Id,
+      member.Email__c
+    );
     return request.Id;
   }
 

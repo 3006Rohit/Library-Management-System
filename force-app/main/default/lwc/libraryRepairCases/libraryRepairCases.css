@@ -1,0 +1,128 @@
+:host {
+  display: block;
+}
+.repair-panel {
+  background: #fff;
+  border: 1px solid #dce5ef;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgb(24 52 84 / 6%);
+  margin: 1rem 0;
+  padding: 1.25rem;
+}
+.header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+h2 {
+  color: #17365d;
+  margin: 0.1rem 0 0.35rem;
+}
+.header p {
+  color: #61758e;
+  margin: 0;
+  max-width: 720px;
+}
+.eyebrow {
+  color: #3377b8 !important;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.count,
+.status {
+  background: #e8f5ec;
+  border-radius: 999px;
+  color: #237445;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  white-space: nowrap;
+}
+.open-form,
+.filter-row,
+.actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+input,
+select {
+  border: 1px solid #c8d6e5;
+  border-radius: 8px;
+  padding: 0.55rem;
+}
+.open-form input:first-child {
+  max-width: 190px;
+}
+.open-form input:nth-child(2) {
+  flex: 1;
+  min-width: 230px;
+}
+button {
+  background: #246ca6;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.58rem 0.8rem;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.refresh {
+  background: #edf3f8;
+  color: #31526f;
+}
+.filter-row label {
+  color: #5c7087;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,
+td {
+  border-bottom: 1px solid #edf1f5;
+  padding: 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  color: #5c7087;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+td {
+  color: #2d435d;
+  font-size: 0.84rem;
+}
+td input {
+  display: block;
+  margin-bottom: 0.35rem;
+  min-width: 150px;
+  width: 100%;
+}
+.actions button {
+  font-size: 0.72rem;
+  padding: 0.4rem 0.55rem;
+}
+.actions .danger {
+  background: #a63f4b;
+}
+.empty {
+  color: #61758e;
+  margin: 1.2rem 0 0.25rem;
+}

@@ -1,0 +1,132 @@
+<template>
+  <section class="metadata-panel" aria-label="ISBN metadata enrichment">
+    <div class="header">
+      <div>
+        <p class="eyebrow">Catalog quality</p>
+        <h2>ISBN metadata enrichment</h2>
+        <p>
+          Preview provider data, compare quality warnings, and apply only the
+          fields you select.
+        </p>
+      </div>
+    </div>
+    <div class="lookup-form">
+      <input
+        data-field="isbn"
+        oninput={capture}
+        placeholder="ISBN-10 or ISBN-13"
+        aria-label="ISBN"
+      />
+      <button type="button" onclick={lookup} disabled={canLookup}>
+        Preview metadata
+      </button>
+    </div>
+    <template if:true={hasMetadata}>
+      <div class="preview-grid">
+        <div><span>Title</span><strong>{metadata.title}</strong></div>
+        <div><span>Authors</span><strong>{metadata.authorsLabel}</strong></div>
+        <div><span>Publisher</span><strong>{metadata.publisher}</strong></div>
+        <div>
+          <span>Publication year</span
+          ><strong>{metadata.publicationYear}</strong>
+        </div>
+        <div><span>Language</span><strong>{metadata.language}</strong></div>
+        <div><span>Edition</span><strong>{metadata.edition}</strong></div>
+        <div class="wide">
+          <span>Description</span>
+          <p>{metadata.description}</p>
+        </div>
+        <div class="wide">
+          <span>Categories</span>
+          <p>{metadata.categoriesLabel}</p>
+        </div>
+      </div>
+      <template if:true={hasWarnings}
+        ><p class="warning">{warningText}</p></template
+      >
+      <template if:true={metadata.duplicateBookId}
+        ><p class="duplicate">
+          A catalog record already uses this ISBN. Applying ISBN will be
+          rejected unless it is the same record.
+        </p></template
+      >
+      <div class="apply-form">
+        <input
+          data-field="bookId"
+          oninput={capture}
+          placeholder="Target Book record ID"
+          aria-label="Target Book record ID"
+        />
+        <div class="field-list">
+          <label
+            ><input
+              type="checkbox"
+              data-field="isbn"
+              checked={isIsbnSelected}
+              onchange={toggleField}
+            />ISBN</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              data-field="title"
+              checked={isTitleSelected}
+              onchange={toggleField}
+            />Title</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              data-field="publisher"
+              checked={isPublisherSelected}
+              onchange={toggleField}
+            />Publisher</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              data-field="publicationYear"
+              checked={isPublicationYearSelected}
+              onchange={toggleField}
+            />Year</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              data-field="edition"
+              checked={isEditionSelected}
+              onchange={toggleField}
+            />Edition</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              data-field="language"
+              checked={isLanguageSelected}
+              onchange={toggleField}
+            />Language</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              data-field="description"
+              checked={isDescriptionSelected}
+              onchange={toggleField}
+            />Description</label
+          >
+          <label
+            ><input
+              type="checkbox"
+              data-field="coverUrl"
+              checked={isCoverUrlSelected}
+              onchange={toggleField}
+            />Cover</label
+          >
+        </div>
+        <button type="button" onclick={apply} disabled={canApply}>
+          Apply {selectedCount} selected fields
+        </button>
+      </div>
+    </template>
+  </section>
+</template>

@@ -1,0 +1,118 @@
+<template>
+  <section class="repair-panel" aria-label="Copy repair cases">
+    <div class="header">
+      <div>
+        <p class="eyebrow">Collection care</p>
+        <h2>Missing &amp; damaged copy repair</h2>
+        <p>
+          Keep damaged or lost copies out of circulation until a librarian
+          records a controlled outcome.
+        </p>
+      </div>
+      <span class="count">{openCaseCount} open</span>
+    </div>
+
+    <div class="open-form">
+      <input
+        data-field="barcode"
+        oninput={capture}
+        placeholder="Copy barcode"
+        aria-label="Copy barcode"
+      />
+      <input
+        data-field="reason"
+        oninput={capture}
+        placeholder="Issue description (at least 10 characters)"
+        aria-label="Issue description"
+      />
+      <button type="button" onclick={openCase} disabled={openDisabled}>
+        Open repair case
+      </button>
+    </div>
+
+    <div class="filter-row">
+      <label for="repair-status">Show</label>
+      <select id="repair-status" onchange={changeStatus}>
+        <template for:each={statusOptions} for:item="option">
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        </template>
+      </select>
+      <button type="button" class="refresh" onclick={refresh} disabled={busy}>
+        Refresh
+      </button>
+    </div>
+
+    <template if:true={hasCases}>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Copy</th>
+              <th>Barcode</th>
+              <th>Previous status</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Resolution</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={cases} for:item="repair">
+              <tr key={repair.id}>
+                <td>{repair.copyName}</td>
+                <td>{repair.barcode}</td>
+                <td>{repair.previousStatus}</td>
+                <td>{repair.reason}</td>
+                <td><span class="status">{repair.status}</span></td>
+                <td>
+                  <template if:true={repair.isOpen}>
+                    <input
+                      data-field="resolution"
+                      oninput={capture}
+                      placeholder="Resolution"
+                      aria-label="Resolution"
+                    />
+                    <input
+                      data-field="note"
+                      oninput={capture}
+                      placeholder="Inspection note (10+ chars)"
+                      aria-label="Inspection note"
+                    />
+                    <div class="actions">
+                      <button
+                        type="button"
+                        data-id={repair.id}
+                        data-status="Repaired"
+                        onclick={resolveCase}
+                        disabled={resolveDisabled}
+                      >
+                        Repaired
+                      </button>
+                      <button
+                        type="button"
+                        class="danger"
+                        data-id={repair.id}
+                        data-status="Unrepairable"
+                        onclick={resolveCase}
+                        disabled={resolveDisabled}
+                      >
+                        Unrepairable
+                      </button>
+                    </div>
+                  </template>
+                  <template if:false={repair.isOpen}
+                    >{repair.resolution}</template
+                  >
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+    <template if:false={hasCases}
+      ><p class="empty">No repair cases match this filter.</p></template
+    >
+  </section>
+</template>

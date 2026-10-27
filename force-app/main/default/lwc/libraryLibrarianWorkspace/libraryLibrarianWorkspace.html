@@ -289,6 +289,10 @@
           </section>
         </template>
 
+        <template if:true={isAcquisitions}>
+          <c-library-acquisition-dashboard></c-library-acquisition-dashboard>
+        </template>
+
         <template if:true={isDashboard}>
           <section
             class="panel data-cloud-panel"
@@ -391,6 +395,8 @@
               <div class="empty">{analyticsMessage}</div>
             </template>
           </section>
+          <c-library-librarian-closures></c-library-librarian-closures>
+          <c-library-repair-cases></c-library-repair-cases>
         </template>
 
         <template if:true={isBooks}>
@@ -1077,6 +1083,7 @@
                     <th>Issue Date</th>
                     <th>Due Date</th>
                     <th>Status</th>
+                    <th>Defect / Replacement</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -1090,6 +1097,22 @@
                       <td>{loan.Due_Date__c}</td>
                       <td>
                         <span class={loan.statusClass}>{loan.Status__c}</span>
+                      </td>
+                      <td class="defect-cell">
+                        <template if:true={loan.replacementRequired}>
+                          <strong class="defect-flag"
+                            >Replacement required</strong
+                          >
+                          <small>{loan.defectReportedDate}</small>
+                          <p title={loan.defectNotes}>{loan.defectNotes}</p>
+                          <c-library-damage-replacement-panel
+                            record-id={loan.Id}
+                            replacement-only
+                          ></c-library-damage-replacement-panel>
+                        </template>
+                        <template if:false={loan.replacementRequired}
+                          >—</template
+                        >
                       </td>
                       <td class="row-actions">
                         <template if:true={loan.canApprove}
@@ -1172,6 +1195,7 @@
                     <th>Reserved On</th>
                     <th>Status</th>
                     <th>Queue Position</th>
+                    <th>Estimated Availability</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -1188,6 +1212,10 @@
                         >
                       </td>
                       <td>{reservation.queuePosition}</td>
+                      <td title={reservation.etaReason}>
+                        <strong>{reservation.etaDateLabel}</strong>
+                        <small>{reservation.etaConfidence} confidence</small>
+                      </td>
                       <td>
                         <button
                           class="action-link"
@@ -1500,6 +1528,53 @@
               <div>
                 <span>Active members</span
                 ><strong>{dashboard.activeMembers}</strong>
+              </div>
+            </div>
+          </section>
+          <section class="panel report-panel delivery-health-panel">
+            <div class="report-panel-heading">
+              <div>
+                <h2>Notification delivery health</h2>
+                <p>
+                  Per-channel delivery attempts with preference and provider
+                  outcomes.
+                </p>
+              </div>
+              <div class="delivery-actions">
+                <span class="delivery-total"
+                  >{notificationDelivery.total} attempts</span
+                >
+                <button
+                  class="button secondary"
+                  type="button"
+                  onclick={retryFailedDeliveries}
+                  disabled={retryDeliveryDisabled}
+                >
+                  Retry failed email
+                </button>
+              </div>
+            </div>
+            <div class="report-lines delivery-lines">
+              <div>
+                <span>Pending</span
+                ><strong>{notificationDelivery.pending}</strong>
+              </div>
+              <div>
+                <span>Sent</span><strong>{notificationDelivery.sent}</strong>
+              </div>
+              <div>
+                <span>Delivered in-app</span
+                ><strong>{notificationDelivery.delivered}</strong>
+              </div>
+              <div>
+                <span>Failed</span
+                ><strong class="delivery-failed"
+                  >{notificationDelivery.failed}</strong
+                >
+              </div>
+              <div>
+                <span>Skipped by preference/address</span
+                ><strong>{notificationDelivery.skipped}</strong>
               </div>
             </div>
           </section>
@@ -2087,6 +2162,18 @@
           <div>
             <span>Expires On</span
             ><strong>{selectedReservation.Expiry_Date__c}</strong>
+          </div>
+          <div>
+            <span>Estimated Availability</span
+            ><strong>{selectedReservation.etaDateLabel}</strong>
+          </div>
+          <div>
+            <span>ETA Confidence</span
+            ><strong>{selectedReservation.etaConfidence}</strong>
+          </div>
+          <div>
+            <span>ETA Explanation</span
+            ><strong>{selectedReservation.etaReason}</strong>
           </div>
         </div>
         <footer>

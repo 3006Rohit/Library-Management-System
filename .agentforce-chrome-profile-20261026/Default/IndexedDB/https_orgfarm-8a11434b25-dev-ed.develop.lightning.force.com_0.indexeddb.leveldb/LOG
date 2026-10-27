@@ -1,0 +1,15 @@
+2026/10/26-08:32:11.174 6094 Creating DB C:\Users\Rohit\Desktop\Library Management System\.agentforce-chrome-profile-20261026\Default\IndexedDB\https_orgfarm-8a11434b25-dev-ed.develop.lightning.force.com_0.indexeddb.leveldb since it was missing.
+2026/10/26-08:32:11.180 6094 Reusing MANIFEST C:\Users\Rohit\Desktop\Library Management System\.agentforce-chrome-profile-20261026\Default\IndexedDB\https_orgfarm-8a11434b25-dev-ed.develop.lightning.force.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/10/26-08:32:11.604 2e58 Level-0 table #5: started
+2026/10/26-08:32:11.606 2e58 Level-0 table #5: 13498 bytes OK
+2026/10/26-08:32:11.608 2e58 Delete type=0 #3
+2026/10/26-08:32:11.608 6094 Manual compaction at level-0 from '\x00\x09\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0a\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/10/26-08:52:26.576 804 Level-0 table #7: started
+2026/10/26-08:52:26.590 804 Level-0 table #7: 1396566 bytes OK
+2026/10/26-08:52:26.593 804 Delete type=0 #4
+2026/10/26-09:30:12.550 6094 Compacting 1@1 + 1@2 files
+2026/10/26-09:30:12.663 6094 Generated table #8@1: 399 keys, 559210 bytes
+2026/10/26-09:30:12.663 6094 Compacted 1@1 + 1@2 files => 559210 bytes
+2026/10/26-09:30:12.666 6094 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/10/26-09:30:12.666 6094 Delete type=2 #5
+2026/10/26-09:30:12.667 6094 Delete type=2 #7

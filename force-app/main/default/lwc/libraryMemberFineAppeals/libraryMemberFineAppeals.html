@@ -1,0 +1,51 @@
+<template>
+  <section class="appeal-page" aria-label="Fine appeals">
+    <div class="appeal-header">
+      <div>
+        <p class="eyebrow">Fair review</p>
+        <h2>Fine appeals</h2>
+        <p>Explain a disputed charge and let a librarian review it.</p>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading fines…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <div class="appeal-list">
+      <template for:each={rows} for:item="row"
+        ><article class="appeal-card" key={row.Id}>
+          <div>
+            <h3>{row.Name}</h3>
+            <p>{row.Fine_Type__c} · {row.Amount__c}</p>
+            <template if:true={row.appeal}
+              ><span class="status">Appeal: {row.appeal.status}</span
+              ><template if:true={row.appeal.decisionReason}
+                ><small>{row.appeal.decisionReason}</small></template
+              ></template
+            ><template if:false={row.appeal}>
+              <textarea
+                data-id={row.Id}
+                placeholder="Explain why this fine should be reviewed"
+                onchange={captureReason}
+              ></textarea
+              ><button
+                type="button"
+                class="primary"
+                data-id={row.Id}
+                onclick={submit}
+              >
+                Submit appeal
+              </button></template
+            >
+          </div>
+        </article></template
+      >
+    </div>
+    <template if:false={hasRows}
+      ><div class="empty">You have no fines eligible for appeal.</div></template
+    >
+  </section>
+</template>

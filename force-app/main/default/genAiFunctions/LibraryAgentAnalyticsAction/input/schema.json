@@ -1,0 +1,8 @@
+{
+  "required": [],
+  "unevaluatedProperties": false,
+  "properties": {
+    "requestContext": { "title": "Request Context", "description": "Optional context for a librarian analytics request.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isUserInput": false }
+  },
+  "lightning:type": "lightning__objectType"
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <canEscalate>false</canEscalate>
+    <description>This topic is chosen when the authenticated member requests information about their current or past loans using their server-validated session token.</description>
+    <developerName>p_16jgK000002I337_My_Loans</developerName>
+    <genAiFunctions>
+        <functionName>LibraryAgentMyLoansAction</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>EmployeeCopilot__AnswerQuestionsWithKnowledge</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>If the query is about viewing the member&apos;s own loans, use LibraryAgentMyLoansAction.</description>
+        <developerName>instruction_0</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_0</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>p_16jgK000002I337_My_Loans</localDeveloperName>
+    <masterLabel>My Loans</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>Your job is to only provide details about the authenticated member&apos;s current and past loans using the server-validated session token. You cannot disclose loan information for other members or perform any write operations.</scope>
+</GenAiPlugin>

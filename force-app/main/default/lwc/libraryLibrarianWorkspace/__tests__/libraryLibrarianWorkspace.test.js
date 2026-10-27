@@ -2,6 +2,12 @@ import { createElement } from "lwc";
 import LibraryLibrarianWorkspace from "c/libraryLibrarianWorkspace";
 import getDashboard from "@salesforce/apex/LibraryLibrarianController.getDashboard";
 import getDashboardAnalytics from "@salesforce/apex/LibraryLibrarianController.getDashboardAnalytics";
+import getNotificationDeliverySummary from "@salesforce/apex/LibraryLibrarianController.getNotificationDeliverySummary";
+import retryFailedNotificationDeliveries from "@salesforce/apex/LibraryLibrarianController.retryFailedNotificationDeliveries";
+import getDataCloudReadiness from "@salesforce/apex/LibraryLibrarianController.getDataCloudReadiness";
+import getLedgerMigrationReadiness from "@salesforce/apex/LibraryLibrarianController.getLedgerMigrationReadiness";
+import getLedgerMigrationReview from "@salesforce/apex/LibraryLibrarianController.getLedgerMigrationReview";
+import recordLedgerMigrationReview from "@salesforce/apex/LibraryLibrarianController.recordLedgerMigrationReview";
 import searchBooks from "@salesforce/apex/LibraryLibrarianController.searchBooks";
 import searchCopies from "@salesforce/apex/LibraryLibrarianController.searchCopies";
 import searchMembers from "@salesforce/apex/LibraryLibrarianController.searchMembers";
@@ -29,6 +35,67 @@ jest.mock(
         available: false,
         topBorrowedBooks: [],
         reservationDemand: []
+      })
+    )
+  }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryLibrarianController.getNotificationDeliverySummary",
+  () => ({ default: jest.fn(() => Promise.resolve({ total: 0 })) }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryLibrarianController.retryFailedNotificationDeliveries",
+  () => ({ default: jest.fn(() => Promise.resolve(0)) }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryLibrarianController.getDataCloudReadiness",
+  () => ({
+    default: jest.fn(() =>
+      Promise.resolve({
+        ready: false,
+        status: "Blocked",
+        blockers: ["Data Cloud source readiness is incomplete."],
+        warnings: []
+      })
+    )
+  }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryLibrarianController.getLedgerMigrationReadiness",
+  () => ({
+    default: jest.fn(() =>
+      Promise.resolve({
+        ready: true,
+        status: "Ready for migration planning",
+        totalRows: 0,
+        migratableRows: 0,
+        malformedRows: 0,
+        unknownOperationRows: 0,
+        blockers: [],
+        operations: []
+      })
+    )
+  }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryLibrarianController.getLedgerMigrationReview",
+  () => ({ default: jest.fn(() => Promise.resolve(null)) }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryLibrarianController.recordLedgerMigrationReview",
+  () => ({
+    default: jest.fn(() =>
+      Promise.resolve({
+        auditId: "audit-1",
+        status: "Reviewed",
+        reviewer: "Librarian",
+        reviewedAt: "2026-10-17T00:00:00.000Z"
       })
     )
   }),
@@ -151,11 +218,45 @@ describe("libraryLibrarianWorkspace", () => {
     document.body.appendChild(element);
     await flushPromises();
 
-    expect(element.shadowRoot.querySelectorAll(".nav-item")).toHaveLength(13);
+    expect(element.shadowRoot.querySelectorAll(".nav-item")).toHaveLength(14);
     expect(element.shadowRoot.querySelectorAll(".metric-card")).toHaveLength(0);
     expect(
       element.shadowRoot.querySelector(".page-heading h1").textContent
     ).toBe("Dashboard");
+  });
+
+  it("allows librarians to retry failed email deliveries", async () => {
+    getDashboard.mockResolvedValue({ recentLoans: [] });
+    getNotificationDeliverySummary.mockResolvedValue({
+      total: 4,
+      pending: 0,
+      sent: 1,
+      delivered: 1,
+      failed: 2,
+      skipped: 0
+    });
+    retryFailedNotificationDeliveries.mockResolvedValue(2);
+    const element = createElement("c-library-librarian-workspace", {
+      is: LibraryLibrarianWorkspace
+    });
+    document.body.appendChild(element);
+    await flushPromises();
+    const reportsButton = [
+      ...element.shadowRoot.querySelectorAll(".nav-item")
+    ].find((button) => button.textContent.includes("Reports"));
+    reportsButton.click();
+    await flushPromises();
+
+    const retryButton = element.shadowRoot.querySelector(
+      ".delivery-health-panel button"
+    );
+    expect(retryButton.disabled).toBe(false);
+    retryButton.click();
+    await flushPromises();
+
+    expect(retryFailedNotificationDeliveries).toHaveBeenCalledWith({
+      requestedLimit: 10
+    });
   });
 
   it("opens the Librarian Assistant tab without loading transactional data", async () => {
@@ -290,6 +391,135 @@ describe("libraryLibrarianWorkspace", () => {
     expect(
       element.shadowRoot.querySelector(".data-cloud-panel").textContent
     ).toContain("1984");
+  });
+
+  it("builds a source-safe Data Cloud handoff checklist", async () => {
+    getDashboard.mockResolvedValue({ recentLoans: [] });
+    getDataCloudReadiness.mockResolvedValue({
+      ready: true,
+      status: "Ready",
+      handoffVersion: "2026-10-17-v1",
+      generatedAt: "2026-10-17T00:00:00.000Z",
+      productionMemberFilter: "Member_Type__c = Production",
+      productionChildFilter: "Member__r.Member_Type__c = Production",
+      governedSources: ["Member__c", "Borrow_Record__c"],
+      deferredSources: ["Member_Session__c"],
+      orphanLoans: 1,
+      orphanReservations: 1,
+      orphanFines: 0,
+      calculatedInsightStatus: "Ready for setup review",
+      calculatedInsights: [
+        {
+          name: "Active loan count",
+          purpose: "Count active and overdue loans by member.",
+          sources: "Borrow_Record__c + Member__c",
+          status: "Ready for setup review"
+        }
+      ],
+      blockers: [],
+      warnings: []
+    });
+    const element = createElement("c-library-librarian-workspace", {
+      is: LibraryLibrarianWorkspace
+    });
+    document.body.appendChild(element);
+    await flushPromises();
+
+    const reportsButton = [
+      ...element.shadowRoot.querySelectorAll(".nav-item")
+    ].find((button) => button.textContent.includes("Reports"));
+    reportsButton.click();
+    await flushPromises();
+
+    const panelText =
+      element.shadowRoot.querySelector(".readiness-panel").textContent;
+    expect(panelText).toContain("v2026-10-17-v1");
+    expect(panelText).toContain("Member__r.Member_Type__c = Production");
+    expect(panelText).toContain("Member_Session__c");
+    expect(panelText).toContain("Relationship gaps");
+    expect(panelText).toContain("2");
+    expect(panelText).toContain("Calculated insight blueprint");
+    expect(panelText).toContain("Active loan count");
+  });
+
+  it("renders ledger migration blockers and operation inventory", async () => {
+    getDashboard.mockResolvedValue({ recentLoans: [] });
+    getLedgerMigrationReadiness.mockResolvedValue({
+      ready: false,
+      status: "Blocked",
+      totalRows: 3,
+      migratableRows: 1,
+      malformedRows: 1,
+      unknownOperationRows: 1,
+      generatedAt: "2026-10-17T00:00:00.000Z",
+      blockers: ["1 ledger row uses an unknown operation."],
+      operations: [
+        {
+          operation: "Legacy Unknown",
+          totalRows: 1,
+          plannedTarget: "Dedicated target metadata pending",
+          status: "Review required"
+        }
+      ]
+    });
+    const element = createElement("c-library-librarian-workspace", {
+      is: LibraryLibrarianWorkspace
+    });
+    document.body.appendChild(element);
+    await flushPromises();
+    const reportsButton = [
+      ...element.shadowRoot.querySelectorAll(".nav-item")
+    ].find((button) => button.textContent.includes("Reports"));
+    reportsButton.click();
+    await flushPromises();
+
+    const panelText =
+      element.shadowRoot.querySelector(".migration-panel").textContent;
+    expect(panelText).toContain("Ledger migration readiness");
+    expect(panelText).toContain("Legacy Unknown");
+    expect(panelText).toContain("Dedicated target metadata pending");
+    expect(panelText).toContain("Review required");
+  });
+
+  it("records an idempotent ledger migration review from Reports", async () => {
+    getLedgerMigrationReadiness.mockResolvedValue({
+      ready: true,
+      status: "Ready for migration planning",
+      totalRows: 3,
+      migratableRows: 3,
+      malformedRows: 0,
+      unknownOperationRows: 0,
+      generatedAt: "2026-10-17T00:00:00.000Z",
+      blockers: [],
+      operations: []
+    });
+    const element = createElement("c-library-librarian-workspace", {
+      is: LibraryLibrarianWorkspace
+    });
+    document.body.appendChild(element);
+    await flushPromises();
+    const reportsButton = [
+      ...element.shadowRoot.querySelectorAll(".nav-item")
+    ].find((button) => button.textContent.includes("Reports"));
+    reportsButton.click();
+    await flushPromises();
+
+    element.shadowRoot
+      .querySelector(".migration-review-controls lightning-button")
+      .click();
+    await flushPromises();
+
+    expect(recordLedgerMigrationReview).toHaveBeenCalledWith({
+      manifestVersion: "2026-10-17-v1",
+      generatedAt: "2026-10-17T00:00:00.000Z",
+      reviewNote: "",
+      totalRows: 3,
+      migratableRows: 3,
+      blockerCount: 0
+    });
+    expect(
+      element.shadowRoot.querySelector(".migration-review-status")
+    ).not.toBeNull();
   });
 
   it("opens Add Copy with an explicit book selector", async () => {
@@ -480,6 +710,7 @@ describe("libraryLibrarianWorkspace", () => {
     ].find((button) => button.textContent.trim() === "Reservations");
     reservationsButton.click();
     await flushPromises();
+    expect(getReservations).toHaveBeenCalledWith({ status: null });
 
     expect(
       element.shadowRoot.querySelectorAll(".reservation-tab")
@@ -489,7 +720,10 @@ describe("libraryLibrarianWorkspace", () => {
     ).not.toBeNull();
     expect(
       element.shadowRoot.querySelectorAll(".reservations-table th")
-    ).toHaveLength(7);
+    ).toHaveLength(8);
+    expect(
+      element.shadowRoot.querySelector(".reservations-table").textContent
+    ).toContain("Estimated Availability");
     expect(
       element.shadowRoot.querySelector(".reservations-table").textContent
     ).toContain("The Pragmatic Programmer");

@@ -1,0 +1,56 @@
+<template>
+  <section class="card-panel" aria-labelledby="digital-card-title">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Fast, private, reusable at the desk</p>
+        <h3 id="digital-card-title">Digital member card</h3>
+        <p class="intro">
+          Show this short-lived token at a supported kiosk or service desk. It
+          never exposes your Salesforce ID or session token.
+        </p>
+      </div>
+      <button class="button secondary" onclick={refreshCard} disabled={loading}>
+        {cardLabel}
+      </button>
+    </div>
+
+    <template if:true={loading}>
+      <p class="status" role="status">Preparing a secure card token…</p>
+    </template>
+    <template if:false={loading}>
+      <template if:true={hasCard}>
+        <div class="member-card">
+          <div class="card-topline">
+            <span>LIBRARY MEMBER</span
+            ><span class="shield" aria-label="Secure token">◈</span>
+          </div>
+          <div class="card-body">
+            <div class="token-block" aria-label="Member card token">
+              <span class="token-caption">Present this code</span>
+              <code>{card.token}</code>
+              <button
+                class="copy-button"
+                onclick={copyToken}
+                title="Copy card token"
+              >
+                {copyLabel}
+              </button>
+            </div>
+            <div class="member-details">
+              <strong>{card.memberName}</strong>
+              <span>Member {card.memberNumber}</span>
+              <span>{card.membershipPlan}</span>
+              <span class="status-pill">{card.membershipStatus}</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            Valid until {expiryLabel} · Refresh after use
+          </div>
+        </div>
+      </template>
+      <template if:true={error}
+        ><p class="error" role="alert">{error}</p></template
+      >
+    </template>
+  </section>
+</template>

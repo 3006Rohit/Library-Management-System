@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Borrow_Record__c</fullName><label>Borrow Record</label><relationshipLabel
+  >Scan Transactions</relationshipLabel><relationshipName
+  >Borrow_Record_Scan_Transactions</relationshipName><type
+  >Lookup</type><referenceTo>Borrow_Record__c</referenceTo><deleteConstraint
+  >Restrict</deleteConstraint></CustomField>

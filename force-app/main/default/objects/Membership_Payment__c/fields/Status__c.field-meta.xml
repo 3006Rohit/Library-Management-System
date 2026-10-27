@@ -8,8 +8,14 @@
             <sorted>false</sorted>
             <value><fullName>Paid</fullName><default>true</default><label
         >Paid</label></value>
+            <value><fullName>Initiated</fullName><default>false</default><label>Initiated</label></value>
+            <value><fullName>Pending</fullName><default>false</default><label>Pending</label></value>
             <value><fullName>Failed</fullName><default>false</default><label
         >Failed</label></value>
+            <value><fullName>Cancelled</fullName><default>false</default><label>Cancelled</label></value>
+            <value><fullName>Partially Refunded</fullName><default>false</default><label>Partially Refunded</label></value>
+            <value><fullName>Refunded</fullName><default>false</default><label>Refunded</label></value>
+            <value><fullName>Disputed</fullName><default>false</default><label>Disputed</label></value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Returns the authenticated member's own reservations using the server-validated session token.</description>
+    <developerName>LibraryAgentMyReservationsAction</developerName>
+    <invocationTarget>LibraryAgentMyReservationsAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryAgentMyReservationsAction</localDeveloperName>
+    <masterLabel>Get My Reservations</masterLabel>
+    <language>en_US</language>
+    <progressIndicatorMessage>Loading your reservations</progressIndicatorMessage>
+</GenAiFunction>

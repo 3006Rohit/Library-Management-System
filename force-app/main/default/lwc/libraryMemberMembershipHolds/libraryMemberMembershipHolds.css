@@ -1,0 +1,127 @@
+.hold-page {
+  background: #fff;
+  border: 1px solid #e8e2da;
+  border-radius: 18px;
+  padding: 28px;
+  color: #2b2926;
+}
+.hold-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+.eyebrow {
+  color: #8a5d32;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+h2,
+h3 {
+  margin: 0 0 8px;
+}
+.hold-header p:last-child,
+.request-card p,
+.hold-row p {
+  color: #756f68;
+  margin: 0;
+}
+.refresh,
+.link-button {
+  background: transparent;
+  border: 0;
+  color: #8a5d32;
+  cursor: pointer;
+  font-weight: 700;
+}
+.hold-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+  gap: 18px;
+}
+.request-card,
+.history-card {
+  background: #fbfaf8;
+  border: 1px solid #eee8e0;
+  border-radius: 14px;
+  padding: 20px;
+}
+label {
+  display: grid;
+  gap: 6px;
+  color: #514b45;
+  font-weight: 600;
+  margin: 14px 0;
+}
+input,
+textarea {
+  border: 1px solid #d8d0c7;
+  border-radius: 8px;
+  font: inherit;
+  padding: 10px;
+}
+textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+.primary {
+  background: #8a5d32;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 11px 16px;
+}
+.hold-list {
+  display: grid;
+  gap: 10px;
+}
+.hold-row {
+  background: #fff;
+  border: 1px solid #eee8e0;
+  border-radius: 10px;
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+}
+.hold-row strong {
+  color: #332d27;
+}
+.status {
+  color: #8a5d32;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+small {
+  color: #756f68;
+}
+.notice {
+  background: #fff7e7;
+  border: 1px solid #ecd19c;
+  border-radius: 10px;
+  color: #6d5223;
+  margin-bottom: 16px;
+  padding: 12px;
+}
+.loading,
+.error,
+.empty {
+  color: #756f68;
+  padding: 14px 0;
+}
+.error {
+  color: #a3382e;
+}
+@media (max-width: 760px) {
+  .hold-header,
+  .hold-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

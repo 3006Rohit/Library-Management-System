@@ -79,6 +79,7 @@ public without sharing class LibraryReservationWorkflowService {
       );
       notifyReady(reservation);
     }
+    LibraryReservationEtaService.recalculateForBook(bookId);
   }
 
   private static void notifyReady(Reservation__c reservation) {

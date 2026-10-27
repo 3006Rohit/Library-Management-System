@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Estimated_Available_Date__c</fullName><description
+  >Server-calculated estimate for when a pending reservation may become available.</description><inlineHelpText
+  >Estimated availability based on queue and circulation activity.</inlineHelpText><label
+  >Estimated Available Date</label><type>DateTime</type></CustomField>

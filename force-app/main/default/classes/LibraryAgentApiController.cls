@@ -1,6 +1,9 @@
 public with sharing class LibraryAgentApiController {
   private static final String NAMED_CREDENTIAL = 'Library_Agent_API';
-  private static final String AGENT_ID = '0XxgK000002Q7G1SAK';
+  // Active Agentforce version created from docs/agent-spec-librarian.yaml.
+  // Keep this ID aligned with the activated librarian agent used by the
+  // workspace assistant; member conversations use their own agent channel.
+  private static final String AGENT_ID = '0XxgK000002QwOz';
   private static final String API_ROOT = '/einstein/ai-agent/v1';
   private static final Integer MAX_UTTERANCE_LENGTH = 2000;
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Book_Copy__c</fullName><label>Book Copy</label><relationshipLabel
+  >Scan Transactions</relationshipLabel><relationshipName
+  >Book_Copy_Scan_Transactions</relationshipName><type>Lookup</type><referenceTo
+  >Book_Copy__c</referenceTo><deleteConstraint
+  >Restrict</deleteConstraint></CustomField>

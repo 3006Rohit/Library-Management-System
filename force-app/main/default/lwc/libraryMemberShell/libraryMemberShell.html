@@ -11,7 +11,7 @@
   </template>
 
   <template if:false={showAccessState}>
-    <div class="member-app">
+    <div class={accessibilityClassName}>
       <aside class="sidebar">
         <div class="brand">
           <span class="brand-mark">▥</span><span>Library</span>
@@ -443,6 +443,42 @@
               </div>
             </template>
 
+            <template if:true={isReadingLists}>
+              <c-library-member-engagement></c-library-member-engagement>
+            </template>
+
+            <template if:true={isEvents}>
+              <c-library-member-events></c-library-member-events>
+            </template>
+
+            <template if:true={isRooms}>
+              <c-library-member-rooms></c-library-member-rooms>
+            </template>
+
+            <template if:true={isChallenges}>
+              <c-library-member-challenges></c-library-member-challenges>
+            </template>
+
+            <template if:true={isBranches}>
+              <c-library-member-branches></c-library-member-branches>
+            </template>
+
+            <template if:true={isFineAppeals}>
+              <c-library-member-fine-appeals></c-library-member-fine-appeals>
+            </template>
+
+            <template if:true={isMembershipHolds}>
+              <c-library-member-membership-holds></c-library-member-membership-holds>
+            </template>
+
+            <template if:true={isPrivacyCenter}>
+              <c-library-member-privacy-center></c-library-member-privacy-center>
+            </template>
+
+            <template if:true={isFollowedAuthors}>
+              <c-library-member-author-follows></c-library-member-author-follows>
+            </template>
+
             <template if:true={isMyBooks}>
               <div class="tabs">
                 <template for:each={loanTabs} for:item="tab"
@@ -549,6 +585,7 @@
                           <th>Reserved On</th>
                           <th>Status</th>
                           <th>Queue Position</th>
+                          <th>Estimated Availability</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
@@ -565,6 +602,12 @@
                               >
                             </td>
                             <td>{reservation.Queue_Position__c}</td>
+                            <td>
+                              <strong>{reservation.estimatedDateLabel}</strong>
+                              <small title={reservation.etaReason}
+                                >{reservation.etaLabel}</small
+                              >
+                            </td>
                             <td>
                               <template if:true={reservation.canCancel}
                                 ><button
@@ -761,6 +804,10 @@
               </section>
             </template>
 
+            <template if:true={isScanner}>
+              <c-library-scanner></c-library-scanner>
+            </template>
+
             <template if:true={isProfile}>
               <template if:true={profile}>
                 <section class="profile-hero card">
@@ -868,6 +915,70 @@
                       </div></template
                     ></template
                   >
+                  <template if:true={isNotificationProfile}
+                    ><div class="preference-header">
+                      <div>
+                        <h3>Notification preferences</h3>
+                        <p>
+                          Choose which channels can reach you for each library
+                          update. In-app alerts remain available in your portal.
+                        </p>
+                      </div>
+                      <button
+                        class="button primary"
+                        onclick={saveNotificationPreferences}
+                        disabled={notificationPreferenceSaving}
+                      >
+                        {savePreferenceLabel}
+                      </button>
+                    </div>
+                    <template if:true={preferenceRows.length}
+                      ><div class="preference-table" role="table">
+                        <div
+                          class="preference-row preference-heading"
+                          role="row"
+                        >
+                          <span>Notification</span><span>Channel</span
+                          ><span>Delivery</span><span>Digest</span>
+                        </div>
+                        <template for:each={preferenceRows} for:item="row"
+                          ><div class="preference-row" key={row.id} role="row">
+                            <span>{row.notificationType}</span>
+                            <span>{row.channel}</span>
+                            <label class="preference-toggle">
+                              <input
+                                type="checkbox"
+                                checked={row.enabled}
+                                data-id={row.id}
+                                onchange={changePreference}
+                              />
+                              <span class={row.statusClass}
+                                >{row.enabledLabel}</span
+                              >
+                            </label>
+                            <lightning-combobox
+                              variant="label-hidden"
+                              value={row.digestFrequency}
+                              options={digestFrequencyOptions}
+                              data-id={row.id}
+                              onchange={changePreferenceFrequency}
+                              label="Digest frequency"
+                            ></lightning-combobox></div
+                        ></template></div></template
+                    ><template if:false={preferenceRows.length}
+                      ><div class="empty-state">
+                        Notification preferences are not available yet.
+                      </div></template
+                    ></template
+                  >
+                  <template if:true={isDigitalCardProfile}>
+                    <c-library-digital-member-card></c-library-digital-member-card>
+                  </template>
+                  <template if:true={isAccessibilityProfile}>
+                    <c-library-member-accessibility
+                      onaccessibilitychange={handleAccessibilityChange}
+                    ></c-library-member-accessibility>
+                  </template>
                 </section>
               </template>
               <template if:false={profile}>
@@ -904,12 +1015,42 @@
         </button>
         <h2>{bookDetail.Name}</h2>
         <p class="book-author">{bookDetailAuthors}</p>
+        <template if:true={bookDetailAuthorId}>
+          <button class="author-follow-link" onclick={followBookAuthor}>
+            Follow author
+          </button>
+        </template>
         <span class="category-pill">{bookDetailCategories}</span
         ><span class={bookDetailStatusClass}
           >{bookDetail.Available_Copies__c} of {bookDetail.Total_Copies__c}
           copies available</span
         >
         <p class="description">{bookDetail.Description__c}</p>
+        <section class="review-box" aria-label="Write a book review">
+          <h3>Share your experience</h3>
+          <p>Reviews are checked by a librarian before they appear publicly.</p>
+          <lightning-input
+            type="number"
+            min="1"
+            max="5"
+            label="Rating (1-5)"
+            value={reviewRating}
+            onchange={handleReviewRating}
+          ></lightning-input>
+          <textarea
+            class="review-text"
+            maxlength="150"
+            placeholder="Write at least 10 characters"
+            oninput={handleReviewText}
+          >
+{reviewText}</textarea>
+          <button class="button outline" onclick={submitReview}>
+            Submit for moderation
+          </button>
+          <template if:true={reviewStatus}
+            ><span class="review-status">Status: {reviewStatus}</span></template
+          >
+        </section>
         <div class="metadata-grid">
           <div><small>ISBN</small><strong>{bookDetail.ISBN__c}</strong></div>
           <div>
@@ -938,7 +1079,9 @@
             ><button class="button primary" onclick={requestReserve}>
               Reserve Book
             </button></template
-          >
+          ><button class="button outline" onclick={saveBookToReadingList}>
+            Save to Reading List
+          </button>
         </div>
       </div>
     </section>

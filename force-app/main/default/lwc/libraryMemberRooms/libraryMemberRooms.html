@@ -1,0 +1,91 @@
+<template>
+  <section class="rooms-page" aria-label="Room bookings">
+    <div class="rooms-header">
+      <div>
+        <p class="eyebrow">Quiet spaces</p>
+        <h2>Book a room</h2>
+        <p>Find a room for study groups, workshops, or community meetings.</p>
+      </div>
+    </div>
+    <div class="search-card">
+      <lightning-input
+        name="startAt"
+        type="datetime"
+        label="Starts"
+        value={startAt}
+        onchange={handleInput}
+      ></lightning-input>
+      <lightning-input
+        name="endAt"
+        type="datetime"
+        label="Ends"
+        value={endAt}
+        onchange={handleInput}
+      ></lightning-input>
+      <lightning-input
+        name="minimumCapacity"
+        type="number"
+        min="1"
+        label="Minimum capacity"
+        value={minimumCapacity}
+        onchange={handleInput}
+      ></lightning-input>
+      <lightning-input
+        name="purpose"
+        label="Purpose"
+        value={purpose}
+        onchange={handleInput}
+      ></lightning-input>
+      <button type="button" class="primary" onclick={search}>Find rooms</button>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Checking availability…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <div class="room-list">
+      <template for:each={rooms} for:item="room">
+        <article class="room-card" key={room.id}>
+          <div>
+            <h3>{room.name}</h3>
+            <p>{room.location}</p>
+            <span>{room.capacity} seats · {room.equipment}</span>
+          </div>
+          <button
+            type="button"
+            class="primary"
+            data-id={room.id}
+            onclick={book}
+            disabled={room.disabled}
+          >
+            Book
+          </button>
+        </article>
+      </template>
+    </div>
+    <section class="bookings" aria-label="My room bookings">
+      <h3>My bookings</h3>
+      <template for:each={bookings} for:item="booking">
+        <article class="booking-row" key={booking.id}>
+          <div>
+            <strong>{booking.roomName}</strong
+            ><span>{booking.startAt} – {booking.endAt}</span
+            ><span>{booking.purpose}</span>
+          </div>
+          <button
+            type="button"
+            class="secondary"
+            data-id={booking.id}
+            onclick={cancel}
+          >
+            Cancel
+          </button>
+        </article>
+      </template>
+      <template if:false={hasBookings}
+        ><p class="empty">You have no room bookings.</p></template
+      >
+    </section>
+  </section>
+</template>

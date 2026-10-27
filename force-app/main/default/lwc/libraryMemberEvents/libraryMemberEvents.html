@@ -1,0 +1,79 @@
+<template>
+  <section class="events-page" aria-label="Library events">
+    <div class="events-header">
+      <div>
+        <p class="eyebrow">Community calendar</p>
+        <h2>Library events</h2>
+        <p>Discover talks, workshops and reading groups at your library.</p>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading events…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}>
+      <div class="event-list">
+        <template for:each={rows} for:item="row">
+          <article class="event-card" key={row.id}>
+            <div class="event-date" aria-hidden="true">✦</div>
+            <div class="event-copy">
+              <h3>{row.title}</h3>
+              <p>{row.description}</p>
+              <div class="event-meta">
+                <span>{row.startAt} – {row.endAt}</span>
+                <span>{row.location}</span>
+                <span>{row.registeredCount} / {row.capacity} seats filled</span>
+              </div>
+            </div>
+            <div class="event-action">
+              <template if:true={row.registrationStatus}>
+                <span class="status">{row.registrationStatus}</span>
+                <template if:true={row.checkInToken}>
+                  <code class="check-in-code">{row.checkInToken}</code>
+                </template>
+                <template if:true={row.canIssueCheckIn}>
+                  <template if:false={row.checkInToken}>
+                    <button
+                      type="button"
+                      class="secondary"
+                      data-id={row.id}
+                      onclick={issueToken}
+                    >
+                      Get check-in code
+                    </button>
+                  </template>
+                </template>
+                <button
+                  type="button"
+                  class="secondary"
+                  data-id={row.id}
+                  onclick={cancel}
+                >
+                  Cancel
+                </button>
+              </template>
+              <template if:false={row.registrationStatus}>
+                <button
+                  type="button"
+                  class="primary"
+                  data-id={row.id}
+                  onclick={register}
+                >
+                  Register
+                </button>
+              </template>
+            </div>
+          </article>
+        </template>
+      </div>
+    </template>
+    <template if:false={hasRows}
+      ><div class="empty">
+        There are no upcoming events right now. Check back soon.
+      </div></template
+    >
+  </section>
+</template>

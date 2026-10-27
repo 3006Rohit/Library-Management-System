@@ -6,7 +6,14 @@ import USER_EMAIL from "@salesforce/schema/User.Email";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import getDashboard from "@salesforce/apex/LibraryLibrarianController.getDashboard";
 import getDashboardAnalytics from "@salesforce/apex/LibraryLibrarianController.getDashboardAnalytics";
+import getNotificationDeliverySummary from "@salesforce/apex/LibraryLibrarianController.getNotificationDeliverySummary";
+import getDataCloudReadiness from "@salesforce/apex/LibraryLibrarianController.getDataCloudReadiness";
+import getLedgerMigrationReadiness from "@salesforce/apex/LibraryLibrarianController.getLedgerMigrationReadiness";
+import getLedgerMigrationReview from "@salesforce/apex/LibraryLibrarianController.getLedgerMigrationReview";
+import recordLedgerMigrationReview from "@salesforce/apex/LibraryLibrarianController.recordLedgerMigrationReview";
+import retryFailedNotificationDeliveries from "@salesforce/apex/LibraryLibrarianController.retryFailedNotificationDeliveries";
 import searchBooks from "@salesforce/apex/LibraryLibrarianController.searchBooks";
+import recordSearchTelemetry from "@salesforce/apex/LibraryLibrarianController.recordSearchTelemetry";
 import getBookDetail from "@salesforce/apex/LibraryLibrarianController.getBookDetail";
 import getAuthors from "@salesforce/apex/LibraryLibrarianController.getAuthors";
 import getCategories from "@salesforce/apex/LibraryLibrarianController.getCategories";
@@ -53,6 +60,7 @@ import waiveFine from "@salesforce/apex/LibraryLibrarianController.waiveFine";
 const NAV = [
   ["Dashboard", "utility:home"],
   ["Librarian Assistant", "utility:einstein"],
+  ["Acquisitions", "utility:light_bulb"],
   ["Books", "utility:knowledge_base"],
   ["Book Copies", "utility:copy"],
   ["Members", "utility:groups"],
@@ -70,6 +78,10 @@ const PAGE_COPY = {
   "Librarian Assistant": [
     "Librarian Assistant",
     "Read-only assistance for library operations"
+  ],
+  Acquisitions: [
+    "Acquisition Intelligence",
+    "Turn collection demand into explainable purchasing decisions"
   ],
   Books: ["Books", "Manage library books, authors and categories"],
   "Book Copies": [
@@ -100,6 +112,55 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   section = "Dashboard";
   dashboard = { recentLoans: [] };
   analytics = { available: false, topBorrowedBooks: [], reservationDemand: [] };
+  notificationDelivery = {
+    total: 0,
+    pending: 0,
+    sent: 0,
+    delivered: 0,
+    failed: 0,
+    skipped: 0
+  };
+  dataCloudReadiness = {
+    ready: false,
+    status: "Blocked",
+    totalMembers: 0,
+    productionMembers: 0,
+    unclassifiedMembers: 0,
+    productionMembersMissingEmail: 0,
+    nonProductionLoans: 0,
+    nonProductionReservations: 0,
+    nonProductionFines: 0,
+    productionLoans: 0,
+    productionReservations: 0,
+    productionFines: 0,
+    orphanLoans: 0,
+    orphanReservations: 0,
+    orphanFines: 0,
+    blockers: ["Data Cloud source readiness has not been checked."],
+    warnings: [],
+    handoffVersion: "2026-10-17-v1",
+    productionMemberFilter: "Member_Type__c = Production",
+    productionChildFilter: "Member__r.Member_Type__c = Production",
+    governedSources: [],
+    deferredSources: [],
+    calculatedInsightStatus: "Blocked by source quality",
+    calculatedInsights: []
+  };
+  ledgerMigrationReadiness = {
+    ready: true,
+    status: "Ready for migration planning",
+    totalRows: 0,
+    migratableRows: 0,
+    malformedRows: 0,
+    unknownOperationRows: 0,
+    generatedAt: null,
+    blockers: [],
+    operations: []
+  };
+  ledgerMigrationReview;
+  ledgerReviewNote = "";
+  ledgerReviewing = false;
+  retryingDelivery = false;
   books = [];
   members = [];
   allMembers = [];
@@ -483,6 +544,9 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   get isLibrarianAssistant() {
     return this.section === "Librarian Assistant";
   }
+  get isAcquisitions() {
+    return this.section === "Acquisitions";
+  }
   get assistantQuestions() {
     return [
       "Show overdue loans",
@@ -543,6 +607,175 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   }
   get isReports() {
     return this.section === "Reports";
+  }
+  get retryDeliveryDisabled() {
+    return (
+      this.retryingDelivery || Number(this.notificationDelivery.failed || 0) < 1
+    );
+  }
+  get dataCloudReadinessClass() {
+    return this.dataCloudReadiness.ready
+      ? this.dataCloudReadiness.status === "Ready with warnings"
+        ? "readiness-status warning"
+        : "readiness-status ready"
+      : "readiness-status blocked";
+  }
+  get hasDataCloudBlockers() {
+    return (this.dataCloudReadiness.blockers || []).length > 0;
+  }
+  get hasDataCloudWarnings() {
+    return (this.dataCloudReadiness.warnings || []).length > 0;
+  }
+  get dataCloudRelationshipGaps() {
+    return (
+      Number(this.dataCloudReadiness.orphanLoans || 0) +
+      Number(this.dataCloudReadiness.orphanReservations || 0) +
+      Number(this.dataCloudReadiness.orphanFines || 0)
+    );
+  }
+  get hasDataCloudInsights() {
+    return (this.dataCloudReadiness.calculatedInsights || []).length > 0;
+  }
+  get hasLedgerMigrationBlockers() {
+    return (this.ledgerMigrationReadiness.blockers || []).length > 0;
+  }
+  get ledgerMigrationStatusClass() {
+    return this.ledgerMigrationReadiness.ready
+      ? "readiness-status ready"
+      : "readiness-status blocked";
+  }
+  get hasLedgerOperations() {
+    return (this.ledgerMigrationReadiness.operations || []).length > 0;
+  }
+  get hasLedgerMigrationReview() {
+    return Boolean(this.ledgerMigrationReview?.auditId);
+  }
+  get ledgerReviewButtonLabel() {
+    return this.ledgerReviewing
+      ? "Saving review..."
+      : this.hasLedgerMigrationReview
+        ? "Review recorded"
+        : "Record review";
+  }
+  get ledgerReviewButtonDisabled() {
+    return this.ledgerReviewing || this.hasLedgerMigrationReview;
+  }
+  get ledgerMigrationManifestJson() {
+    return JSON.stringify(
+      {
+        manifestVersion: "2026-10-17-v1",
+        sourceObject: "Library_Scan_Transaction__c",
+        generatedAt: this.ledgerMigrationReadiness.generatedAt,
+        status: this.ledgerMigrationReadiness.status,
+        totalRows: this.ledgerMigrationReadiness.totalRows,
+        migratableRows: this.ledgerMigrationReadiness.migratableRows,
+        malformedRows: this.ledgerMigrationReadiness.malformedRows,
+        unknownOperationRows:
+          this.ledgerMigrationReadiness.unknownOperationRows,
+        blockers: this.ledgerMigrationReadiness.blockers || [],
+        operations: this.ledgerMigrationReadiness.operations || []
+      },
+      null,
+      2
+    );
+  }
+  downloadLedgerMigrationManifest() {
+    const urlApi = window.URL || window.webkitURL;
+    if (!urlApi || typeof urlApi.createObjectURL !== "function") {
+      this.toast(
+        "Manifest unavailable",
+        "This browser cannot create a ledger migration download.",
+        "warning"
+      );
+      return;
+    }
+    const blob = new Blob([this.ledgerMigrationManifestJson], {
+      type: "application/json"
+    });
+    const url = urlApi.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "library-ledger-migration-manifest.json";
+    anchor.click();
+    urlApi.revokeObjectURL(url);
+    this.toast(
+      "Manifest downloaded",
+      "The read-only ledger migration manifest is ready for planning.",
+      "success"
+    );
+  }
+  handleLedgerReviewNote(event) {
+    this.ledgerReviewNote = event.target.value;
+  }
+  recordLedgerReview() {
+    this.ledgerReviewing = true;
+    this.error = undefined;
+    return recordLedgerMigrationReview({
+      manifestVersion: "2026-10-17-v1",
+      generatedAt:
+        this.ledgerMigrationReadiness.generatedAt || new Date().toISOString(),
+      reviewNote: this.ledgerReviewNote,
+      totalRows: this.ledgerMigrationReadiness.totalRows,
+      migratableRows: this.ledgerMigrationReadiness.migratableRows,
+      blockerCount: (this.ledgerMigrationReadiness.blockers || []).length
+    })
+      .then((review) => {
+        this.ledgerMigrationReview = review;
+        this.toast(
+          "Migration review recorded",
+          "The current ledger manifest was recorded for follow-up planning.",
+          "success"
+        );
+      })
+      .catch((error) => this.handleError(error))
+      .finally(() => {
+        this.ledgerReviewing = false;
+      });
+  }
+  get dataCloudHandoffJson() {
+    return JSON.stringify(
+      {
+        handoffVersion: this.dataCloudReadiness.handoffVersion,
+        generatedAt: this.dataCloudReadiness.generatedAt,
+        status: this.dataCloudReadiness.status,
+        productionMemberFilter: this.dataCloudReadiness.productionMemberFilter,
+        productionChildFilter: this.dataCloudReadiness.productionChildFilter,
+        governedSources: this.dataCloudReadiness.governedSources || [],
+        deferredSources: this.dataCloudReadiness.deferredSources || [],
+        calculatedInsightStatus:
+          this.dataCloudReadiness.calculatedInsightStatus,
+        calculatedInsights: this.dataCloudReadiness.calculatedInsights || [],
+        blockers: this.dataCloudReadiness.blockers || [],
+        warnings: this.dataCloudReadiness.warnings || []
+      },
+      null,
+      2
+    );
+  }
+  downloadDataCloudHandoff() {
+    const urlApi = window.URL || window.webkitURL;
+    if (!urlApi || typeof urlApi.createObjectURL !== "function") {
+      this.toast(
+        "Handoff unavailable",
+        "This browser cannot create a Data Cloud handoff download.",
+        "warning"
+      );
+      return;
+    }
+    const blob = new Blob([this.dataCloudHandoffJson], {
+      type: "application/json"
+    });
+    const url = urlApi.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "library-data-cloud-handoff.json";
+    anchor.click();
+    urlApi.revokeObjectURL(url);
+    this.toast(
+      "Handoff downloaded",
+      "The source-safe Data Cloud handoff checklist is ready for setup review.",
+      "success"
+    );
   }
   get isSettings() {
     return this.section === "Settings";
@@ -1041,17 +1274,68 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   }
   loadDashboard() {
     return this.run(
-      () => Promise.all([getDashboard(), getDashboardAnalytics()]),
+      () =>
+        Promise.all([
+          getDashboard(),
+          getDashboardAnalytics(),
+          getNotificationDeliverySummary(),
+          getDataCloudReadiness(),
+          getLedgerMigrationReadiness(),
+          getLedgerMigrationReview()
+        ]),
       null,
-      ([dashboard, analytics]) => {
+      ([
+        dashboard,
+        analytics,
+        notificationDelivery,
+        dataCloudReadiness,
+        ledgerMigrationReadiness,
+        ledgerMigrationReview
+      ]) => {
         this.dashboard = dashboard || { recentLoans: [] };
         this.analytics = analytics || {
           available: false,
           topBorrowedBooks: [],
           reservationDemand: []
         };
+        this.notificationDelivery = notificationDelivery || {
+          total: 0,
+          pending: 0,
+          sent: 0,
+          delivered: 0,
+          failed: 0,
+          skipped: 0
+        };
+        this.dataCloudReadiness = {
+          ...this.dataCloudReadiness,
+          ...(dataCloudReadiness || {})
+        };
+        this.ledgerMigrationReadiness = {
+          ...this.ledgerMigrationReadiness,
+          ...(ledgerMigrationReadiness || {})
+        };
+        this.ledgerMigrationReview = ledgerMigrationReview || undefined;
       }
     );
+  }
+  retryFailedDeliveries() {
+    this.retryingDelivery = true;
+    this.error = undefined;
+    return retryFailedNotificationDeliveries({ requestedLimit: 10 })
+      .then((claimed) => {
+        this.toast(
+          "Notification retries queued",
+          claimed
+            ? `${claimed} failed email ${claimed === 1 ? "delivery" : "deliveries"} queued for retry.`
+            : "No retryable failed email deliveries were found.",
+          "success"
+        );
+        return this.loadDashboard();
+      })
+      .catch((error) => this.handleError(error))
+      .finally(() => {
+        this.retryingDelivery = false;
+      });
   }
   loadReferenceData() {
     return Promise.all([getAuthors(), getCategories()])
@@ -1078,6 +1362,13 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
         pageNumber: this.bookPage
       },
       (data) => {
+        if (this.bookSearch?.trim()) {
+          recordSearchTelemetry({
+            searchTerm: this.bookSearch,
+            resultCount: (data || []).length,
+            bookId: null
+          }).catch(() => undefined);
+        }
         this.books = (data || []).map((r) => ({
           ...r,
           authorNames:
@@ -1171,6 +1462,9 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
         bookName: r.Book_Copy__r?.Book__r?.Name || "—",
         copyName: r.Book_Copy__r?.Name || "—",
         statusClass: this.badge(r.Status__c),
+        replacementRequired: Boolean(r.Replacement_Required__c),
+        defectReportedDate: r.Defect_Reported_Date__c || "—",
+        defectNotes: r.Notes__c || "No defect notes provided.",
         canAct: ["Active", "Overdue"].includes(r.Status__c),
         canApprove: r.Status__c === "Pending",
         canReject: r.Status__c === "Pending"
@@ -1188,6 +1482,9 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
           r.Status__c === "Pending" ? "Waiting" : r.Status__c
         ),
         queuePosition: r.Queue_Position__c || "–",
+        etaDateLabel: this.formatDate(r.Estimated_Available_Date__c),
+        etaConfidence: r.ETA_Confidence__c || "Low",
+        etaReason: r.ETA_Reason__c || "Estimate unavailable",
         canIssue: r.Status__c === "Ready" && Boolean(r.Book_Copy__c),
         canPrepare: r.Status__c === "Pending",
         canCancel: !["Cancelled", "Fulfilled", "Expired"].includes(r.Status__c)
@@ -2229,6 +2526,16 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
       return `${months} ${months === 1 ? "Month" : "Months"}`;
     }
     return `${days} ${days === 1 ? "Day" : "Days"}`;
+  }
+  formatDate(value) {
+    if (!value) return "—";
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(new Date(value));
   }
   sameMonth(value, date) {
     if (!value) return false;

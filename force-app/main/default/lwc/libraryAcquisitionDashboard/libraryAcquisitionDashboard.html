@@ -1,0 +1,90 @@
+<template>
+  <section class="acquisition-page" aria-label="Acquisition intelligence">
+    <div class="acquisition-header">
+      <div>
+        <p class="eyebrow">Collection development</p>
+        <h2>Acquisition intelligence</h2>
+        <p class="subheading">
+          Explainable recommendations from the last 90 days of circulation and
+          reservation evidence.
+        </p>
+      </div>
+      <button
+        class="refresh-button"
+        type="button"
+        onclick={refresh}
+        disabled={loading}
+      >
+        ↻ Refresh
+      </button>
+    </div>
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRecommendations}>
+      <div class="recommendation-grid">
+        <template for:each={recommendations} for:item="row">
+          <article class="recommendation-card" key={row.id}>
+            <div class="card-topline">
+              <span class="action-label">{row.recommendationType}</span
+              ><span class={row.statusClass}>{row.status}</span>
+            </div>
+            <h3>{row.bookTitle}</h3>
+            <div class="signal-row">
+              <span class="score">{row.scoreLabel}</span
+              ><span class={row.confidenceClass}
+                >{row.confidence} confidence</span
+              ><span>Order {row.quantityLabel}</span>
+            </div>
+            <p class="evidence">{row.evidence}</p>
+            <div class="metrics">
+              <span><strong>{row.reservations}</strong> waits</span
+              ><span><strong>{row.recentCheckouts}</strong> checkouts</span
+              ><span><strong>{row.availableCopies}</strong> available</span
+              ><span><strong>{row.damagedCopies}</strong> damaged</span
+              ><span><strong>{row.agingCopies}</strong> aging</span>
+            </div>
+            <p class="window">Evidence window: {row.windowLabel}</p>
+            <lightning-input
+              label="Decision note"
+              variant="label-hidden"
+              placeholder="Optional note"
+              value={row.notes}
+              data-id={row.id}
+              onchange={handleNotes}
+            ></lightning-input>
+            <div class="actions">
+              <button
+                type="button"
+                data-id={row.id}
+                data-status="Accepted"
+                onclick={decide}
+              >
+                Accept
+              </button>
+              <button
+                type="button"
+                data-id={row.id}
+                data-status="Deferred"
+                onclick={decide}
+              >
+                Defer
+              </button>
+              <button
+                type="button"
+                data-id={row.id}
+                data-status="Rejected"
+                onclick={decide}
+              >
+                Reject
+              </button>
+            </div>
+          </article>
+        </template>
+      </div>
+    </template>
+    <template if:false={hasRecommendations}
+      ><div class="empty">{emptyMessage}</div></template
+    >
+  </section>
+</template>

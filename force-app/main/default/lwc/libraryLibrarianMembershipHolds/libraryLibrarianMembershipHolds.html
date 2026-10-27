@@ -1,0 +1,84 @@
+<template>
+  <section class="hold-review" aria-label="Membership hold review">
+    <div class="review-header">
+      <div>
+        <p class="eyebrow">Policy workflow</p>
+        <h2>Membership hold requests</h2>
+        <p>
+          Approve eligible pauses and extend the membership once, with a
+          recorded policy decision.
+        </p>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading requests…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}>
+      <div class="responsive-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Dates</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row"
+              ><tr key={row.id}>
+                <td>{row.memberName}</td>
+                <td>{row.startDate} → {row.endDate}</td>
+                <td>{row.reason}</td>
+                <td>
+                  <span class="status">{row.status}</span
+                  ><template if:true={row.adjustedEndDate}
+                    ><small>Ends {row.adjustedEndDate}</small></template
+                  >
+                </td>
+                <td>
+                  <textarea
+                    data-id={row.id}
+                    onchange={captureReason}
+                    placeholder="Decision reason"
+                  ></textarea>
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="approve"
+                      data-id={row.id}
+                      data-status="Approved"
+                      onclick={decide}
+                      disabled={row.disabled}
+                    >
+                      Approve</button
+                    ><button
+                      type="button"
+                      class="reject"
+                      data-id={row.id}
+                      data-status="Rejected"
+                      onclick={decide}
+                      disabled={row.disabled}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </td>
+              </tr></template
+            >
+          </tbody>
+        </table>
+      </div>
+    </template>
+    <template if:false={hasRows}
+      ><div class="empty">
+        No membership hold requests have been submitted.
+      </div></template
+    >
+  </section>
+</template>

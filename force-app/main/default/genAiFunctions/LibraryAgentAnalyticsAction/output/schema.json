@@ -1,0 +1,10 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "activeLoans": { "title": "Active Loans", "description": "Active governed loans.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "totalFineCount": { "title": "Total Fine Count", "description": "Total governed fines.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "totalLoans": { "title": "Total Loans", "description": "Total governed loans.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "totalReservations": { "title": "Total Reservations", "description": "Total governed reservations.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true }
+  },
+  "lightning:type": "lightning__objectType"
+}

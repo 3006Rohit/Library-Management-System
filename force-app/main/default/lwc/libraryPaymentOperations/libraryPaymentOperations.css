@@ -1,0 +1,127 @@
+:host {
+  display: block;
+}
+.payment-panel {
+  background: #fff;
+  border: 1px solid #dce5ef;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgb(24 52 84 / 6%);
+  margin: 1rem 0;
+  padding: 1.25rem;
+}
+.header {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+h2 {
+  color: #17365d;
+  margin: 0.1rem 0 0.35rem;
+}
+.header p {
+  color: #61758e;
+  margin: 0;
+  max-width: 720px;
+}
+.gateway-status {
+  align-items: center;
+  background: #fff8e8;
+  border: 1px solid #f2d99b;
+  border-radius: 10px;
+  color: #6c5319;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+}
+.gateway-status.ready {
+  background: #edf9f1;
+  border-color: #a9dbba;
+  color: #1d6a3b;
+}
+.gateway-status strong,
+.gateway-status p {
+  display: block;
+  margin: 0;
+}
+.gateway-status p {
+  font-size: 0.78rem;
+  margin-top: 0.25rem;
+}
+.gateway-status > span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.eyebrow {
+  color: #3377b8 !important;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+button {
+  background: #246ca6;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.55rem 0.7rem;
+}
+button.secondary {
+  background: #eef3f8;
+  color: #31526f;
+}
+button.link {
+  background: transparent;
+  color: #246ca6;
+}
+.table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse;
+  min-width: 940px;
+  width: 100%;
+}
+th,
+td {
+  border-bottom: 1px solid #edf1f5;
+  padding: 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  color: #5c7087;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+td {
+  color: #2d435d;
+  font-size: 0.84rem;
+}
+textarea {
+  border: 1px solid #c8d6e5;
+  border-radius: 8px;
+  min-height: 42px;
+  padding: 0.5rem;
+  width: 220px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+.message {
+  color: #61758e;
+  padding: 1rem 0;
+}
+.error {
+  color: #b42318;
+  padding: 1rem 0;
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <canEscalate>false</canEscalate>
+    <description>Use this topic when librarians request a privacy-safe summary of an authorized member&apos;s information without exposing sensitive authentication or security details.</description>
+    <developerName>p_16jgK000002I31V_Member_Lookup</developerName>
+    <genAiFunctions>
+        <functionName>LibraryAgentMemberSummaryAction</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>EmployeeCopilot__AnswerQuestionsWithKnowledge</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>If the request is for information about a specific member, use LibraryAgentMemberSummaryAction.</description>
+        <developerName>instruction_0</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_0</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>Ensure that no authentication, security fields, or sensitive data is included in the response.</description>
+        <developerName>instruction_1</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_1</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>p_16jgK000002I31V_Member_Lookup</localDeveloperName>
+    <masterLabel>Member Lookup</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>Your job is to only provide authorized, privacy-safe summaries of selected members&apos; information. Do not expose or process authentication details, security fields, or personal passwords.</scope>
+</GenAiPlugin>

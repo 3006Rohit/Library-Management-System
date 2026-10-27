@@ -11,11 +11,15 @@ function Fail([string]$Message) {
     exit 1
 }
 
-$agentRoot = Join-Path $ProjectRoot 'force-app/main/default/aiAgentDefinitionVersions'
+$agentRoot = Join-Path $ProjectRoot 'force-app/main/default/genAiFunctions'
+$bundleRoot = Join-Path $ProjectRoot 'force-app/main/default/aiAuthoringBundles'
 $manifestRoot = Join-Path $ProjectRoot 'manifest'
 
 if (-not (Test-Path -LiteralPath $agentRoot)) {
     Fail "Agentforce source directory not found: $agentRoot"
+}
+if (-not (Test-Path -LiteralPath $bundleRoot)) {
+    Fail "Agentforce authoring-bundle directory not found: $bundleRoot"
 }
 
 $schemaErrors = @()
@@ -61,7 +65,7 @@ foreach ($manifestName in @('core-package.xml', 'agentforce-package.xml')) {
 
 $agentforceManifest = [xml](Get-Content -LiteralPath (Join-Path $manifestRoot 'agentforce-package.xml') -Raw)
 $agentforceTypes = @($agentforceManifest.Package.types | ForEach-Object { [string]$_.name })
-foreach ($requiredType in @('AiAgentDefinition', 'AiAuthoringBundle', 'GenAiFunction')) {
+foreach ($requiredType in @('GenAiFunction', 'GenAiPlugin')) {
     if ($agentforceTypes -notcontains $requiredType) {
         Fail "Agentforce manifest is missing metadata type: $requiredType"
     }

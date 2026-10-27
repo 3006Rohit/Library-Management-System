@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Acquisition Recommendation</label>
+    <pluralLabel>Acquisition Recommendations</pluralLabel>
+    <nameField><displayFormat>AR-{000000}</displayFormat><label
+    >Recommendation Number</label><type>AutoNumber</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>Private</sharingModel>
+    <fields><fullName>Book__c</fullName><label>Book</label><relationshipLabel
+    >Acquisition Recommendations</relationshipLabel><relationshipName
+    >Acquisition_Recommendations</relationshipName><type
+    >Lookup</type><referenceTo>Book__c</referenceTo><deleteConstraint
+    >Restrict</deleteConstraint></fields>
+    <fields><fullName>Recommendation_Type__c</fullName><label
+    >Recommendation Type</label><length>40</length><type>Text</type></fields>
+    <fields><fullName>Recommendation_Score__c</fullName><label
+    >Recommendation Score</label><precision>5</precision><scale>2</scale><type
+    >Number</type></fields>
+    <fields><fullName>Recommended_Quantity__c</fullName><label
+    >Recommended Quantity</label><precision>5</precision><scale>0</scale><type
+    >Number</type></fields>
+    <fields><fullName>Confidence__c</fullName><label>Confidence</label><length
+    >20</length><type>Text</type></fields>
+    <fields><fullName>Evidence__c</fullName><label>Evidence</label><length
+    >32768</length><type>LongTextArea</type><visibleLines
+    >5</visibleLines></fields>
+    <fields><fullName>Status__c</fullName><label>Status</label><length
+    >20</length><type>Text</type></fields>
+    <fields><fullName>Evidence_Window_Start__c</fullName><label
+    >Evidence Window Start</label><type>Date</type></fields>
+    <fields><fullName>Evidence_Window_End__c</fullName><label
+    >Evidence Window End</label><type>Date</type></fields>
+    <fields><fullName>Refreshed_At__c</fullName><label>Refreshed At</label><type
+    >DateTime</type></fields>
+    <fields><fullName>Decision_Notes__c</fullName><label
+    >Decision Notes</label><length>32768</length><type
+    >LongTextArea</type><visibleLines>5</visibleLines></fields>
+    <fields><fullName>Decided_At__c</fullName><label>Decided At</label><type
+    >DateTime</type></fields>
+    <fields><fullName>Snapshot_Key__c</fullName><label
+    >Snapshot Key</label><length>255</length><type>Text</type><unique
+    >true</unique><externalId>true</externalId></fields>
+</CustomObject>

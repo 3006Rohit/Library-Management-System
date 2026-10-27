@@ -1,0 +1,41 @@
+<template>
+  <section class="branch-page" aria-label="Library branches">
+    <div class="branch-header">
+      <div>
+        <p class="eyebrow">Find us nearby</p>
+        <h2>Library branches</h2>
+        <p>
+          Explore locations and see how many copies are assigned to each branch.
+        </p>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading branches…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}
+      ><div class="branch-grid">
+        <template for:each={rows} for:item="row"
+          ><article class="branch-card" key={row.id}>
+            <div class="branch-mark">⌂</div>
+            <div>
+              <h3>{row.name}</h3>
+              <p>{row.code}</p>
+              <span>{row.address}</span
+              ><span>{row.copyCount} catalog copies</span
+              ><small>{row.timezone}</small>
+            </div>
+          </article></template
+        >
+      </div></template
+    >
+    <template if:false={hasRows}
+      ><div class="empty">
+        No active branches have been published yet.
+      </div></template
+    >
+  </section>
+</template>

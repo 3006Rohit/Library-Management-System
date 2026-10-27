@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Library Scan Transaction</label>
+    <pluralLabel>Library Scan Transactions</pluralLabel>
+    <nameField><displayFormat>SCAN-{000000}</displayFormat><label
+    >Scan Transaction Number</label><type>AutoNumber</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>Private</sharingModel>
+</CustomObject>

@@ -1,0 +1,11 @@
+{
+  "required": ["sessionToken", "action"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "sessionToken": { "title": "sessionToken", "description": "Server-provided session binding; never ask the member to type or reveal it.", "lightning:type": "lightning__textType", "lightning:isPII": true, "copilotAction:isUserInput": false },
+    "action": { "title": "action", "description": "The action to perform: RENEW_LOAN or CANCEL_RESERVATION.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isUserInput": false },
+    "targetId": { "title": "targetId", "description": "Salesforce record ID of the loan or reservation to act on.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isUserInput": false },
+    "confirmationToken": { "title": "confirmationToken", "description": "Single-use token returned by the preview step. Omit on preview calls; supply on execute calls only. Never accept from the member.", "lightning:type": "lightning__textType", "lightning:isPII": true, "copilotAction:isUserInput": false }
+  },
+  "lightning:type": "lightning__objectType"
+}

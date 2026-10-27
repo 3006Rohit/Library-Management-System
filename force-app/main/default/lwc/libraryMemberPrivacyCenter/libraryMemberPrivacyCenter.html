@@ -1,0 +1,150 @@
+<template>
+  <section class="privacy-page" aria-label="Privacy center">
+    <div class="privacy-header">
+      <div>
+        <p class="eyebrow">Your data, your control</p>
+        <h2>Privacy center</h2>
+        <p>
+          Export your library data, request a correction, or ask us to close
+          your account.
+        </p>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading privacy requests…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <div class="reauth">
+      <strong>Re-authentication required</strong
+      ><span
+        >Enter your current password before submitting a sensitive
+        request.</span
+      ><input
+        type="password"
+        data-field="currentPassword"
+        value={currentPassword}
+        onchange={capture}
+        autocomplete="current-password"
+        placeholder="Current password"
+      />
+    </div>
+    <div class="privacy-grid">
+      <article class="privacy-card">
+        <h3>Export my data</h3>
+        <p>
+          Download an allowlisted JSON export of your profile, loans,
+          reservations, fines, payments, engagement, events, rooms, and
+          notifications.
+        </p>
+        <button type="button" class="primary" onclick={exportData}>
+          Generate protected export
+        </button>
+      </article>
+      <article class="privacy-card">
+        <h3>Request a correction</h3>
+        <label
+          >First name
+          <input
+            type="text"
+            data-field="firstName"
+            value={firstName}
+            onchange={capture} /></label
+        ><label
+          >Last name
+          <input
+            type="text"
+            data-field="lastName"
+            value={lastName}
+            onchange={capture} /></label
+        ><label
+          >Phone
+          <input
+            type="tel"
+            data-field="phone"
+            value={phone}
+            onchange={capture} /></label
+        ><label
+          >Address
+          <input
+            type="text"
+            data-field="address"
+            value={address}
+            onchange={capture} /></label
+        ><label
+          >Reason
+          <textarea
+            data-field="correctionReason"
+            onchange={capture}
+            placeholder="Explain what should be corrected"
+          >
+{correctionReason}</textarea></label
+        ><button type="button" class="primary" onclick={submitCorrection}>
+          Submit correction
+        </button>
+      </article>
+      <article class="privacy-card danger">
+        <h3>Close my account</h3>
+        <p>
+          Approved closure anonymizes your profile and revokes sessions. Loans,
+          fines, payments, audit, and safety records remain retained where
+          required.
+        </p>
+        <label
+          >Reason
+          <textarea
+            data-field="deletionReason"
+            onchange={capture}
+            placeholder="Explain why you want to close the account"
+          >
+{deletionReason}</textarea></label
+        ><button
+          type="button"
+          class="danger-button"
+          onclick={submitDeletion}
+          disabled={deletionRequested}
+        >
+          Request account closure
+        </button>
+      </article>
+    </div>
+    <article class="history-card">
+      <h3>Request history</h3>
+      <template if:true={hasRequests}
+        ><div class="request-list">
+          <template for:each={requests} for:item="request"
+            ><div class="request-row" key={request.id}>
+              <div>
+                <strong>{request.requestType}</strong
+                ><span>{request.status}</span><small>{request.reason}</small>
+              </div>
+              <template if:true={request.downloadUrl}
+                ><a
+                  class="download"
+                  href={request.downloadUrl}
+                  target="_blank"
+                  rel="noopener"
+                  >Download export</a
+                ></template
+              ><template if:true={request.decisionReason}
+                ><small>{request.decisionReason}</small></template
+              ><button
+                type="button"
+                class="link-button"
+                data-id={request.id}
+                onclick={cancel}
+                disabled={request.disabled}
+              >
+                Cancel pending request
+              </button>
+            </div></template
+          >
+        </div></template
+      ><template if:false={hasRequests}
+        ><div class="empty">No privacy requests yet.</div></template
+      >
+    </article>
+  </section>
+</template>

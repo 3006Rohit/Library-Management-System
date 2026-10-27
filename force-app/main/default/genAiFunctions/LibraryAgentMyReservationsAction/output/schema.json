@@ -1,0 +1,13 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "reservationId": { "title": "reservationId", "description": "Reservation identifier for internal reasoning only.", "lightning:type": "lightning__textType", "lightning:isPII": true, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "bookTitle": { "title": "bookTitle", "description": "Reserved book title.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "status": { "title": "status", "description": "Reservation lifecycle status.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "reservationDate": { "title": "reservationDate", "description": "Reservation creation date.", "lightning:type": "lightning__dateTimeType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "queuePosition": { "title": "queuePosition", "description": "Current queue position.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "readyDate": { "title": "readyDate", "description": "Date the hold became ready, when applicable.", "lightning:type": "lightning__dateTimeType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "expiryDate": { "title": "expiryDate", "description": "Ready-hold expiry date, when applicable.", "lightning:type": "lightning__dateTimeType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true }
+  },
+  "lightning:type": "lightning__objectType"
+}

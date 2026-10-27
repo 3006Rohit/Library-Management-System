@@ -1,0 +1,66 @@
+<template>
+  <section class="audit-trail" aria-label="Operation audit trail">
+    <div class="header">
+      <div>
+        <p class="eyebrow">Governance and accountability</p>
+        <h2>Operation audit trail</h2>
+        <p>
+          Immutable-style records show who performed sensitive actions without
+          storing passwords, tokens, or raw personal payloads.
+        </p>
+      </div>
+      <div class="controls">
+        <input
+          type="search"
+          value={operation}
+          oninput={captureOperation}
+          placeholder="Filter by operation"
+          aria-label="Filter audit by operation"
+        />
+        <button type="button" onclick={refresh}>Refresh</button>
+      </div>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading audit entries…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}
+      ><div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>When</th>
+              <th>Actor</th>
+              <th>Operation</th>
+              <th>Permission</th>
+              <th>Result</th>
+              <th>Correlation</th>
+              <th>Before / after digests</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.id}>
+                <td>{row.createdAt}</td>
+                <td>{row.actorName}</td>
+                <td>{row.operation}</td>
+                <td>{row.permissionContext}</td>
+                <td><span class="result">{row.result}</span></td>
+                <td><code>{row.correlationId}</code></td>
+                <td>
+                  <code>{row.beforeDigest}</code><br />
+                  <code>{row.afterDigest}</code>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div></template
+    >
+    <template if:false={hasRows}
+      ><div class="empty">{emptyMessage}</div></template
+    >
+  </section>
+</template>

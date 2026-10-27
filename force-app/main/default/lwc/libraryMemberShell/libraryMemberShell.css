@@ -29,6 +29,24 @@
   min-height: 100dvh;
   background: var(--page);
 }
+.member-app.high-contrast {
+  --page: #fff;
+  --ink: #000;
+  --muted: #243447;
+  --line: #111;
+  --blue: #0046a8;
+}
+.member-app.large-text {
+  font-size: 108%;
+}
+.member-app.reduced-motion *,
+.member-app.reduced-motion *::before,
+.member-app.reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.001ms !important;
+}
 button,
 input {
   font: inherit;
@@ -1005,6 +1023,37 @@ td strong {
   color: var(--muted);
   margin: 0 0 12px;
 }
+.review-box {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+}
+.review-box h3 {
+  margin: 0;
+  color: #152238;
+}
+.review-box p {
+  margin: 0;
+  color: #617187;
+  font-size: 0.82rem;
+}
+.review-text {
+  min-height: 5rem;
+  padding: 0.7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font: inherit;
+  resize: vertical;
+}
+.review-status {
+  color: #1d765a;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
 .category-pill {
   display: inline-flex;
   padding: 4px 8px;
@@ -1880,4 +1929,72 @@ td strong {
   .assistant-topic-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.preference-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.preference-header h3 {
+  margin: 0 0 6px;
+}
+.preference-header p {
+  margin: 0;
+  color: #5f6b7a;
+}
+.preference-table {
+  display: grid;
+  gap: 1px;
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #e2e8f0;
+}
+.preference-row {
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 1.4fr) minmax(90px, 0.7fr) minmax(90px, 0.6fr)
+    minmax(130px, 0.8fr);
+  align-items: center;
+  gap: 14px;
+  min-width: 620px;
+  padding: 12px 14px;
+  background: #fff;
+}
+.preference-heading {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5f6b7a;
+}
+.preference-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.preference-toggle input {
+  accent-color: #0877eb;
+}
+.preference-on,
+.preference-off {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.preference-on {
+  color: #16794c;
+}
+.preference-off {
+  color: #697586;
+}
+.preference-row select {
+  min-height: 34px;
+  border: 1px solid #cdd6e1;
+  border-radius: 7px;
+  padding: 4px 8px;
+  background: #fff;
 }

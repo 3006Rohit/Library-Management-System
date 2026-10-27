@@ -2,7 +2,13 @@ public without sharing class LibraryCirculationService {
   public static void approveBorrowRequest(Id loanId) {
     LibraryPolicyService.require('Manage_Library_Circulation');
     Borrow_Record__c loan = [
-      SELECT Id, Member__c, Book_Copy__c, Status__c
+      SELECT
+        Id,
+        Member__c,
+        Member__r.Email__c,
+        Book_Copy__c,
+        Book_Copy__r.Book__r.Name,
+        Status__c
       FROM Borrow_Record__c
       WHERE Id = :loanId
       FOR UPDATE
@@ -24,6 +30,17 @@ public without sharing class LibraryCirculationService {
     update new Book_Copy__c(Id = copy.Id, Status__c = 'Available');
     checkout(loan.Member__c, copy.Id);
     delete new Borrow_Record__c(Id = loan.Id);
+    LibraryMemberNotificationService.create(
+      loan.Member__c,
+      'Borrowing Approved',
+      'Your borrowing request was approved',
+      'Your request for ' +
+        loan.Book_Copy__r.Book__r.Name +
+        ' was approved. Check your account for the due date.',
+      loan.Id,
+      'BORROW-APPROVED-' + loan.Id,
+      loan.Member__r.Email__c
+    );
   }
 
   public static void rejectBorrowRequest(Id loanId, String reason) {
@@ -119,8 +136,10 @@ public without sharing class LibraryCirculationService {
       Book_Copy__c = copy.Id,
       Contact__c = member.Contact__c,
       Borrow_Date__c = now,
-      Due_Date__c = now.addDays(
-        Integer.valueOf(member.Membership_Plan__r.Loan_Duration_Days__c)
+      Due_Date__c = LibraryCalendarService.calculateDueDate(
+        now,
+        Integer.valueOf(member.Membership_Plan__r.Loan_Duration_Days__c),
+        null
       ),
       Status__c = 'Active',
       Renewal_Count__c = 0
@@ -140,11 +159,22 @@ public without sharing class LibraryCirculationService {
       // remaining reservations so the next member becomes position 1.
       resequenceQueue(copy.Book__c);
     }
+    LibraryReservationEtaService.recalculateForBook(copy.Book__c);
     return loan.Id;
   }
 
   public static void returnLoan(Id loanId) {
     LibraryPolicyService.require('Manage_Library_Circulation');
+    returnLoanInternal(loanId, null);
+  }
+
+  public static void returnLoanForMember(Id loanId, Id memberId) {
+    if (loanId == null || memberId == null)
+      throw new AuraHandledException('A valid loan is required.');
+    returnLoanInternal(loanId, memberId);
+  }
+
+  private static void returnLoanInternal(Id loanId, Id expectedMemberId) {
     Borrow_Record__c loan = [
       SELECT
         Id,
@@ -160,6 +190,10 @@ public without sharing class LibraryCirculationService {
       WHERE Id = :loanId
       FOR UPDATE
     ];
+    if (expectedMemberId != null && loan.Member__c != expectedMemberId)
+      throw new AuraHandledException(
+        'This loan does not belong to the member.'
+      );
     if (loan.Return_Date__c != null || loan.Status__c == 'Returned')
       throw new AuraHandledException('Loan has already been returned.');
     Book_Copy__c copy = [
@@ -238,6 +272,7 @@ public without sharing class LibraryCirculationService {
       update new Book_Copy__c(Id = copy.Id, Status__c = 'Reserved');
       resequenceQueue(copy.Book__c);
     }
+    LibraryReservationEtaService.recalculateForBook(copy.Book__c);
   }
 
   public static void renewLoan(Id loanId) {
@@ -286,8 +321,10 @@ public without sharing class LibraryCirculationService {
       throw new AuraHandledException(
         'A reservation from another member blocks renewal.'
       );
-    loan.Due_Date__c = loan.Due_Date__c.addDays(
-      Integer.valueOf(loan.Member__r.Membership_Plan__r.Loan_Duration_Days__c)
+    loan.Due_Date__c = LibraryCalendarService.calculateDueDate(
+      loan.Due_Date__c,
+      Integer.valueOf(loan.Member__r.Membership_Plan__r.Loan_Duration_Days__c),
+      null
     );
     loan.Renewal_Count__c = (loan.Renewal_Count__c == null
       ? 1
@@ -419,6 +456,7 @@ public without sharing class LibraryCirculationService {
       'Reservation entered the queue.'
     );
     resequenceQueue(bookId);
+    LibraryReservationEtaService.recalculateForBook(bookId);
     return reservation.Id;
   }
 
@@ -453,6 +491,7 @@ public without sharing class LibraryCirculationService {
     if (releasedCopy != null)
       promoteNext(reservation.Book__c, releasedCopy);
     resequenceQueue(reservation.Book__c);
+    LibraryReservationEtaService.recalculateForBook(reservation.Book__c);
   }
 
   public static Integer processExpiredReservations() {
@@ -595,6 +634,7 @@ public without sharing class LibraryCirculationService {
     }
     if (!resequenced.isEmpty())
       Database.update(resequenced, AccessLevel.SYSTEM_MODE);
+    LibraryReservationEtaService.recalculateForBooks(bookIds);
     return expiredUpdates.size();
   }
 
@@ -648,8 +688,10 @@ public without sharing class LibraryCirculationService {
       throw new AuraHandledException(
         'A reservation from another member blocks renewal.'
       );
-    loan.Due_Date__c = loan.Due_Date__c.addDays(
-      Integer.valueOf(loan.Member__r.Membership_Plan__r.Loan_Duration_Days__c)
+    loan.Due_Date__c = LibraryCalendarService.calculateDueDate(
+      loan.Due_Date__c,
+      Integer.valueOf(loan.Member__r.Membership_Plan__r.Loan_Duration_Days__c),
+      null
     );
     loan.Renewal_Count__c = (loan.Renewal_Count__c == null
       ? 1
@@ -757,6 +799,7 @@ public without sharing class LibraryCirculationService {
       'Reservation entered the queue.'
     );
     resequenceQueue(bookId);
+    LibraryReservationEtaService.recalculateForBook(bookId);
     return reservation.Id;
   }
 
@@ -797,6 +840,7 @@ public without sharing class LibraryCirculationService {
       );
       promoteNext(reservation.Book__c, releasedCopy);
       resequenceQueue(reservation.Book__c);
+      LibraryReservationEtaService.recalculateForBook(reservation.Book__c);
     } else {
       String previous = reservation.Status__c;
       reservation.Status__c = 'Cancelled';
@@ -811,6 +855,7 @@ public without sharing class LibraryCirculationService {
         'Cancelled by member.'
       );
       resequenceQueue(reservation.Book__c);
+      LibraryReservationEtaService.recalculateForBook(reservation.Book__c);
     }
   }
   private static void promoteNext(Id bookId, Id copyId) {
@@ -854,6 +899,7 @@ public without sharing class LibraryCirculationService {
       'A released copy became available.'
     );
     notifyReady(promoted);
+    LibraryReservationEtaService.recalculateForBook(bookId);
   }
   private static void resequenceQueue(Id bookId) {
     if (bookId == null)

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Returns an authorized, privacy-safe summary for a librarian-selected member without authentication or security fields.</description>
+    <developerName>LibraryAgentMemberSummaryAction</developerName>
+    <invocationTarget>LibraryAgentMemberSummaryAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryAgentMemberSummaryAction</localDeveloperName>
+    <masterLabel>Get Member Summary</masterLabel>
+    <language>en_US</language>
+    <progressIndicatorMessage>Loading the member summary</progressIndicatorMessage>
+</GenAiFunction>

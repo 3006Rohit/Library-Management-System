@@ -1,0 +1,110 @@
+:host {
+  display: block;
+}
+.import-panel {
+  background: #fff;
+  border: 1px solid #dce5ef;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgb(24 52 84 / 6%);
+  margin: 1rem 0;
+  padding: 1.25rem;
+}
+.header {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+h2 {
+  color: #17365d;
+  margin: 0.1rem 0 0.35rem;
+}
+.header p {
+  color: #61758e;
+  margin: 0;
+  max-width: 720px;
+}
+.eyebrow {
+  color: #3377b8 !important;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+button {
+  background: #246ca6;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.6rem 0.85rem;
+}
+button.secondary {
+  background: #eef3f8;
+  color: #31526f;
+}
+.key-label {
+  color: #31526f;
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-top: 1rem;
+}
+input,
+.csv-input {
+  border: 1px solid #c8d6e5;
+  border-radius: 8px;
+  box-sizing: border-box;
+  display: block;
+  margin-top: 0.35rem;
+  padding: 0.6rem;
+  width: 100%;
+}
+.csv-input {
+  font-family: monospace;
+  min-height: 130px;
+}
+.table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,
+td {
+  border-bottom: 1px solid #edf1f5;
+  padding: 0.6rem;
+  text-align: left;
+}
+th {
+  color: #5c7087;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+td {
+  color: #2d435d;
+  font-size: 0.84rem;
+}
+.message {
+  color: #61758e;
+  padding: 1rem 0;
+}
+.error {
+  color: #b42318;
+  padding: 1rem 0;
+}
+@media (max-width: 760px) {
+  .header {
+    flex-direction: column;
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+}

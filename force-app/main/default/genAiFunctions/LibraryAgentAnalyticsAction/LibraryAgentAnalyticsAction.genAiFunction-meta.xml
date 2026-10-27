@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Returns bounded, read-only library-wide analytics for authorized librarians.</description>
+    <developerName>LibraryAgentAnalyticsAction</developerName>
+    <invocationTarget>LibraryAgentAnalyticsAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryAgentAnalyticsAction</localDeveloperName>
+    <masterLabel>Get Library Analytics</masterLabel>
+    <language>en_US</language>
+    <progressIndicatorMessage>Loading library analytics</progressIndicatorMessage>
+</GenAiFunction>

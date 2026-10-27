@@ -23,11 +23,26 @@ import payForMembershipUpgrade from "@salesforce/apex/LibraryMemberSessionContro
 import renewMyMembership from "@salesforce/apex/LibraryMemberSessionController.renewMyMembership";
 import getMyNotifications from "@salesforce/apex/LibraryMemberSessionController.getMyNotifications";
 import markNotificationRead from "@salesforce/apex/LibraryMemberSessionController.markNotificationRead";
+import getMyNotificationPreferences from "@salesforce/apex/LibraryMemberSessionController.getMyNotificationPreferences";
+import updateMyNotificationPreferences from "@salesforce/apex/LibraryMemberSessionController.updateMyNotificationPreferences";
 import reportDefectiveLoan from "@salesforce/apex/LibraryMemberSessionController.reportDefectiveLoan";
+import saveMyEngagement from "@salesforce/apex/LibraryMemberSessionController.saveMyEngagement";
+import followAuthor from "@salesforce/apex/LibraryMemberSessionController.followAuthor";
+import submitBookReview from "@salesforce/apex/LibraryMemberSessionController.submitBookReview";
 
 const NAVIGATION = [
   ["Dashboard", "utility:home"],
   ["Explore Books", "utility:knowledge_base"],
+  ["Events", "utility:event"],
+  ["Rooms", "utility:company"],
+  ["Challenges", "utility:favorite"],
+  ["Branches", "utility:location"],
+  ["Fine Appeals", "utility:warning"],
+  ["Membership Holds", "utility:pause"],
+  ["Privacy Center", "utility:lock"],
+  ["Reading Lists", "utility:bookmark"],
+  ["Followed Authors", "utility:favorite"],
+  ["Scan & Borrow", "utility:scan"],
   ["My Books", "utility:bookmark"],
   ["Reservations", "utility:favorite"],
   ["Membership", "utility:groups"],
@@ -40,6 +55,40 @@ const PAGE_COPY = {
   "Explore Books": [
     "Explore Books",
     "Discover new books, authors and categories"
+  ],
+  Events: [
+    "Library Events",
+    "Discover talks, workshops and reading groups at your library"
+  ],
+  Rooms: [
+    "Room Bookings",
+    "Find and reserve a library room for your next gathering"
+  ],
+  Challenges: [
+    "Reading Challenges",
+    "Set goals and celebrate your reading progress"
+  ],
+  Branches: ["Library Branches", "Find nearby locations and branch inventory"],
+  "Fine Appeals": ["Fine Appeals", "Request a review of a disputed charge"],
+  "Membership Holds": [
+    "Membership Holds",
+    "Request a policy-approved pause without losing your membership history"
+  ],
+  "Privacy Center": [
+    "Privacy Center",
+    "Export, correct, or close your library account securely"
+  ],
+  "Reading Lists": [
+    "My Reading Lists",
+    "Save books privately and track your reading progress"
+  ],
+  "Followed Authors": [
+    "Authors I Follow",
+    "Keep up with new releases from your favorite authors"
+  ],
+  "Scan & Borrow": [
+    "Scan & Borrow",
+    "Use your camera or enter a copy barcode for self-checkout"
   ],
   "My Books": ["My Books", "View and manage your borrowed books"],
   Reservations: [
@@ -67,12 +116,17 @@ export default class LibraryMemberShell extends LightningElement {
   catalog = [];
   categories = [];
   bookDetail;
+  reviewRating;
+  reviewText = "";
+  reviewStatus;
   borrowings = [];
   reservations = [];
   fines = [];
   membership;
   payments = [];
   notifications = [];
+  notificationPreferences = [];
+  notificationPreferenceSaving = false;
   upgradePlans = [];
   profile;
   loading = false;
@@ -169,6 +223,36 @@ export default class LibraryMemberShell extends LightningElement {
   }
   get isExploreBooks() {
     return this.section === "Explore Books";
+  }
+  get isEvents() {
+    return this.section === "Events";
+  }
+  get isRooms() {
+    return this.section === "Rooms";
+  }
+  get isChallenges() {
+    return this.section === "Challenges";
+  }
+  get isBranches() {
+    return this.section === "Branches";
+  }
+  get isFineAppeals() {
+    return this.section === "Fine Appeals";
+  }
+  get isMembershipHolds() {
+    return this.section === "Membership Holds";
+  }
+  get isPrivacyCenter() {
+    return this.section === "Privacy Center";
+  }
+  get isReadingLists() {
+    return this.section === "Reading Lists";
+  }
+  get isFollowedAuthors() {
+    return this.section === "Followed Authors";
+  }
+  get isScanner() {
+    return this.section === "Scan & Borrow";
   }
   get isMyBooks() {
     return this.section === "My Books";
@@ -357,13 +441,19 @@ export default class LibraryMemberShell extends LightningElement {
     }));
   }
   get profileTabs() {
-    return ["Personal Details", "Address", "Membership", "Activity"].map(
-      (label) => ({
-        label,
-        value: label,
-        className: label === this.profileTab ? "tab active" : "tab"
-      })
-    );
+    return [
+      "Personal Details",
+      "Address",
+      "Membership",
+      "Digital Card",
+      "Activity",
+      "Notifications",
+      "Accessibility"
+    ].map((label) => ({
+      label,
+      value: label,
+      className: label === this.profileTab ? "tab active" : "tab"
+    }));
   }
   get isPersonalProfile() {
     return this.profileTab === "Personal Details";
@@ -374,8 +464,43 @@ export default class LibraryMemberShell extends LightningElement {
   get isMembershipProfile() {
     return this.profileTab === "Membership";
   }
+  get isDigitalCardProfile() {
+    return this.profileTab === "Digital Card";
+  }
   get isActivityProfile() {
     return this.profileTab === "Activity";
+  }
+  get isNotificationProfile() {
+    return this.profileTab === "Notifications";
+  }
+  get isAccessibilityProfile() {
+    return this.profileTab === "Accessibility";
+  }
+  accessibilityClassName = "member-app";
+  handleAccessibilityChange(event) {
+    const detail = event.detail || {};
+    const classes = ["member-app"];
+    if (detail.highContrast) classes.push("high-contrast");
+    if (detail.largeText) classes.push("large-text");
+    if (detail.reducedMotion) classes.push("reduced-motion");
+    this.accessibilityClassName = classes.join(" ");
+  }
+  get preferenceRows() {
+    return (this.notificationPreferences || []).map((row) => ({
+      ...row,
+      enabledLabel: row.enabled ? "On" : "Off",
+      statusClass: row.enabled ? "preference-on" : "preference-off"
+    }));
+  }
+  get savePreferenceLabel() {
+    return this.notificationPreferenceSaving ? "Saving…" : "Save preferences";
+  }
+  get digestFrequencyOptions() {
+    return [
+      { label: "Instant", value: "Instant" },
+      { label: "Daily digest", value: "Daily" },
+      { label: "Weekly digest", value: "Weekly" }
+    ];
   }
   get outstandingFine() {
     return Number(this.dashboard?.outstandingFine || 0);
@@ -499,6 +624,9 @@ export default class LibraryMemberShell extends LightningElement {
   }
   get bookDetailAuthors() {
     return this.bookDetail?.authors || "Author unavailable";
+  }
+  get bookDetailAuthorId() {
+    return this.bookDetail?.Book_Authors__r?.[0]?.Author__c;
   }
   get bookDetailCategories() {
     return this.bookDetail?.categories || "Uncategorized";
@@ -969,13 +1097,63 @@ export default class LibraryMemberShell extends LightningElement {
       this.loadBorrowings(),
       this.loadReservations(),
       this.loadFinesAndPayments(),
-      this.loadMembership()
+      this.loadMembership(),
+      this.loadNotificationPreferences()
     ]);
   }
 
   loadNotifications() {
     return this.call(getMyNotifications, {}, (data) => {
       this.notifications = data || [];
+    });
+  }
+
+  loadNotificationPreferences() {
+    return this.call(getMyNotificationPreferences, {}, (data) => {
+      this.notificationPreferences = data || [];
+    });
+  }
+
+  changePreference(event) {
+    const id = event.currentTarget.dataset.id;
+    const enabled = event.currentTarget.checked;
+    this.notificationPreferences = this.notificationPreferences.map((row) => {
+      return row.id === id ? { ...row, enabled } : row;
+    });
+  }
+
+  changePreferenceFrequency(event) {
+    const id = event.currentTarget.dataset.id;
+    const digestFrequency = event.detail?.value || event.currentTarget.value;
+    this.notificationPreferences = this.notificationPreferences.map((row) => {
+      return row.id === id ? { ...row, digestFrequency } : row;
+    });
+  }
+
+  saveNotificationPreferences() {
+    this.notificationPreferenceSaving = true;
+    return this.call(
+      updateMyNotificationPreferences,
+      {
+        inputs: this.notificationPreferences.map((row) => ({
+          channel: row.channel,
+          notificationType: row.notificationType,
+          enabled: row.enabled,
+          digestFrequency: row.digestFrequency,
+          quietHoursStart: row.quietHoursStart,
+          quietHoursEnd: row.quietHoursEnd,
+          timezone: row.timezone
+        }))
+      },
+      () => {
+        this.toast(
+          "Notification preferences saved",
+          "Your delivery choices will be used for future messages.",
+          "success"
+        );
+      }
+    ).finally(() => {
+      this.notificationPreferenceSaving = false;
     });
   }
 
@@ -1055,6 +1233,9 @@ export default class LibraryMemberShell extends LightningElement {
     const bookId = event.detail?.id || event.currentTarget?.dataset?.id;
     return this.call(getBookDetails, { bookId }, (data) => {
       this.bookDetail = this.decorateBook(data);
+      this.reviewRating = undefined;
+      this.reviewText = "";
+      this.reviewStatus = undefined;
     });
   }
 
@@ -1090,6 +1271,71 @@ export default class LibraryMemberShell extends LightningElement {
   requestReserve() {
     this.confirmAction = "reserve";
     this.confirmRecord = this.bookDetail;
+  }
+
+  saveBookToReadingList() {
+    return this.call(
+      saveMyEngagement,
+      {
+        bookId: this.bookDetail.Id,
+        state: "Want to Read",
+        notes: null,
+        rating: null,
+        notifyWhenAvailable: false
+      },
+      () => {
+        this.toast(
+          "Added to reading list",
+          "You can update its progress from Reading Lists.",
+          "success"
+        );
+      }
+    );
+  }
+
+  followBookAuthor() {
+    if (!this.bookDetailAuthorId) {
+      this.toast(
+        "Author unavailable",
+        "This book has no linked author record.",
+        "warning"
+      );
+      return;
+    }
+    this.call(followAuthor, { authorId: this.bookDetailAuthorId }, () =>
+      this.toast(
+        "Author followed",
+        "You will see this author in Followed Authors.",
+        "success"
+      )
+    );
+  }
+
+  handleReviewRating(event) {
+    this.reviewRating = event.target.value;
+  }
+
+  handleReviewText(event) {
+    this.reviewText = event.target.value;
+  }
+
+  submitReview() {
+    return this.call(
+      submitBookReview,
+      {
+        bookId: this.bookDetail?.Id,
+        rating: this.reviewRating ? Number(this.reviewRating) : null,
+        reviewText: this.reviewText
+      },
+      (review) => {
+        this.reviewStatus = review.status;
+        this.toast(
+          "Review submitted",
+          "Your review is pending librarian moderation.",
+          "success"
+        );
+      }
+    );
   }
 
   requestRenew(event) {
@@ -1364,10 +1610,22 @@ export default class LibraryMemberShell extends LightningElement {
       Ready_Date__c: row.readyDate || row.Ready_Date__c,
       Expiry_Date__c: row.expiryDate || row.Expiry_Date__c,
       Fulfilled_Date__c: row.fulfilledDate || row.Fulfilled_Date__c,
+      Estimated_Available_Date__c:
+        row.estimatedAvailableDate || row.Estimated_Available_Date__c,
+      ETA_Confidence__c: row.etaConfidence || row.ETA_Confidence__c || "Low",
+      ETA_Last_Calculated__c:
+        row.etaLastCalculated || row.ETA_Last_Calculated__c,
+      ETA_Reason__c: row.etaReason || row.ETA_Reason__c,
       bookName: row.bookName || row.Book__r?.Name || "Book unavailable",
       reservedDateLabel: this.formatDate(
         row.reservationDate || row.Reservation_Date__c
       ),
+      estimatedDateLabel: this.formatDateTime(
+        row.estimatedAvailableDate || row.Estimated_Available_Date__c
+      ),
+      etaLabel:
+        (row.etaConfidence || row.ETA_Confidence__c || "Low") + " confidence",
+      etaReason: row.etaReason || row.ETA_Reason__c || "Estimate unavailable",
       statusLabel,
       statusClass: this.badge(statusLabel),
       canCancel: ["Pending", "Ready"].includes(status)
@@ -1404,6 +1662,17 @@ export default class LibraryMemberShell extends LightningElement {
       day: "numeric",
       month: "short",
       year: "numeric"
+    }).format(new Date(value));
+  }
+
+  formatDateTime(value) {
+    if (!value) return "—";
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
     }).format(new Date(value));
   }
 

@@ -1,5 +1,7 @@
 @IsTest
 private class LibraryAgentApiControllerTest {
+  private static String startEndpoint;
+
   private class AgentApiMock implements HttpCalloutMock {
     public HttpResponse respond(HttpRequest request) {
       HttpResponse response = new HttpResponse();
@@ -8,6 +10,7 @@ private class LibraryAgentApiControllerTest {
         request.getMethod() == 'POST' &&
         request.getEndpoint().contains('/agents/')
       ) {
+        LibraryAgentApiControllerTest.startEndpoint = request.getEndpoint();
         response.setBody('{"sessionId":"session-1"}');
       } else if (request.getMethod() == 'POST') {
         response.setBody(
@@ -32,6 +35,10 @@ private class LibraryAgentApiControllerTest {
     Test.stopTest();
 
     System.assertEquals('session-1', session.sessionId);
+    System.assert(
+      startEndpoint.contains('0XxgK000002QwOz'),
+      'The workspace must use the activated librarian Agentforce agent.'
+    );
     System.assertEquals('There are 350 copies available.', message.message);
     System.assertEquals('Inform', message.messageType);
   }

@@ -159,7 +159,11 @@ public with sharing class LibraryLibrarianController {
         Member__r.Name,
         Book__r.Name,
         Ready_Date__c,
-        Expiry_Date__c
+        Expiry_Date__c,
+        Estimated_Available_Date__c,
+        ETA_Confidence__c,
+        ETA_Last_Calculated__c,
+        ETA_Reason__c
       FROM Reservation__c
       WHERE Status__c = 'Ready'
       ORDER BY Ready_Date__c ASC
@@ -171,7 +175,87 @@ public with sharing class LibraryLibrarianController {
   @AuraEnabled(cacheable=false)
   public static LibraryDataCloudService.LibrarianAnalyticsDTO getDashboardAnalytics() {
     LibraryPolicyService.require('Manage_Library_Circulation');
-    return LibraryDataCloudService.getRealtimeLibrarianAnalytics();
+    return LibraryDataCloudService.getLibrarianAnalytics();
+  }
+  @AuraEnabled(cacheable=true)
+  public static LibraryDataCloudReadinessService.StatusDTO getDataCloudReadiness() {
+    return LibraryDataCloudReadinessService.getStatus();
+  }
+  @AuraEnabled(cacheable=true)
+  public static LibraryLedgerMigrationReadinessService.StatusDTO getLedgerMigrationReadiness() {
+    return LibraryLedgerMigrationReadinessService.getStatus();
+  }
+  @AuraEnabled(cacheable=true)
+  public static LibraryLedgerMigrationReviewService.ReviewDTO getLedgerMigrationReview() {
+    return LibraryLedgerMigrationReviewService.getLatestReview();
+  }
+  @AuraEnabled
+  public static LibraryLedgerMigrationReviewService.ReviewDTO recordLedgerMigrationReview(
+    String manifestVersion,
+    Datetime generatedAt,
+    String reviewNote,
+    Integer totalRows,
+    Integer migratableRows,
+    Integer blockerCount
+  ) {
+    return LibraryLedgerMigrationReviewService.recordReview(
+      manifestVersion,
+      generatedAt,
+      reviewNote,
+      totalRows,
+      migratableRows,
+      blockerCount
+    );
+  }
+  @AuraEnabled(cacheable=true)
+  public static LibraryNotificationDeliveryService.SummaryDTO getNotificationDeliverySummary() {
+    LibraryPolicyService.require('Manage_Library_Circulation');
+    return LibraryNotificationDeliveryService.getSummary();
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryNotificationDeliveryService.DeliveryDTO> getRecentNotificationDeliveries(
+    Integer requestedLimit
+  ) {
+    LibraryPolicyService.require('Manage_Library_Circulation');
+    return LibraryNotificationDeliveryService.getRecent(requestedLimit);
+  }
+  @AuraEnabled
+  public static Integer retryFailedNotificationDeliveries(
+    Integer requestedLimit
+  ) {
+    LibraryPolicyService.require('Manage_Library_Circulation');
+    return LibraryNotificationDeliveryRetryService.retryFailedDeliveries(
+      requestedLimit
+    );
+  }
+  @AuraEnabled(cacheable=false)
+  public static List<LibraryAcquisitionInsightService.RecommendationDTO> getAcquisitionRecommendations() {
+    return LibraryAcquisitionInsightService.getRecommendations();
+  }
+  @AuraEnabled
+  public static Acquisition_Recommendation__c decideAcquisitionRecommendation(
+    Id recommendationId,
+    String status,
+    String notes
+  ) {
+    return LibraryAcquisitionInsightService.decide(
+      recommendationId,
+      status,
+      notes
+    );
+  }
+  @AuraEnabled
+  public static void recordSearchTelemetry(
+    String searchTerm,
+    Integer resultCount,
+    Id bookId
+  ) {
+    LibraryPolicyService.require('Manage_Library_Catalog');
+    LibraryAcquisitionInsightService.recordSearchTelemetry(
+      searchTerm,
+      resultCount,
+      bookId
+    );
   }
   @AuraEnabled(cacheable=true)
   public static List<Book__c> searchBooks(
@@ -209,7 +293,8 @@ public with sharing class LibraryLibrarianController {
     if (!clauses.isEmpty())
       q += ' WHERE ' + String.join(clauses, ' AND ');
     q += ' ORDER BY Name LIMIT :size OFFSET :offsetValue';
-    return Database.query(q);
+    List<Book__c> results = Database.query(q);
+    return results;
   }
   @AuraEnabled(cacheable=true)
   public static List<Author__c> getAuthors() {
@@ -612,7 +697,7 @@ public with sharing class LibraryLibrarianController {
   @AuraEnabled(cacheable=true)
   public static List<Reservation__c> getReservations(String status) {
     LibraryPolicyService.require('Manage_Library_Circulation');
-    String q = 'SELECT Id,Name,Member__c,Member__r.Name,Book__c,Book__r.Name,Book_Copy__c,Book_Copy__r.Name,Reservation_Date__c,Queue_Position__c,Status__c,Ready_Date__c,Expiry_Date__c,Fulfilled_Date__c FROM Reservation__c';
+    String q = 'SELECT Id,Name,Member__c,Member__r.Name,Book__c,Book__r.Name,Book_Copy__c,Book_Copy__r.Name,Reservation_Date__c,Queue_Position__c,Status__c,Ready_Date__c,Expiry_Date__c,Fulfilled_Date__c,Estimated_Available_Date__c,ETA_Confidence__c,ETA_Last_Calculated__c,ETA_Reason__c FROM Reservation__c';
     if (!String.isBlank(status))
       q += ' WHERE Status__c=:status';
     q += ' ORDER BY Reservation_Date__c DESC LIMIT 200';
@@ -679,7 +764,11 @@ public with sharing class LibraryLibrarianController {
         Queue_Position__c,
         Ready_Date__c,
         Expiry_Date__c,
-        Fulfilled_Date__c
+        Fulfilled_Date__c,
+        Estimated_Available_Date__c,
+        ETA_Confidence__c,
+        ETA_Last_Calculated__c,
+        ETA_Reason__c
       FROM Reservation__c
       WHERE Member__c = :memberId
       ORDER BY Reservation_Date__c DESC
@@ -966,7 +1055,7 @@ public with sharing class LibraryLibrarianController {
   @AuraEnabled(cacheable=true)
   public static List<Borrow_Record__c> getLoans(String status) {
     LibraryPolicyService.require('Manage_Library_Circulation');
-    String q = 'SELECT Id,Name,Member__r.Name,Book_Copy__r.Name,Book_Copy__r.Book__r.Name,Borrow_Date__c,Due_Date__c,Return_Date__c,Status__c,Renewal_Count__c FROM Borrow_Record__c';
+    String q = 'SELECT Id,Name,Member__r.Name,Book_Copy__r.Name,Book_Copy__r.Book__r.Name,Borrow_Date__c,Due_Date__c,Return_Date__c,Status__c,Renewal_Count__c,Defect_Reported_Date__c,Replacement_Required__c,Notes__c FROM Borrow_Record__c';
     if (!String.isBlank(status))
       q += ' WHERE Status__c=:status';
     q += ' ORDER BY Borrow_Date__c DESC LIMIT 200';
@@ -988,5 +1077,350 @@ public with sharing class LibraryLibrarianController {
   @AuraEnabled
   public static Integer processExpiredReservations() {
     return LibraryCirculationService.processExpiredReservations();
+  }
+  @AuraEnabled
+  public static void moderateBookReview(Id reviewId, String status) {
+    LibraryMemberReviewService.moderate(reviewId, status);
+  }
+  @AuraEnabled
+  public static Id createLibraryEvent(
+    String title,
+    String description,
+    Datetime startAt,
+    Datetime endAt,
+    Integer capacity,
+    String location
+  ) {
+    return LibraryEventService.create(
+      title,
+      description,
+      startAt,
+      endAt,
+      capacity,
+      location
+    );
+  }
+  @AuraEnabled
+  public static LibraryEventService.CheckInDTO checkInEvent(
+    Id eventId,
+    String token
+  ) {
+    return LibraryEventService.checkIn(eventId, token);
+  }
+  @AuraEnabled
+  public static Id createLibraryRoom(
+    String name,
+    String location,
+    Integer capacity,
+    String equipment
+  ) {
+    return LibraryRoomBookingService.createRoom(
+      name,
+      location,
+      capacity,
+      equipment
+    );
+  }
+  @AuraEnabled
+  public static Id createReadingChallenge(
+    String name,
+    String description,
+    Datetime startAt,
+    Datetime endAt,
+    Integer goalCount
+  ) {
+    return LibraryChallengeService.create(
+      name,
+      description,
+      startAt,
+      endAt,
+      goalCount
+    );
+  }
+  @AuraEnabled
+  public static Id createLibraryBranch(
+    String code,
+    String name,
+    String address,
+    String timezone
+  ) {
+    return LibraryBranchService.createBranch(code, name, address, timezone);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryBranchService.BranchDTO> getManagedLibraryBranches() {
+    return LibraryBranchService.getManagedBranches();
+  }
+  @AuraEnabled
+  public static Id assignCopyToBranch(Id copyId, Id branchId) {
+    return LibraryBranchService.assignCopy(copyId, branchId);
+  }
+  @AuraEnabled
+  public static LibraryBranchService.TransferDTO requestCopyTransfer(
+    Id copyId,
+    Id destinationBranchId
+  ) {
+    return LibraryBranchService.requestTransfer(copyId, destinationBranchId);
+  }
+  @AuraEnabled
+  public static void shipCopyTransfer(Id transferId) {
+    LibraryBranchService.shipTransfer(transferId);
+  }
+  @AuraEnabled
+  public static void receiveCopyTransfer(Id transferId) {
+    LibraryBranchService.receiveTransfer(transferId);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryFineAppealService.AppealDTO> getFineAppeals() {
+    return LibraryFineAppealService.getAll();
+  }
+  @AuraEnabled
+  public static void decideFineAppeal(
+    Id appealId,
+    String status,
+    String decisionReason
+  ) {
+    LibraryFineAppealService.decide(appealId, status, decisionReason);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryMembershipHoldService.HoldDTO> getMembershipHolds() {
+    return LibraryMembershipHoldService.getAll();
+  }
+  @AuraEnabled
+  public static void decideMembershipHold(
+    Id holdId,
+    String status,
+    String decisionReason
+  ) {
+    LibraryMembershipHoldService.decide(holdId, status, decisionReason);
+  }
+  @AuraEnabled
+  public static Id createLibraryClosure(
+    String name,
+    Date startDate,
+    Date endDate,
+    Id branchId,
+    String timezone,
+    Boolean emergency
+  ) {
+    return LibraryCalendarService.createClosure(
+      name,
+      startDate,
+      endDate,
+      branchId,
+      timezone,
+      emergency
+    );
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryCalendarService.ClosureDTO> getLibraryClosures() {
+    return LibraryCalendarService.getClosures();
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryPrivacyService.RequestDTO> getPrivacyRequests() {
+    return LibraryPrivacyService.getAll();
+  }
+  @AuraEnabled
+  public static void decidePrivacyRequest(
+    Id requestId,
+    String status,
+    String decisionReason
+  ) {
+    LibraryPrivacyService.decide(requestId, status, decisionReason);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryOperationAuditService.AuditDTO> getOperationAudit(
+    String operation,
+    Id targetId,
+    Integer limitSize
+  ) {
+    return LibraryOperationAuditService.getRecent(
+      operation,
+      targetId,
+      limitSize
+    );
+  }
+  @AuraEnabled
+  public static LibraryRiskInsightService.RunDTO scanRiskInsights() {
+    return LibraryRiskInsightService.scan();
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryRiskInsightService.AlertDTO> getRiskAlerts(
+    String status
+  ) {
+    return LibraryRiskInsightService.getAll(status);
+  }
+  @AuraEnabled
+  public static void decideRiskAlert(
+    Id alertId,
+    String status,
+    String reviewerNote
+  ) {
+    LibraryRiskInsightService.decide(alertId, status, reviewerNote);
+  }
+  @AuraEnabled
+  public static LibraryExecutiveSummaryService.SummaryDTO generateExecutiveSummary() {
+    return LibraryExecutiveSummaryService.generate();
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryExecutiveSummaryService.SummaryDTO> getExecutiveSummaries(
+    Integer limitSize
+  ) {
+    return LibraryExecutiveSummaryService.getRecent(limitSize);
+  }
+  @AuraEnabled
+  public static LibraryPaymentOperationsService.ReceiptDTO createPaymentReceipt(
+    Id paymentId
+  ) {
+    return LibraryPaymentOperationsService.createReceipt(paymentId);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryPaymentOperationsService.ReconciliationDTO> getPaymentReconciliationExceptions() {
+    return LibraryPaymentOperationsService.getExceptions();
+  }
+  @AuraEnabled
+  public static void reconcileMembershipPayment(
+    Id paymentId,
+    String status,
+    String reason
+  ) {
+    LibraryPaymentOperationsService.reconcile(paymentId, status, reason);
+  }
+  @AuraEnabled
+  public static LibraryPaymentGatewayService.PaymentDTO initiatePaymentTransaction(
+    Id memberId,
+    Id planId,
+    Decimal amount,
+    String currencyCode,
+    String idempotencyKey
+  ) {
+    return LibraryPaymentGatewayService.initiate(
+      memberId,
+      planId,
+      amount,
+      currencyCode,
+      idempotencyKey
+    );
+  }
+  @AuraEnabled
+  public static LibraryPaymentGatewayService.RefundDTO requestPaymentRefund(
+    Id paymentId,
+    Decimal amount,
+    String reason,
+    String idempotencyKey
+  ) {
+    return LibraryPaymentGatewayService.requestRefund(
+      paymentId,
+      amount,
+      reason,
+      idempotencyKey
+    );
+  }
+  @AuraEnabled(cacheable=true)
+  public static LibraryPaymentGatewayService.ConfigurationDTO getPaymentGatewayConfigurationStatus() {
+    return LibraryPaymentGatewayService.getConfigurationStatus();
+  }
+  @AuraEnabled
+  public static List<LibraryCatalogImportService.RowDTO> previewCatalogImport(
+    String csvText
+  ) {
+    return LibraryCatalogImportService.preview(csvText);
+  }
+  @AuraEnabled
+  public static LibraryCatalogImportService.ImportDTO commitCatalogImport(
+    String importKey,
+    String csvText
+  ) {
+    return LibraryCatalogImportService.executeImport(importKey, csvText);
+  }
+  @AuraEnabled
+  public static LibraryStocktakeService.AuditDTO startStocktake(
+    String name,
+    String scope
+  ) {
+    return LibraryStocktakeService.start(name, scope);
+  }
+  @AuraEnabled
+  public static LibraryStocktakeService.LineDTO scanStocktake(
+    Id auditId,
+    String barcode,
+    String observedStatus,
+    String note
+  ) {
+    return LibraryStocktakeService.scan(auditId, barcode, observedStatus, note);
+  }
+  @AuraEnabled
+  public static void closeStocktake(Id auditId, String summary) {
+    LibraryStocktakeService.close(auditId, summary);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryStocktakeService.AuditDTO> getStocktakes() {
+    return LibraryStocktakeService.getAudits();
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryStocktakeService.LineDTO> getStocktakeLines(
+    Id auditId
+  ) {
+    return LibraryStocktakeService.getLines(auditId);
+  }
+  @AuraEnabled
+  public static LibraryRepairService.RepairDTO openRepair(
+    Id copyId,
+    String reason
+  ) {
+    return LibraryRepairService.open(copyId, reason);
+  }
+  @AuraEnabled
+  public static LibraryRepairService.RepairDTO openRepairByBarcode(
+    String barcode,
+    String reason
+  ) {
+    return LibraryRepairService.openByBarcode(barcode, reason);
+  }
+  @AuraEnabled
+  public static void resolveRepair(
+    Id repairId,
+    String resolution,
+    String status,
+    String note
+  ) {
+    LibraryRepairService.resolve(repairId, resolution, status, note);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryRepairService.RepairDTO> getRepairCases(
+    String status
+  ) {
+    return LibraryRepairService.getAll(status);
+  }
+  @AuraEnabled
+  public static LibraryMetadataService.MetadataDTO lookupBookMetadata(
+    String isbn
+  ) {
+    return LibraryMetadataService.lookup(isbn);
+  }
+  @AuraEnabled
+  public static void applyBookMetadata(
+    Id bookId,
+    String selectedFieldsCsv,
+    String isbn,
+    String title,
+    String publisher,
+    Integer publicationYear,
+    String edition,
+    String language,
+    String description,
+    String coverUrl
+  ) {
+    LibraryMetadataService.apply(
+      bookId,
+      selectedFieldsCsv,
+      isbn,
+      title,
+      publisher,
+      publicationYear,
+      edition,
+      language,
+      description,
+      coverUrl
+    );
   }
 }

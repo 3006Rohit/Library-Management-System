@@ -5,6 +5,7 @@ import replaceDefectiveCopy from "@salesforce/apex/LibraryLibrarianController.re
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 export default class LibraryDamageReplacementPanel extends LightningElement {
   @api recordId;
+  @api replacementOnly = false;
   copies = [];
   selectedCopyId;
   notes = "";

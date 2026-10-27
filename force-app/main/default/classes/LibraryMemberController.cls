@@ -196,7 +196,11 @@ public with sharing class LibraryMemberController {
             Status__c,
             Ready_Date__c,
             Expiry_Date__c,
-            Fulfilled_Date__c
+            Fulfilled_Date__c,
+            Estimated_Available_Date__c,
+            ETA_Confidence__c,
+            ETA_Last_Calculated__c,
+            ETA_Reason__c
           FROM Reservation__c
           WHERE Member__c = :m.Id
           ORDER BY Reservation_Date__c DESC
@@ -389,7 +393,11 @@ public with sharing class LibraryMemberController {
           Status__c,
           Ready_Date__c,
           Expiry_Date__c,
-          Fulfilled_Date__c
+          Fulfilled_Date__c,
+          Estimated_Available_Date__c,
+          ETA_Confidence__c,
+          ETA_Last_Calculated__c,
+          ETA_Reason__c
         FROM Reservation__c
         WHERE Member__c = :m.Id
         ORDER BY Reservation_Date__c DESC

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Member Book Engagement</label>
+    <pluralLabel>Member Book Engagements</pluralLabel>
+    <nameField><displayFormat>ENG-{000000}</displayFormat><label>Engagement Number</label><type>AutoNumber</type></nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableLicensing>false</enableLicensing>
+    <enableReports>false</enableReports>
+    <enableSearch>false</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <externalSharingModel>Private</externalSharingModel>
+    <sharingModel>Private</sharingModel>
+    <visibility>Public</visibility>
+    <fields><fullName>Member__c</fullName><label>Member</label><relationshipLabel>Book Engagements</relationshipLabel><relationshipName>Book_Engagements</relationshipName><type>Lookup</type><referenceTo>Member__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>Book__c</fullName><label>Book</label><relationshipLabel>Member Engagements</relationshipLabel><relationshipName>Member_Engagements</relationshipName><type>Lookup</type><referenceTo>Book__c</referenceTo><deleteConstraint>Restrict</deleteConstraint></fields>
+    <fields><fullName>State__c</fullName><label>Reading State</label><length>30</length><type>Text</type></fields>
+    <fields><fullName>Private_Notes__c</fullName><label>Private Notes</label><length>32768</length><type>LongTextArea</type><visibleLines>5</visibleLines></fields>
+    <fields><fullName>Rating__c</fullName><label>Rating</label><precision>2</precision><scale>0</scale><type>Number</type></fields>
+    <fields><fullName>Notify_When_Available__c</fullName><label>Notify When Available</label><defaultValue>false</defaultValue><type>Checkbox</type></fields>
+    <fields><fullName>Engagement_Key__c</fullName><label>Engagement Key</label><length>100</length><type>Text</type><unique>true</unique><externalId>true</externalId></fields>
+    <fields><fullName>Last_Updated__c</fullName><label>Last Updated</label><type>DateTime</type></fields>
+</CustomObject>

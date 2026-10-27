@@ -1,0 +1,92 @@
+<template>
+  <section class="payment-panel" aria-label="Payment reconciliation">
+    <div class="header">
+      <div>
+        <p class="eyebrow">Finance controls</p>
+        <h2>Payment reconciliation</h2>
+        <p>
+          Review pending gateway settlement states, record an explicit outcome,
+          and generate protected receipts for paid transactions.
+        </p>
+      </div>
+      <button type="button" class="secondary" onclick={refresh}>Refresh</button>
+    </div>
+    <div class={gatewayStatusClass} role="status">
+      <div>
+        <strong>Gateway readiness</strong>
+        <p>{gateway.message}</p>
+      </div>
+      <span>{gatewayStatusLabel}</span>
+    </div>
+    <template if:true={loading}
+      ><div class="message">Loading payment exceptions…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Transaction</th>
+              <th>Member</th>
+              <th>Amount</th>
+              <th>Reference</th>
+              <th>Status</th>
+              <th>Decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.id}>
+                <td>{row.paymentName}</td>
+                <td>{row.memberName}</td>
+                <td>{row.amount}</td>
+                <td>{row.reference}</td>
+                <td>{row.status}</td>
+                <td>
+                  <textarea
+                    data-id={row.id}
+                    onchange={captureReason}
+                    placeholder="Settlement rationale"
+                  ></textarea>
+                  <div class="actions">
+                    <button
+                      type="button"
+                      data-id={row.id}
+                      data-status="Reconciled"
+                      onclick={reconcile}
+                    >
+                      Reconciled</button
+                    ><button
+                      type="button"
+                      class="secondary"
+                      data-id={row.id}
+                      data-status="Exception"
+                      onclick={reconcile}
+                    >
+                      Exception</button
+                    ><button
+                      type="button"
+                      class="link"
+                      data-id={row.id}
+                      onclick={receipt}
+                    >
+                      Receipt
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+    <template if:false={hasRows}
+      ><div class="message">
+        No pending reconciliation exceptions.
+      </div></template
+    >
+  </section>
+</template>

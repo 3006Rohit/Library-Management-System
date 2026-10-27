@@ -1,0 +1,10 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "activeLoans": { "title": "Active Loans", "description": "Member active loan count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "found": { "title": "Found", "description": "Whether a member was found.", "lightning:type": "lightning__booleanType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "memberName": { "title": "Member Name", "description": "Safe member name.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "totalLoans": { "title": "Total Loans", "description": "Member total loan count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true }
+  },
+  "lightning:type": "lightning__objectType"
+}

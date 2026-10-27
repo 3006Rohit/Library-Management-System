@@ -20,6 +20,70 @@
         <apexClass>LibraryMemberSessionController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <fieldPermissions><field
+    >Reservation__c.Estimated_Available_Date__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Reservation__c.ETA_Confidence__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Reservation__c.ETA_Last_Calculated__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Reservation__c.ETA_Reason__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Member__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Channel__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Notification_Type__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Enabled__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Digest_Frequency__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Quiet_Hours_Start__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Quiet_Hours_End__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Timezone__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Preference_Key__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Last_Updated__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Idempotency_Key__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Operation__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Member__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Book_Copy__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Borrow_Record__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Status__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Result_Message__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Created_At__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
     <objectPermissions><object>Author__c</object><allowCreate
     >false</allowCreate><allowDelete>false</allowDelete><allowEdit
     >false</allowEdit><allowRead>true</allowRead><modifyAllRecords
@@ -106,6 +170,16 @@
     >false</modifyAllRecords><viewAllRecords
     >false</viewAllRecords></objectPermissions>
     <objectPermissions><object>Reservation_Audit__c</object><allowCreate
+    >false</allowCreate><allowDelete>false</allowDelete><allowEdit
+    >false</allowEdit><allowRead>true</allowRead><modifyAllRecords
+    >false</modifyAllRecords><viewAllRecords
+    >false</viewAllRecords></objectPermissions>
+    <objectPermissions><object>Notification_Preference__c</object><allowCreate
+    >false</allowCreate><allowDelete>false</allowDelete><allowEdit
+    >false</allowEdit><allowRead>true</allowRead><modifyAllRecords
+    >false</modifyAllRecords><viewAllRecords
+    >false</viewAllRecords></objectPermissions>
+    <objectPermissions><object>Library_Scan_Transaction__c</object><allowCreate
     >false</allowCreate><allowDelete>false</allowDelete><allowEdit
     >false</allowEdit><allowRead>true</allowRead><modifyAllRecords
     >false</modifyAllRecords><viewAllRecords

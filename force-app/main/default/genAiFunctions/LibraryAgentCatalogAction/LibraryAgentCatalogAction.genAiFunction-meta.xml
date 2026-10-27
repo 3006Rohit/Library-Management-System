@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Searches the public library catalog by title, author, category, and availability without exposing member data.</description>
+    <developerName>LibraryAgentCatalogAction</developerName>
+    <invocationTarget>LibraryAgentCatalogAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryAgentCatalogAction</localDeveloperName>
+    <masterLabel>Search Library Catalog</masterLabel>
+    <language>en_US</language>
+    <progressIndicatorMessage>Searching the library catalog</progressIndicatorMessage>
+</GenAiFunction>

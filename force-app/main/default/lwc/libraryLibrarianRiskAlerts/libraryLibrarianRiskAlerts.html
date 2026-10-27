@@ -1,0 +1,95 @@
+<template>
+  <section class="risk-panel" aria-label="Risk and anomaly alerts">
+    <div class="header">
+      <div>
+        <p class="eyebrow">Explainable review queue</p>
+        <h2>Risk and anomaly alerts</h2>
+        <p>
+          Signals are evidence for a librarian review only. They never
+          automatically suspend a member or deny service.
+        </p>
+      </div>
+      <div class="actions">
+        <select onchange={changeStatus} aria-label="Risk alert status">
+          <template for:each={statusOptions} for:item="option">
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          </template>
+        </select>
+        <button type="button" onclick={scan} disabled={scanning}>
+          {scanLabel}
+        </button>
+        <button type="button" class="secondary" onclick={refresh}>
+          Refresh
+        </button>
+      </div>
+    </div>
+    <template if:true={loading}
+      ><div class="message">Loading alerts…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Signal</th>
+              <th>Severity</th>
+              <th>Evidence</th>
+              <th>Status</th>
+              <th>Review</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.id}>
+                <td>{row.subjectName}</td>
+                <td>
+                  {row.category}<br /><small>Score {row.score}/100</small>
+                </td>
+                <td><span class="severity">{row.severity}</span></td>
+                <td>{row.evidence}</td>
+                <td>{row.status}</td>
+                <td>
+                  <textarea
+                    data-id={row.id}
+                    onchange={captureNote}
+                    placeholder="Reviewer rationale"
+                  ></textarea>
+                  <div class="decision-actions">
+                    <button
+                      type="button"
+                      data-id={row.id}
+                      data-status="Resolved"
+                      onclick={decide}
+                      disabled={row.disabled}
+                    >
+                      Resolve
+                    </button>
+                    <button
+                      type="button"
+                      class="secondary"
+                      data-id={row.id}
+                      data-status="False Positive"
+                      onclick={decide}
+                      disabled={row.disabled}
+                    >
+                      False positive
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+    <template if:false={hasRows}
+      ><div class="message">No alerts match this status.</div></template
+    >
+  </section>
+</template>

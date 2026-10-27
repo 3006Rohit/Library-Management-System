@@ -1,0 +1,97 @@
+<template>
+  <section class="scanner-card" aria-labelledby="scanner-title">
+    <div class="scanner-heading">
+      <div>
+        <span class="eyebrow">SELF-SERVICE</span>
+        <h2 id="scanner-title">Scan &amp; borrow</h2>
+        <p>
+          Scan a copy barcode or enter it manually to preview and check out a
+          book.
+        </p>
+      </div>
+      <span class="scanner-icon" aria-hidden="true">⌗</span>
+    </div>
+
+    <div class="scanner-entry">
+      <div class="scanner-mode" role="tablist" aria-label="Scan operation">
+        <button
+          class={checkoutModeClass}
+          type="button"
+          data-mode="Checkout"
+          onclick={changeMode}
+        >
+          Checkout
+        </button>
+        <button
+          class={returnModeClass}
+          type="button"
+          data-mode="Return"
+          onclick={changeMode}
+        >
+          Return
+        </button>
+      </div>
+      <lightning-input
+        data-id="barcode"
+        label="Book copy barcode"
+        value={barcode}
+        placeholder="Scan or type a barcode"
+        onchange={handleBarcodeChange}
+        onkeydown={handleKeydown}
+      ></lightning-input>
+      <div class="scanner-actions">
+        <button
+          class="button primary"
+          type="button"
+          onclick={previewCopy}
+          disabled={busy}
+        >
+          Preview copy
+        </button>
+        <button
+          class="button outline"
+          type="button"
+          onclick={toggleCamera}
+          disabled={busy}
+        >
+          {cameraButtonLabel}
+        </button>
+      </div>
+    </div>
+
+    <template if:true={cameraActive}>
+      <div class="camera-panel">
+        <video class="camera-video" autoplay playsinline muted></video>
+        <p>{cameraMessage}</p>
+        <button class="button outline" type="button" onclick={stopCamera}>
+          Stop camera
+        </button>
+      </div>
+    </template>
+
+    <template if:true={hasPreview}>
+      <div class="scan-preview" role="region" aria-label="Scanned copy preview">
+        <div>
+          <span class="eyebrow">COPY FOUND</span>
+          <h3>{preview.bookTitle}</h3>
+          <p>{preview.barcode} · {preview.status}</p>
+        </div>
+        <button
+          class="button primary"
+          type="button"
+          onclick={confirmCheckout}
+          disabled={busy}
+        >
+          {confirmLabel}
+        </button>
+      </div>
+    </template>
+
+    <template if:true={hasMessage}>
+      <div class={messageClass} role="status" aria-live="polite">{message}</div>
+    </template>
+    <template if:true={busy}>
+      <lightning-spinner alternative-text="Processing scan"></lightning-spinner>
+    </template>
+  </section>
+</template>

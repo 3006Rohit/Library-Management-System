@@ -31,6 +31,7 @@ public without sharing class LibraryCatalogService {
     );
     insert book;
     createLinks(book.Id, authorIds, categoryIds);
+    LibraryMemberNotificationService.notifyActiveMembersForBook(book.Id, 'New Book', 'New book added to the library', 'A new book, {BOOK}, has been added to the catalog.', 'NEW-BOOK');
     return book.Id;
   }
   public static Id addCopy(
@@ -63,6 +64,7 @@ public without sharing class LibraryCatalogService {
       Price__c = price
     );
     insert copy;
+    LibraryMemberNotificationService.notifyActiveMembersForBook(bookId, 'Book Available', 'A book is now available to borrow', '{BOOK} now has a copy available to borrow. Sign in to request it.', 'BOOK-AVAILABLE');
     return copy.Id;
   }
   public static void retireCopy(Id copyId) {

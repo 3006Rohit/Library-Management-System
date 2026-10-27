@@ -1,0 +1,89 @@
+<template>
+  <section class="stocktake" aria-label="Inventory stocktake">
+    <div class="header">
+      <div>
+        <p class="eyebrow">Inventory assurance</p>
+        <h2>Mobile stocktake</h2>
+        <p>
+          Scan and compare observed copy status. Discrepancies are recorded for
+          review and never silently correct inventory.
+        </p>
+      </div>
+    </div>
+    <template if:false={hasAudit}
+      ><div class="start-form">
+        <input
+          data-field="name"
+          oninput={capture}
+          placeholder="Audit name"
+        /><input
+          data-field="scope"
+          oninput={capture}
+          placeholder="Scope, shelf, or branch"
+        /><button type="button" onclick={start} disabled={startDisabled}>
+          Start audit
+        </button>
+      </div></template
+    >
+    <template if:true={hasAudit}
+      ><div class="audit-meta">
+        <strong>{audit.name}</strong><span>{audit.scope}</span
+        ><span class="status">{audit.status}</span>
+      </div>
+      <div class="scan-form">
+        <input
+          data-field="barcode"
+          oninput={capture}
+          placeholder="Scan barcode"
+        /><input
+          data-field="observedStatus"
+          oninput={capture}
+          placeholder="Observed status (optional)"
+        /><input
+          data-field="note"
+          oninput={capture}
+          placeholder="Note (optional)"
+        /><button type="button" onclick={scan} disabled={scanDisabled}>
+          Record scan
+        </button>
+      </div>
+      <div class="close-form">
+        <input
+          data-field="summary"
+          oninput={capture}
+          placeholder="Closing summary (at least 10 characters)"
+        /><button type="button" onclick={close} disabled={closeDisabled}>
+          Close audit
+        </button>
+      </div></template
+    >
+    <template if:true={hasLines}
+      ><div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Barcode</th>
+              <th>Copy</th>
+              <th>Expected</th>
+              <th>Observed</th>
+              <th>Result</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={lines} for:item="line"
+              ><tr key={line.id}>
+                <td>{line.barcode}</td>
+                <td>{line.copyName}</td>
+                <td>{line.expectedStatus}</td>
+                <td>{line.observedStatus}</td>
+                <td>{line.discrepancy}</td>
+                <td>{line.note}</td>
+              </tr></template
+            >
+          </tbody>
+        </table>
+      </div></template
+    >
+  </section>
+</template>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <canEscalate>false</canEscalate>
+    <description>This topic is selected when the authenticated member wants to view their own library activity, such as recent interactions or updates, using their server-validated session token.</description>
+    <developerName>p_16jgK000002I337_My_Library_Activity</developerName>
+    <genAiFunctions>
+        <functionName>LibraryAgentMyActivityAction</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>EmployeeCopilot__AnswerQuestionsWithKnowledge</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>If the query is about viewing the member&apos;s own library activity, use LibraryAgentMyActivityAction.</description>
+        <developerName>instruction_0</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_0</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>p_16jgK000002I337_My_Library_Activity</localDeveloperName>
+    <masterLabel>My Library Activity</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>Your job is to only provide the authenticated member with their own library activity details using the server-validated session token. You cannot provide activity details for any other member or perform any write operations.</scope>
+</GenAiPlugin>

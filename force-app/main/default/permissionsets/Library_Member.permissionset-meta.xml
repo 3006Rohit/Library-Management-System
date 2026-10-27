@@ -87,6 +87,43 @@
     >false</allowEdit><allowRead>true</allowRead><modifyAllRecords
     >false</modifyAllRecords><viewAllRecords
     >false</viewAllRecords></objectPermissions>
+    <objectPermissions><object>Notification_Preference__c</object><allowCreate
+    >false</allowCreate><allowDelete>false</allowDelete><allowEdit
+    >false</allowEdit><allowRead>true</allowRead><modifyAllRecords
+    >false</modifyAllRecords><viewAllRecords
+    >false</viewAllRecords></objectPermissions>
+    <objectPermissions><object>Library_Scan_Transaction__c</object><allowCreate
+    >false</allowCreate><allowDelete>false</allowDelete><allowEdit
+    >false</allowEdit><allowRead>true</allowRead><modifyAllRecords
+    >false</modifyAllRecords><viewAllRecords
+    >false</viewAllRecords></objectPermissions>
+    <objectPermissions><object>Member_Book_Engagement__c</object><allowCreate
+    >true</allowCreate><allowDelete>true</allowDelete><allowEdit
+    >true</allowEdit><allowRead>true</allowRead><modifyAllRecords
+    >false</modifyAllRecords><viewAllRecords
+    >false</viewAllRecords></objectPermissions>
+    <fieldPermissions><field
+    >Member_Book_Engagement__c.Member__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Member_Book_Engagement__c.Book__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Member_Book_Engagement__c.State__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Member_Book_Engagement__c.Private_Notes__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Member_Book_Engagement__c.Rating__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Member_Book_Engagement__c.Notify_When_Available__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Member_Book_Engagement__c.Engagement_Key__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Member_Book_Engagement__c.Last_Updated__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field>Member__c.First_Name__c</field><editable
     >true</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field>Member__c.Last_Name__c</field><editable
@@ -283,5 +320,69 @@
     <fieldPermissions><field>Fine__c.Notes__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field>Fine__c.Contact__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Reservation__c.Estimated_Available_Date__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Reservation__c.ETA_Confidence__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Reservation__c.ETA_Last_Calculated__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Reservation__c.ETA_Reason__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Member__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Channel__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Notification_Type__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Enabled__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Digest_Frequency__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Quiet_Hours_Start__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Quiet_Hours_End__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Timezone__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Preference_Key__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Notification_Preference__c.Last_Updated__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Idempotency_Key__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Operation__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Member__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Book_Copy__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Borrow_Record__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Status__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Result_Message__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Scan_Transaction__c.Created_At__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>
 </PermissionSet>

@@ -1,0 +1,109 @@
+<template>
+  <section class="accessibility-panel" aria-labelledby="accessibility-title">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Inclusive library access</p>
+        <h3 id="accessibility-title">Accessibility &amp; language</h3>
+        <p class="intro">
+          Personalize contrast, text size, motion, language, and time settings
+          for a more comfortable portal experience.
+        </p>
+      </div>
+      <button class="button primary" onclick={save} disabled={saveDisabled}>
+        {saveLabel}
+      </button>
+    </div>
+
+    <template if:true={loading}>
+      <p class="status" role="status">Loading your preferences…</p>
+    </template>
+    <template if:false={loading}>
+      <div class="form-grid">
+        <label>
+          <span>Preferred language</span>
+          <lightning-combobox
+            data-field="preferredLanguage"
+            value={preferredLanguage}
+            label="Preferred language"
+            onchange={handleInput}
+            options={languageOptions}
+            variant="label-hidden"
+          ></lightning-combobox>
+        </label>
+        <label>
+          <span>Timezone</span>
+          <input
+            data-field="timezone"
+            type="text"
+            value={timezone}
+            maxlength="80"
+            placeholder="e.g. Asia/Kolkata"
+            onchange={handleInput}
+          />
+          <small>Used for due dates, quiet hours, and reminders.</small>
+        </label>
+      </div>
+
+      <div
+        class="toggle-grid"
+        role="group"
+        aria-label="Visual and assistive preferences"
+      >
+        <label class="toggle-card">
+          <input
+            data-field="highContrast"
+            type="checkbox"
+            checked={highContrast}
+            onchange={handleInput}
+          />
+          <span
+            ><strong>High contrast</strong
+            ><small>Increase contrast for text and controls.</small></span
+          >
+        </label>
+        <label class="toggle-card">
+          <input
+            data-field="largeText"
+            type="checkbox"
+            checked={largeText}
+            onchange={handleInput}
+          />
+          <span
+            ><strong>Larger text</strong
+            ><small>Scale portal text for easier reading.</small></span
+          >
+        </label>
+        <label class="toggle-card">
+          <input
+            data-field="reducedMotion"
+            type="checkbox"
+            checked={reducedMotion}
+            onchange={handleInput}
+          />
+          <span
+            ><strong>Reduce motion</strong
+            ><small>Minimize transitions and animation.</small></span
+          >
+        </label>
+        <label class="toggle-card">
+          <input
+            data-field="screenReader"
+            type="checkbox"
+            checked={screenReader}
+            onchange={handleInput}
+          />
+          <span
+            ><strong>Screen reader support</strong
+            ><small>Prefer descriptive labels and announcements.</small></span
+          >
+        </label>
+      </div>
+      <template if:true={message}
+        ><p class="success" role="status">{message}</p></template
+      >
+      <template if:true={error}
+        ><p class="error" role="alert">{error}</p></template
+      >
+    </template>
+  </section>
+</template>

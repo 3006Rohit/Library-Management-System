@@ -1,0 +1,135 @@
+:host {
+  display: block;
+}
+.events-page {
+  display: grid;
+  gap: 1.25rem;
+}
+.events-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: #78826f;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+h2,
+h3,
+p {
+  margin: 0;
+}
+h2 {
+  color: #233b2c;
+  font-size: 1.6rem;
+}
+.events-header p:last-child {
+  color: #667064;
+  margin-top: 0.35rem;
+}
+.refresh,
+.primary,
+.secondary {
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+}
+.refresh,
+.secondary {
+  background: #edf1eb;
+  color: #31503a;
+}
+.primary {
+  background: #315b3f;
+  color: white;
+}
+.event-list {
+  display: grid;
+  gap: 0.8rem;
+}
+.event-card {
+  align-items: center;
+  background: white;
+  border: 1px solid #e0e7df;
+  border-radius: 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto 1fr auto;
+  padding: 1.1rem;
+}
+.event-date {
+  align-items: center;
+  background: #eaf2e6;
+  border-radius: 0.8rem;
+  color: #315b3f;
+  display: flex;
+  font-size: 1.4rem;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+.event-copy {
+  display: grid;
+  gap: 0.4rem;
+}
+.event-copy h3 {
+  color: #233b2c;
+}
+.event-copy p {
+  color: #667064;
+}
+.event-meta {
+  color: #78826f;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  font-size: 0.78rem;
+}
+.event-action {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.status {
+  color: #315b3f;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.check-in-code {
+  background: #f0f4ee;
+  border-radius: 0.35rem;
+  color: #233b2c;
+  font-size: 0.68rem;
+  max-width: 12rem;
+  overflow-wrap: anywhere;
+  padding: 0.35rem;
+}
+.empty,
+.error,
+.loading {
+  background: #f7f9f5;
+  border-radius: 0.9rem;
+  color: #667064;
+  padding: 1rem;
+}
+.error {
+  color: #9b3c34;
+}
+@media (max-width: 700px) {
+  .event-card {
+    align-items: start;
+    grid-template-columns: auto 1fr;
+  }
+  .event-action {
+    align-items: start;
+    grid-column: 2;
+  }
+}

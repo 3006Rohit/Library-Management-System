@@ -1,0 +1,176 @@
+.scanner-card {
+  position: relative;
+  display: grid;
+  gap: 1.25rem;
+  max-width: 760px;
+  padding: 1.5rem;
+  border: 1px solid #d9e4f3;
+  border-radius: 1.25rem;
+  background: linear-gradient(145deg, #ffffff, #f4f8fd);
+  box-shadow: 0 16px 40px rgba(35, 73, 125, 0.08);
+}
+
+.scanner-heading,
+.scanner-entry,
+.scan-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.scanner-heading h2,
+.scan-preview h3 {
+  margin: 0.25rem 0;
+  color: #132b4f;
+}
+
+.scanner-heading p,
+.scan-preview p,
+.camera-panel p {
+  margin: 0;
+  color: #5a6c84;
+}
+
+.eyebrow {
+  color: #4674ad;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.scanner-icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 1rem;
+  background: #e4efff;
+  color: #2a63a5;
+  font-size: 1.8rem;
+}
+
+.scanner-entry {
+  align-items: end;
+}
+
+.scanner-mode {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border-radius: 0.65rem;
+  background: #eaf1fb;
+}
+
+.mode-button {
+  padding: 0.5rem 0.7rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: #4d6685;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mode-button.active {
+  background: #fff;
+  color: #205a99;
+  box-shadow: 0 2px 6px rgba(32, 90, 153, 0.12);
+}
+
+.scanner-entry lightning-input {
+  flex: 1;
+}
+
+.scanner-actions {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 0;
+  border-radius: 0.6rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button.primary {
+  background: #2e6bb0;
+  color: #fff;
+}
+
+.button.outline {
+  border: 1px solid #b9cce4;
+  background: #fff;
+  color: #2e5d94;
+}
+
+.button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.camera-panel {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+  padding: 0.75rem;
+  border-radius: 0.85rem;
+  background: #10213a;
+}
+
+.camera-video {
+  width: 100%;
+  max-height: 260px;
+  border-radius: 0.6rem;
+  object-fit: cover;
+}
+
+.camera-panel p {
+  color: #e3edf9;
+}
+
+.scan-preview {
+  padding: 1rem;
+  border: 1px solid #b9ddca;
+  border-radius: 0.85rem;
+  background: #f2fbf5;
+}
+
+.scan-message {
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+}
+
+.scan-message.success {
+  background: #e7f7ec;
+  color: #176837;
+}
+
+.scan-message.error {
+  background: #fff0f0;
+  color: #a03535;
+}
+
+@media (max-width: 640px) {
+  .scanner-entry,
+  .scanner-heading,
+  .scan-preview {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .scanner-actions {
+    width: 100%;
+  }
+
+  .scanner-actions .button {
+    flex: 1;
+  }
+}

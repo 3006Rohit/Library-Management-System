@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <canEscalate>false</canEscalate>
+    <description>Use this topic when librarians need to search the public library catalog by title, author, category, or availability without accessing member-specific data.</description>
+    <developerName>p_16jgK000002I31V_Catalog_Search</developerName>
+    <genAiFunctions>
+        <functionName>LibraryAgentCatalogAction</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>If the query involves searching for books or materials by title, author, category, or availability, use LibraryAgentCatalogAction.</description>
+        <developerName>instruction_0</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_0</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>Ensure the search is limited to public library catalog data.</description>
+        <developerName>instruction_1</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_1</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>p_16jgK000002I31V_Catalog_Search</localDeveloperName>
+    <masterLabel>Catalog Search</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>Your job is to only perform bounded searches in the public library catalog for titles, authors, categories, and availability. You cannot provide or expose member data.</scope>
+</GenAiPlugin>

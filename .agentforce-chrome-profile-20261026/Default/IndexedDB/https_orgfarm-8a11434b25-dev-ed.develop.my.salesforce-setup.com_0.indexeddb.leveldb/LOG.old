@@ -1,0 +1,6 @@
+2026/10/26-08:32:50.668 804 Creating DB C:\Users\Rohit\Desktop\Library Management System\.agentforce-chrome-profile-20261026\Default\IndexedDB\https_orgfarm-8a11434b25-dev-ed.develop.my.salesforce-setup.com_0.indexeddb.leveldb since it was missing.
+2026/10/26-08:32:50.677 804 Reusing MANIFEST C:\Users\Rohit\Desktop\Library Management System\.agentforce-chrome-profile-20261026\Default\IndexedDB\https_orgfarm-8a11434b25-dev-ed.develop.my.salesforce-setup.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/10/26-08:32:51.069 2e58 Level-0 table #5: started
+2026/10/26-08:32:51.072 2e58 Level-0 table #5: 13348 bytes OK
+2026/10/26-08:32:51.074 2e58 Delete type=0 #3
+2026/10/26-08:32:51.075 6094 Manual compaction at level-0 from '\x00\x09\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0a\x00\x00\x00' @ 0 : 0; will stop at (end)

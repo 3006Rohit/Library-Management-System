@@ -1,0 +1,89 @@
+<template>
+  <section class="summary-panel" aria-label="Executive summary">
+    <div class="header">
+      <div>
+        <p class="eyebrow">Aggregate reporting</p>
+        <h2>Executive summary</h2>
+        <p>
+          Daily operational counts are stored as privacy-safe snapshots. Use
+          authorized Salesforce reports for record-level follow-up.
+        </p>
+      </div>
+      <div class="actions">
+        <button type="button" onclick={generate} disabled={generating}>
+          {generateLabel}
+        </button>
+        <button type="button" class="secondary" onclick={refresh}>
+          Refresh
+        </button>
+      </div>
+    </div>
+    <template if:true={loading}
+      ><div class="message">Loading summaries…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={latest}>
+      <div class="metric-grid">
+        <div>
+          <strong>{latest.activeMembers}</strong><span>Active members</span>
+        </div>
+        <div>
+          <strong>{latest.activeLoans}</strong><span>Active loans</span>
+        </div>
+        <div>
+          <strong>{latest.overdueLoans}</strong><span>Overdue loans</span>
+        </div>
+        <div>
+          <strong>{latest.pendingReservations}</strong
+          ><span>Pending reservations</span>
+        </div>
+        <div>
+          <strong>{latest.unpaidFines}</strong><span>Unpaid fines</span>
+        </div>
+        <div>
+          <strong>{latest.openRiskAlerts}</strong><span>Open risk alerts</span>
+        </div>
+      </div>
+      <p class="caption">
+        Latest reporting date: {latest.reportingDate} · Unpaid balance:
+        {latest.unpaidFineBalance} · No-shows (90 days): {latest.noShows}
+      </p>
+    </template>
+    <template if:true={hasRows}>
+      <div class="history">
+        <h3>Snapshot history</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Members</th>
+              <th>Loans</th>
+              <th>Overdue</th>
+              <th>Reservations</th>
+              <th>Risk alerts</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.id}>
+                <td>{row.reportingDate}</td>
+                <td>{row.activeMembers}</td>
+                <td>{row.activeLoans}</td>
+                <td>{row.overdueLoans}</td>
+                <td>{row.pendingReservations}</td>
+                <td>{row.openRiskAlerts}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+    <template if:false={hasRows}
+      ><div class="message">
+        No summary snapshots have been generated.
+      </div></template
+    >
+  </section>
+</template>

@@ -46,6 +46,14 @@ public without sharing class LibraryMemberSessionController {
     public Datetime expiryDate { get; set; }
     @AuraEnabled
     public Datetime fulfilledDate { get; set; }
+    @AuraEnabled
+    public Datetime estimatedAvailableDate { get; set; }
+    @AuraEnabled
+    public String etaConfidence { get; set; }
+    @AuraEnabled
+    public Datetime etaLastCalculated { get; set; }
+    @AuraEnabled
+    public String etaReason { get; set; }
   }
   public class DashboardData {
     @AuraEnabled
@@ -142,6 +150,10 @@ public without sharing class LibraryMemberSessionController {
       result.readyDate = row.Ready_Date__c;
       result.expiryDate = row.Expiry_Date__c;
       result.fulfilledDate = row.Fulfilled_Date__c;
+      result.estimatedAvailableDate = row.Estimated_Available_Date__c;
+      result.etaConfidence = row.ETA_Confidence__c;
+      result.etaLastCalculated = row.ETA_Last_Calculated__c;
+      result.etaReason = row.ETA_Reason__c;
       results.add(result);
     }
     return results;
@@ -234,7 +246,8 @@ public without sharing class LibraryMemberSessionController {
     d.recentReservations = reservationDtos(
       systemReservations(
         'SELECT Id, Name, Book__r.Name, Book_Copy__r.Name, Reservation_Date__c, ' +
-          'Queue_Position__c, Status__c, Ready_Date__c, Expiry_Date__c, Fulfilled_Date__c ' +
+          'Queue_Position__c, Status__c, Ready_Date__c, Expiry_Date__c, Fulfilled_Date__c, ' +
+          'Estimated_Available_Date__c, ETA_Confidence__c, ETA_Last_Calculated__c, ETA_Reason__c ' +
           'FROM Reservation__c WHERE Member__c = :memberId ' +
           'ORDER BY Reservation_Date__c DESC LIMIT 5',
         new Map<String, Object>{ 'memberId' => m.Id }
@@ -454,7 +467,14 @@ public without sharing class LibraryMemberSessionController {
     if (!c.isEmpty())
       q += ' WHERE ' + String.join(c, ' AND ');
     q += ' ORDER BY Name LIMIT :size OFFSET :off';
-    return readableBooks((List<Book__c>) Database.query(q));
+    List<Book__c> results = readableBooks((List<Book__c>) Database.query(q));
+    if (!String.isBlank(searchTerm))
+      LibraryAcquisitionInsightService.recordSearchTelemetry(
+        searchTerm,
+        results.size(),
+        null
+      );
+    return results;
   }
   @AuraEnabled
   public static List<LoanDTO> getMyBorrowings(String sessionToken) {
@@ -487,7 +507,8 @@ public without sharing class LibraryMemberSessionController {
     return reservationDtos(
       systemReservations(
         'SELECT Id, Name, Book__r.Name, Book_Copy__r.Name, Reservation_Date__c, ' +
-          'Queue_Position__c, Status__c, Ready_Date__c, Expiry_Date__c, Fulfilled_Date__c ' +
+          'Queue_Position__c, Status__c, Ready_Date__c, Expiry_Date__c, Fulfilled_Date__c, ' +
+          'Estimated_Available_Date__c, ETA_Confidence__c, ETA_Last_Calculated__c, ETA_Reason__c ' +
           'FROM Reservation__c WHERE Member__c = :memberId ' +
           'ORDER BY Reservation_Date__c DESC LIMIT 200',
         new Map<String, Object>{ 'memberId' => m.Id }
@@ -578,6 +599,303 @@ public without sharing class LibraryMemberSessionController {
     LibraryCirculationService.renewLoanForMember(borrowRecordId, m.Id);
   }
   @AuraEnabled
+  public static LibraryAgentConfirmationService.PreviewDTO previewAgentAction(
+    String sessionToken,
+    String action,
+    Id targetId
+  ) {
+    return LibraryAgentConfirmationService.preview(
+      sessionToken,
+      action,
+      targetId
+    );
+  }
+  @AuraEnabled
+  public static Id confirmAgentAction(String sessionToken, String token) {
+    return LibraryAgentConfirmationService.confirm(sessionToken, token);
+  }
+  @AuraEnabled
+  public static List<LibraryMemberEngagementService.EngagementDTO> getMyEngagements(
+    String sessionToken
+  ) {
+    return LibraryMemberEngagementService.getAll(sessionToken);
+  }
+  @AuraEnabled
+  public static LibraryMemberEngagementService.EngagementDTO saveMyEngagement(
+    String sessionToken,
+    Id bookId,
+    String state,
+    String notes,
+    Integer rating,
+    Boolean notifyWhenAvailable
+  ) {
+    return LibraryMemberEngagementService.save(
+      sessionToken,
+      bookId,
+      state,
+      notes,
+      rating,
+      notifyWhenAvailable
+    );
+  }
+  @AuraEnabled
+  public static void removeMyEngagement(String sessionToken, Id engagementId) {
+    LibraryMemberEngagementService.remove(sessionToken, engagementId);
+  }
+  @AuraEnabled
+  public static List<LibraryMemberAuthorFollowService.FollowDTO> getMyAuthorFollows(
+    String sessionToken
+  ) {
+    return LibraryMemberAuthorFollowService.getAll(sessionToken);
+  }
+  @AuraEnabled
+  public static LibraryMemberAuthorFollowService.FollowDTO followAuthor(
+    String sessionToken,
+    Id authorId
+  ) {
+    return LibraryMemberAuthorFollowService.follow(sessionToken, authorId);
+  }
+  @AuraEnabled
+  public static void unfollowAuthor(String sessionToken, Id followId) {
+    LibraryMemberAuthorFollowService.unfollow(sessionToken, followId);
+  }
+  @AuraEnabled
+  public static LibraryMemberReviewService.ReviewDTO submitBookReview(
+    String sessionToken,
+    Id bookId,
+    Integer rating,
+    String reviewText
+  ) {
+    return LibraryMemberReviewService.submit(
+      sessionToken,
+      bookId,
+      rating,
+      reviewText
+    );
+  }
+  @AuraEnabled
+  public static List<LibraryMemberReviewService.ReviewDTO> getMyBookReviews(
+    String sessionToken
+  ) {
+    return LibraryMemberReviewService.getMine(sessionToken);
+  }
+  @AuraEnabled
+  public static List<LibraryMemberReviewService.ReviewDTO> getPublishedBookReviews(
+    String sessionToken,
+    Id bookId
+  ) {
+    return LibraryMemberReviewService.getPublished(sessionToken, bookId);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryEventService.EventDTO> getUpcomingEvents(
+    String sessionToken
+  ) {
+    return LibraryEventService.getUpcoming(sessionToken);
+  }
+  @AuraEnabled
+  public static LibraryEventService.EventDTO registerForEvent(
+    String sessionToken,
+    Id eventId
+  ) {
+    return LibraryEventService.register(sessionToken, eventId);
+  }
+  @AuraEnabled
+  public static void cancelEventRegistration(String sessionToken, Id eventId) {
+    LibraryEventService.cancel(sessionToken, eventId);
+  }
+  @AuraEnabled
+  public static String issueEventCheckInToken(String sessionToken, Id eventId) {
+    return LibraryEventService.issueCheckInToken(sessionToken, eventId);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryRoomBookingService.RoomDTO> getLibraryRooms(
+    String sessionToken,
+    Datetime startAt,
+    Datetime endAt,
+    Integer minimumCapacity
+  ) {
+    return LibraryRoomBookingService.getRooms(
+      sessionToken,
+      startAt,
+      endAt,
+      minimumCapacity
+    );
+  }
+  @AuraEnabled
+  public static LibraryRoomBookingService.BookingDTO bookLibraryRoom(
+    String sessionToken,
+    Id roomId,
+    Datetime startAt,
+    Datetime endAt,
+    String purpose
+  ) {
+    return LibraryRoomBookingService.book(
+      sessionToken,
+      roomId,
+      startAt,
+      endAt,
+      purpose
+    );
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryRoomBookingService.BookingDTO> getMyRoomBookings(
+    String sessionToken
+  ) {
+    return LibraryRoomBookingService.getMyBookings(sessionToken);
+  }
+  @AuraEnabled
+  public static void cancelLibraryRoomBooking(
+    String sessionToken,
+    Id bookingId
+  ) {
+    LibraryRoomBookingService.cancel(sessionToken, bookingId);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryChallengeService.ChallengeDTO> getReadingChallenges(
+    String sessionToken
+  ) {
+    return LibraryChallengeService.getAvailable(sessionToken);
+  }
+  @AuraEnabled
+  public static LibraryChallengeService.ChallengeDTO enrollReadingChallenge(
+    String sessionToken,
+    Id challengeId
+  ) {
+    return LibraryChallengeService.enroll(sessionToken, challengeId);
+  }
+  @AuraEnabled
+  public static void leaveReadingChallenge(
+    String sessionToken,
+    Id challengeId
+  ) {
+    LibraryChallengeService.leave(sessionToken, challengeId);
+  }
+  @AuraEnabled
+  public static List<LibraryChallengeService.AchievementDTO> syncReadingAchievements(
+    String sessionToken
+  ) {
+    return LibraryChallengeService.syncAchievements(sessionToken);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryChallengeService.AchievementDTO> getMyReadingAchievements(
+    String sessionToken
+  ) {
+    return LibraryChallengeService.getAchievements(sessionToken);
+  }
+  @AuraEnabled
+  public static void setReadingLeaderboardOptIn(
+    String sessionToken,
+    Boolean optIn
+  ) {
+    LibraryChallengeService.setLeaderboardOptIn(sessionToken, optIn);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryChallengeService.LeaderboardDTO> getReadingLeaderboard(
+    String sessionToken,
+    Id challengeId
+  ) {
+    return LibraryChallengeService.getLeaderboard(sessionToken, challengeId);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryBranchService.BranchDTO> getLibraryBranches(
+    String sessionToken
+  ) {
+    return LibraryBranchService.getBranches(sessionToken);
+  }
+  @AuraEnabled
+  public static LibraryFineAppealService.AppealDTO submitFineAppeal(
+    String sessionToken,
+    Id fineId,
+    String reason
+  ) {
+    return LibraryFineAppealService.submit(sessionToken, fineId, reason);
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryFineAppealService.AppealDTO> getMyFineAppeals(
+    String sessionToken
+  ) {
+    return LibraryFineAppealService.getMine(sessionToken);
+  }
+  @AuraEnabled
+  public static LibraryPrivacyService.RequestDTO requestMyPrivacyExport(
+    String sessionToken,
+    String currentPassword
+  ) {
+    return LibraryPrivacyService.requestExport(sessionToken, currentPassword);
+  }
+  @AuraEnabled
+  public static LibraryPrivacyService.RequestDTO requestMyPrivacyCorrection(
+    String sessionToken,
+    String currentPassword,
+    String firstName,
+    String lastName,
+    String phone,
+    String address,
+    String reason
+  ) {
+    return LibraryPrivacyService.requestCorrection(
+      sessionToken,
+      currentPassword,
+      firstName,
+      lastName,
+      phone,
+      address,
+      reason
+    );
+  }
+  @AuraEnabled
+  public static LibraryPrivacyService.RequestDTO requestMyPrivacyDeletion(
+    String sessionToken,
+    String currentPassword,
+    String reason
+  ) {
+    return LibraryPrivacyService.requestDeletion(
+      sessionToken,
+      currentPassword,
+      reason
+    );
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryPrivacyService.RequestDTO> getMyPrivacyRequests(
+    String sessionToken
+  ) {
+    return LibraryPrivacyService.getMine(sessionToken);
+  }
+  @AuraEnabled
+  public static void cancelMyPrivacyRequest(String sessionToken, Id requestId) {
+    LibraryPrivacyService.cancel(sessionToken, requestId);
+  }
+  @AuraEnabled
+  public static LibraryMembershipHoldService.HoldDTO submitMembershipHold(
+    String sessionToken,
+    Date startDate,
+    Date endDate,
+    String reason
+  ) {
+    return LibraryMembershipHoldService.submit(
+      sessionToken,
+      startDate,
+      endDate,
+      reason
+    );
+  }
+  @AuraEnabled(cacheable=true)
+  public static List<LibraryMembershipHoldService.HoldDTO> getMyMembershipHolds(
+    String sessionToken
+  ) {
+    return LibraryMembershipHoldService.getMine(sessionToken);
+  }
+  @AuraEnabled(cacheable=true)
+  public static LibraryMembershipHoldService.MembershipStatusDTO getMyMembershipStatus(
+    String sessionToken
+  ) {
+    return LibraryMembershipHoldService.getStatus(sessionToken);
+  }
+  @AuraEnabled
+  public static void cancelMembershipHold(String sessionToken, Id holdId) {
+    LibraryMembershipHoldService.cancel(sessionToken, holdId);
+  }
+  @AuraEnabled
   public static void reportDefectiveLoan(
     String sessionToken,
     Id borrowRecordId,
@@ -650,6 +968,66 @@ public without sharing class LibraryMemberSessionController {
       member(sessionToken).Id
     );
   }
+
+  @AuraEnabled
+  public static List<LibraryNotificationPreferenceService.PreferenceDTO> getMyNotificationPreferences(
+    String sessionToken
+  ) {
+    return LibraryNotificationPreferenceService.getForMember(
+      member(sessionToken).Id
+    );
+  }
+
+  @AuraEnabled
+  public static void updateMyNotificationPreferences(
+    String sessionToken,
+    List<LibraryNotificationPreferenceService.PreferenceInput> inputs
+  ) {
+    LibraryNotificationPreferenceService.saveForMember(
+      member(sessionToken).Id,
+      inputs
+    );
+  }
+  @AuraEnabled(cacheable=true)
+  public static LibraryAccessibilityService.PreferenceDTO getMyAccessibilityPreferences(
+    String sessionToken
+  ) {
+    return LibraryAccessibilityService.get(sessionToken);
+  }
+
+  @AuraEnabled
+  public static LibraryAccessibilityService.PreferenceDTO saveMyAccessibilityPreferences(
+    String sessionToken,
+    String preferredLanguage,
+    String timezone,
+    Boolean highContrast,
+    Boolean largeText,
+    Boolean reducedMotion,
+    Boolean screenReader
+  ) {
+    return LibraryAccessibilityService.save(
+      sessionToken,
+      preferredLanguage,
+      timezone,
+      highContrast,
+      largeText,
+      reducedMotion,
+      screenReader
+    );
+  }
+  @AuraEnabled
+  public static LibraryDigitalMemberCardService.CardDTO issueMyDigitalMemberCard(
+    String sessionToken
+  ) {
+    return LibraryDigitalMemberCardService.issue(sessionToken);
+  }
+
+  @AuraEnabled
+  public static LibraryDigitalMemberCardService.CardDTO validateDigitalMemberCard(
+    String cardToken
+  ) {
+    return LibraryDigitalMemberCardService.validate(cardToken);
+  }
   @AuraEnabled
   public static Book__c getBookDetails(String sessionToken, Id bookId) {
     member(sessionToken);
@@ -719,6 +1097,36 @@ public without sharing class LibraryMemberSessionController {
         'No copy is currently available. Reserve this title to join the queue.'
       );
     return LibraryMemberBorrowService.request(m, bookId);
+  }
+
+  @AuraEnabled(cacheable=true)
+  public static LibraryScanService.ScanResult lookupScannedCopy(
+    String sessionToken,
+    String barcode
+  ) {
+    return LibraryScanService.lookup(sessionToken, barcode);
+  }
+
+  @AuraEnabled
+  public static LibraryScanService.ScanResult scanSelfCheckout(
+    String sessionToken,
+    String barcode,
+    String idempotencyKey
+  ) {
+    return LibraryScanService.selfCheckout(
+      sessionToken,
+      barcode,
+      idempotencyKey
+    );
+  }
+
+  @AuraEnabled
+  public static LibraryScanService.ScanResult scanReturn(
+    String sessionToken,
+    String barcode,
+    String idempotencyKey
+  ) {
+    return LibraryScanService.returnItem(sessionToken, barcode, idempotencyKey);
   }
 
   private static List<Reservation__c> systemReservations(

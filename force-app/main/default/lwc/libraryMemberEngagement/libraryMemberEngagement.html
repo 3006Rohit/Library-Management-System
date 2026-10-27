@@ -1,0 +1,80 @@
+<template>
+  <section class="engagement-page" aria-label="My reading lists">
+    <div class="engagement-header">
+      <div>
+        <p class="eyebrow">Private by default</p>
+        <h2>My reading lists</h2>
+        <p>
+          Save books without reserving them and track your reading progress.
+        </p>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasRows}
+      ><div class="engagement-list">
+        <template for:each={rows} for:item="row"
+          ><article class="engagement-card" key={row.id}>
+            <div class="book-copy">
+              <span class="book-mark" aria-hidden="true">▥</span>
+              <div>
+                <h3>{row.bookTitle}</h3>
+                <span class="updated">Updated {row.lastUpdated}</span>
+              </div>
+            </div>
+            <lightning-combobox
+              label="Reading state"
+              variant="label-hidden"
+              value={row.state}
+              options={stateOptions}
+              data-id={row.id}
+              onchange={handleState}
+            ></lightning-combobox
+            ><lightning-input
+              label="Private note"
+              variant="label-hidden"
+              placeholder="Private note"
+              value={row.privateNotes}
+              data-id={row.id}
+              onchange={handleNotes}
+            ></lightning-input
+            ><lightning-input
+              type="number"
+              min="1"
+              max="5"
+              label="Rating (1-5)"
+              variant="label-hidden"
+              placeholder="Rating 1-5"
+              value={row.rating}
+              data-id={row.id}
+              onchange={handleRating}
+            ></lightning-input
+            ><lightning-input
+              type="checkbox"
+              label="Notify me when available"
+              checked={row.notifyWhenAvailable}
+              data-id={row.id}
+              onchange={handleNotify}
+            ></lightning-input
+            ><button
+              class="remove"
+              type="button"
+              data-id={row.id}
+              onclick={remove}
+            >
+              Remove
+            </button>
+          </article></template
+        >
+      </div></template
+    >
+    <template if:false={hasRows}
+      ><div class="empty">
+        Your reading list is empty. Open a book from Explore Books and save it
+        to begin.
+      </div></template
+    >
+  </section>
+</template>

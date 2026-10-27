@@ -19,17 +19,18 @@ global without sharing class LibraryNotificationScheduler implements Schedulable
       LIMIT 500
     ]) {
       Boolean overdue = loan.Due_Date__c < today;
+      Boolean dueToday = loan.Due_Date__c == today;
       String type = overdue ? 'Overdue Loan' : 'Due Date';
       String subject = overdue
         ? 'Overdue library loan'
-        : 'Library loan due soon';
+        : dueToday ? 'Your library loan is due today' : 'Library loan due soon';
       String message =
         'Hello ' +
         loan.Member__r.First_Name__c +
         ', your library loan is ' +
         (overdue
           ? 'overdue.'
-          : 'due on ' + String.valueOf(loan.Due_Date__c) + '.');
+          : dueToday ? 'due today.' : 'due on ' + String.valueOf(loan.Due_Date__c) + '.');
       inputs.add(
         new LibraryMemberNotificationService.NotificationInput(
           loan.Member__c,
@@ -45,7 +46,7 @@ global without sharing class LibraryNotificationScheduler implements Schedulable
     for (Fine__c fine : [
       SELECT Id, Member__c, Amount__c, Member__r.Email__c
       FROM Fine__c
-      WHERE Status__c = 'Unpaid' AND Generated_Date__c = :today
+      WHERE Status__c IN ('Unpaid', 'Partially Paid') AND Balance__c > 0
       ORDER BY Id
       LIMIT 500
     ]) {
@@ -58,7 +59,7 @@ global without sharing class LibraryNotificationScheduler implements Schedulable
             String.valueOf(fine.Amount__c) +
             ' was created on your account.',
           fine.Id,
-          'FINE-' + String.valueOf(fine.Id),
+          'FINE-DUE-' + String.valueOf(fine.Id) + '-' + String.valueOf(today),
           fine.Member__r.Email__c
         )
       );

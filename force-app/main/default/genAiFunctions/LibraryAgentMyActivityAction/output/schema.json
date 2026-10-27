@@ -1,0 +1,16 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "available": { "title": "available", "description": "Whether activity data is available.", "lightning:type": "lightning__booleanType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "message": { "title": "message", "description": "Safe activity status message.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "totalLoans": { "title": "totalLoans", "description": "Member total loan count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "activeLoans": { "title": "activeLoans", "description": "Member active loan count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "returnedLoans": { "title": "returnedLoans", "description": "Member returned loan count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "overdueLoans": { "title": "overdueLoans", "description": "Member overdue loan count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "totalReservations": { "title": "totalReservations", "description": "Member total reservation count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "activeReservationCount": { "title": "activeReservationCount", "description": "Member active reservation count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "totalFineCount": { "title": "totalFineCount", "description": "Member total fine count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "unpaidFineCount": { "title": "unpaidFineCount", "description": "Member unpaid fine count.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true }
+  },
+  "lightning:type": "lightning__objectType"
+}

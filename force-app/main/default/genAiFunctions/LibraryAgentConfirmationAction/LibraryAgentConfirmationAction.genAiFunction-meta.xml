@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Previews or confirms a supported member transaction (loan renewal or reservation cancellation). Call without a confirmationToken to preview; call with the returned confirmationToken to execute. Always preview first and require explicit member confirmation before committing.</description>
+    <developerName>LibraryAgentConfirmationAction</developerName>
+    <invocationTarget>LibraryAgentConfirmationAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>true</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryAgentConfirmationAction</localDeveloperName>
+    <masterLabel>Preview or Confirm Member Transaction</masterLabel>
+    <language>en_US</language>
+    <progressIndicatorMessage>Processing your request</progressIndicatorMessage>
+</GenAiFunction>

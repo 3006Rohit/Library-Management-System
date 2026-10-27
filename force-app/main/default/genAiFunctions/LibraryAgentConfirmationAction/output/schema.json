@@ -1,0 +1,11 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "requiresConfirmation": { "title": "requiresConfirmation", "description": "True when the preview is shown and member confirmation is required before executing.", "lightning:type": "lightning__booleanType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "confirmationToken": { "title": "confirmationToken", "description": "Single-use token to pass back when the member confirms. Never reveal to the member.", "lightning:type": "lightning__textType", "lightning:isPII": true, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "preview": { "title": "preview", "description": "Human-readable description of the action to be performed, shown to the member before confirmation.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true },
+    "resultRecordId": { "title": "resultRecordId", "description": "ID of the committed record on success.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
+    "message": { "title": "message", "description": "Status or error message describing the outcome of the preview or execution.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isDisplayable": true, "copilotAction:isUsedByPlanner": true }
+  },
+  "lightning:type": "lightning__objectType"
+}

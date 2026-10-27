@@ -1,0 +1,8 @@
+{
+  "required": ["sessionToken"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "sessionToken": { "title": "sessionToken", "description": "Server-provided session binding; never ask the member to type or reveal it.", "lightning:type": "lightning__textType", "lightning:isPII": true, "copilotAction:isUserInput": false }
+  },
+  "lightning:type": "lightning__objectType"
+}

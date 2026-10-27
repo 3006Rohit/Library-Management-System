@@ -16,6 +16,23 @@ public with sharing class LibrarySchemaValidation {
   public static List<Finding> validate() {
     List<Finding> findings = new List<Finding>();
     validateFields(
+      'Notification_Delivery__c',
+      new List<String>{
+        'Member_Notification__c',
+        'Channel__c',
+        'Status__c',
+        'Attempt__c',
+        'Max_Attempts__c',
+        'Next_Attempt_At__c',
+        'Provider_Id__c',
+        'Error_Code__c',
+        'Idempotency_Key__c',
+        'Attempted_At__c',
+        'Delivered_At__c'
+      },
+      findings
+    );
+    validateFields(
       'Membership_Plan__c',
       new List<String>{
         'Active__c',
@@ -60,6 +77,66 @@ public with sharing class LibrarySchemaValidation {
         'Related_Record__c',
         'Dedup_Key__c',
         'Read_At__c'
+      },
+      findings
+    );
+    validateFields(
+      'Notification_Preference__c',
+      new List<String>{
+        'Member__c',
+        'Channel__c',
+        'Notification_Type__c',
+        'Enabled__c',
+        'Digest_Frequency__c',
+        'Quiet_Hours_Start__c',
+        'Quiet_Hours_End__c',
+        'Timezone__c',
+        'Preference_Key__c',
+        'Last_Updated__c'
+      },
+      findings
+    );
+    validateFields(
+      'Library_Scan_Transaction__c',
+      new List<String>{
+        'Idempotency_Key__c',
+        'Operation__c',
+        'Member__c',
+        'Book_Copy__c',
+        'Borrow_Record__c',
+        'Status__c',
+        'Result_Message__c',
+        'Created_At__c'
+      },
+      findings
+    );
+    validateFields(
+      'Acquisition_Recommendation__c',
+      new List<String>{
+        'Book__c',
+        'Recommendation_Type__c',
+        'Recommendation_Score__c',
+        'Recommended_Quantity__c',
+        'Confidence__c',
+        'Evidence__c',
+        'Status__c',
+        'Evidence_Window_Start__c',
+        'Evidence_Window_End__c',
+        'Refreshed_At__c',
+        'Decision_Notes__c',
+        'Decided_At__c',
+        'Snapshot_Key__c'
+      },
+      findings
+    );
+    validateFields(
+      'Search_Analytics__c',
+      new List<String>{
+        'Search_Hash__c',
+        'Search_Result_Count__c',
+        'Search_Status__c',
+        'Searched_At__c',
+        'Book__c'
       },
       findings
     );

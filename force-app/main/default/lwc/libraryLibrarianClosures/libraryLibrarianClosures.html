@@ -1,0 +1,96 @@
+<template>
+  <section class="calendar-panel" aria-label="Branch closure calendar">
+    <div class="calendar-header">
+      <div>
+        <p class="eyebrow">Branch operations</p>
+        <h2>Holiday &amp; closure calendar</h2>
+        <p>
+          Publish planned or emergency closures so new loans and renewals
+          receive an open-day due date.
+        </p>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading closures…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <div class="calendar-grid">
+      <article class="form-card">
+        <label
+          >Name
+          <input
+            type="text"
+            data-field="name"
+            value={name}
+            onchange={capture}
+            placeholder="Diwali closure" /></label
+        ><label
+          >Start date
+          <input
+            type="date"
+            data-field="startDate"
+            value={startDate}
+            onchange={capture} /></label
+        ><label
+          >End date
+          <input
+            type="date"
+            data-field="endDate"
+            value={endDate}
+            onchange={capture} /></label
+        ><label
+          >Timezone
+          <input
+            type="text"
+            data-field="timezone"
+            value={timezone}
+            onchange={capture} /></label
+        ><label
+          >Branch
+          <select data-field="branchId" onchange={capture}>
+            <template for:each={branchOptions} for:item="option"
+              ><option key={option.value} value={option.value}>
+                {option.label}
+              </option></template
+            >
+          </select></label
+        ><label class="check"
+          ><input
+            type="checkbox"
+            data-field="emergency"
+            checked={emergency}
+            onchange={capture}
+          />
+          Emergency closure</label
+        ><button type="button" class="primary" onclick={submit}>
+          Publish closure
+        </button>
+      </article>
+      <article class="list-card">
+        <h3>Published closures</h3>
+        <template if:true={hasClosures}
+          ><div class="closure-list">
+            <template for:each={closures} for:item="closure"
+              ><div class="closure-row" key={closure.id}>
+                <strong>{closure.name}</strong
+                ><span>{closure.startDate} → {closure.endDate}</span
+                ><small
+                  >{closure.timezone} ·
+                  <template if:true={closure.emergency}>Emergency</template
+                  ><template if:false={closure.emergency}
+                    >Planned</template
+                  ></small
+                >
+              </div></template
+            >
+          </div></template
+        ><template if:false={hasClosures}
+          ><div class="empty">No closures published.</div></template
+        >
+      </article>
+    </div>
+  </section>
+</template>

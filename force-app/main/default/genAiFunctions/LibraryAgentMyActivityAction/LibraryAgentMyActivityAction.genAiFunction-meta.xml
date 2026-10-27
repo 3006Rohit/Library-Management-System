@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Returns the authenticated member's own library activity using the server-validated session token.</description>
+    <developerName>LibraryAgentMyActivityAction</developerName>
+    <invocationTarget>LibraryAgentMyActivityAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryAgentMyActivityAction</localDeveloperName>
+    <masterLabel>Get My Library Activity</masterLabel>
+    <language>en_US</language>
+    <progressIndicatorMessage>Loading your library activity</progressIndicatorMessage>
+</GenAiFunction>
