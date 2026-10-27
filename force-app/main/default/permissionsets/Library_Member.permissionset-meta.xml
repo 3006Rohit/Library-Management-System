@@ -102,6 +102,11 @@
     >true</allowEdit><allowRead>true</allowRead><modifyAllRecords
     >false</modifyAllRecords><viewAllRecords
     >false</viewAllRecords></objectPermissions>
+    <objectPermissions><object>Library_Registration__c</object><allowCreate
+    >true</allowCreate><allowDelete>false</allowDelete><allowEdit
+    >true</allowEdit><allowRead>true</allowRead><modifyAllRecords
+    >false</modifyAllRecords><viewAllRecords
+    >false</viewAllRecords></objectPermissions>
     <fieldPermissions><field
     >Member_Book_Engagement__c.Member__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>
@@ -385,4 +390,25 @@
     <fieldPermissions><field
     >Library_Scan_Transaction__c.Created_At__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Registration__c.First_Name__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Registration__c.Last_Name__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Library_Registration__c.Email__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Library_Registration__c.Phone__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Registration__c.Date_of_Birth__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field>Library_Registration__c.Address__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Registration__c.Interests__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Registration__c.Requested_Plan__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
 </PermissionSet>
