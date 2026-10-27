@@ -633,7 +633,12 @@ public with sharing class LibraryLibrarianController {
         'A member with this email already exists.'
       );
   }
+  private static Map<Id, Membership_Plan__c> planCache = new Map<Id, Membership_Plan__c>();
+
   private static Membership_Plan__c activePlan(Id planId) {
+    if (planCache.containsKey(planId)) {
+      return planCache.get(planId);
+    }
     List<Membership_Plan__c> plans = [
       SELECT Id, Duration_Days__c, Borrow_Limit__c
       FROM Membership_Plan__c
@@ -642,6 +647,7 @@ public with sharing class LibraryLibrarianController {
     ];
     if (plans.isEmpty())
       throw new AuraHandledException('Select an active membership plan.');
+    planCache.put(planId, plans[0]);
     return plans[0];
   }
   @AuraEnabled

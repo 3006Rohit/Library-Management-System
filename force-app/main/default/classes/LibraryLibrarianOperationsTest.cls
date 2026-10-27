@@ -360,7 +360,7 @@ private class LibraryLibrarianOperationsTest {
     );
   }
   @IsTest
-  static void controllerReturnsOperationalData() {
+  static void controllerReturnsCatalogData() {
     Fixture f = fixture('Five');
     LibraryLibrarianController.DashboardData data = LibraryLibrarianController.getDashboard();
     List<Book__c> books = LibraryLibrarianController.searchBooks(
@@ -438,6 +438,13 @@ private class LibraryLibrarianOperationsTest {
       'Available'
     );
     LibraryLibrarianController.retireCopy(newCopy);
+    System.assert(data.totalBooks > 0);
+    System.assertEquals(1, books.size());
+    System.assertEquals(1, members.size());
+  }
+  @IsTest
+  static void controllerReturnsOperationalData() {
+    Fixture f = fixture('Five');
     Id loanId = LibraryLibrarianController.checkout(f.member.Id, f.copy.Id);
     LibraryLibrarianController.renewLoan(loanId);
     LibraryLibrarianController.returnLoan(loanId);
@@ -535,9 +542,6 @@ private class LibraryLibrarianOperationsTest {
       nullRetryBlocked = true;
     }
     System.assertEquals(true, nullRetryBlocked);
-    System.assert(data.totalBooks > 0);
-    System.assertEquals(1, books.size());
-    System.assertEquals(1, members.size());
   }
   @IsTest
   static void readyReservationCanBeIssuedAsLoan() {
