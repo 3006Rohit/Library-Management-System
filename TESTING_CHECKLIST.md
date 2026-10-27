@@ -2,10 +2,10 @@
 
 ## Pre-Testing Setup
 
-- [ ] Org is clean (test data removed)
-- [ ] All code deployed successfully
-- [ ] Data Cloud insights created & running
-- [ ] Agentforce agents activated
+- [x] Org is clean (test data removed)
+- [x] All code deployed successfully
+- [x] Data Cloud insights created & running
+- [x] Agentforce agents activated
 - [ ] Payment gateway configured
 - [ ] Email relay enabled
 
@@ -15,25 +15,25 @@
 
 ### Member Registration & Authentication
 
-- [ ] **Register new member** → Receives verification email
-- [ ] **Verify email** → Account activated
-- [ ] **Login with credentials** → Session token created
+- [x] **Register new member** → Receives verification email ✅
+- [x] **Verify email** → Account activated ✅
+- [x] **Login with credentials** → Session token created ✅
 - [ ] **Reset password** → Reset email received
 - [ ] **Invalid password** → Login fails, account locked after 5 attempts
 - [ ] **Email already exists** → Registration rejected
 
 ### Book Management
 
-- [ ] **Search books** → Results filtered by title/author/category
-- [ ] **View book details** → Availability, description, author info shown
+- [x] **Search books** → Results filtered by title/author/category ✅
+- [x] **View book details** → Availability, description, author info shown ✅
 - [ ] **Add to wishlist** → Book saved for member
 - [ ] **Remove from wishlist** → Book removed
 - [ ] **Sort results** → By relevance, popularity, availability
 
 ### Borrowing & Loans
 
-- [ ] **Borrow available book** → Loan created, due date set
-- [ ] **View my loans** → All active loans displayed
+- [x] **Borrow available book** → Loan created, due date set ✅
+- [x] **View my loans** → All active loans displayed ✅
 - [ ] **Renew loan** → Due date extended (if allowed)
 - [ ] **Return book** → Loan marked returned, inventory updated
 - [ ] **Overdue notification** → Email sent when past due
@@ -41,16 +41,16 @@
 
 ### Reservations
 
-- [ ] **Reserve unavailable book** → Queue position shown
-- [ ] **View my reservations** → Pending/ready/fulfilled shown
+- [x] **Reserve unavailable book** → Queue position shown ✅
+- [x] **View my reservations** → Pending/ready/fulfilled shown ✅
 - [ ] **Book becomes available** → Notification sent
 - [ ] **Cancel reservation** → Removed from queue
 - [ ] **Hold expires** → Auto-canceled after hold period
 
 ### Fine Management
 
-- [ ] **Fine generated** → When book overdue
-- [ ] **View fines** → All outstanding fines listed
+- [x] **Fine generated** → When book overdue ✅
+- [x] **View fines** → All outstanding fines listed ✅
 - [ ] **Pay fine** → Payment processed, balance updated
 - [ ] **Appeal fine** → Submitted for librarian review
 - [ ] **Fine waived** → Status changed, member notified
@@ -67,9 +67,9 @@
 
 ### Agentforce Agents
 
-- [ ] **Member Agent - Check loans** → Returns active loans accurately
-- [ ] **Member Agent - Check reservations** → Shows pending/ready reservations
-- [ ] **Member Agent - Search catalog** → Finds books correctly
+- [x] **Member Agent - Check loans** → Returns active loans accurately ✅
+- [x] **Member Agent - Check reservations** → Shows pending/ready reservations ✅
+- [x] **Member Agent - Search catalog** → Finds books correctly ✅
 - [ ] **Librarian Agent - Show analytics** → Displays accurate metrics
 - [ ] **Librarian Agent - Member lookup** → Finds member information
 - [ ] **Agent error handling** → Graceful fallback on failures
