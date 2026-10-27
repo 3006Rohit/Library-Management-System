@@ -109,21 +109,20 @@ input {
 .main-frame {
   grid-column: 2;
   grid-row: 1;
-  min-height: 100dvh;
+  min-height: 720px;
   min-width: 0;
   margin-left: 0;
 }
 .topbar {
-  position: fixed;
+  position: sticky;
   top: 0;
-  right: 0;
-  left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
+  width: 100%;
   z-index: 12;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 72px;
+  gap: 16px;
+  height: 62px;
   padding: 0 28px;
   border-bottom: 1px solid var(--border-color);
   background: #fff;
@@ -296,8 +295,7 @@ input {
 }
 .content {
   position: relative;
-  min-height: calc(100dvh - 72px);
-  margin-top: 72px;
+  min-height: 658px;
   padding: 25px 28px 48px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -2169,6 +2167,7 @@ tbody tr:hover {
   }
   .main-frame {
     margin-left: 0;
+    padding-top: 62px;
   }
   .menu-button {
     display: block;
@@ -2177,9 +2176,7 @@ tbody tr:hover {
     top: 0;
     left: 0;
     right: 0;
-    width: 100%;
-    padding: 0 16px;
-    height: 62px;
+    padding: 0 12px;
   }
   .global-search {
     width: auto;
@@ -2189,9 +2186,8 @@ tbody tr:hover {
     display: none;
   }
   .content {
-    margin-top: 62px;
-    min-height: calc(100dvh - 62px);
-    padding: 16px 12px 25px;
+    min-height: 658px;
+    padding: 15px 12px 25px;
   }
   .dashboard-grid,
   .settings-grid {
