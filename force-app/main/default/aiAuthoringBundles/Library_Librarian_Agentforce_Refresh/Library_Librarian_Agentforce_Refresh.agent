@@ -67,20 +67,19 @@ start_agent agent_router:
 
     reasoning:
         instructions: ->
-            | Select the best subagent based on the librarian's message and transition immediately - do not ask for clarification.
-              Always preserve topic continuity. Treat "overdues", "show me", "how many", and other short questions as actionable requests - invoke the appropriate action immediately without asking follow-up questions.
-              For any circulation, overdues, loans, returns, reservations, or fines questions - go to circulation_information and invoke action immediately.
-              For catalog searches or book questions - go to catalog_search and invoke action immediately.
-              For member lookups - go to member_lookup and invoke action immediately.
-              For analytics and statistics - go to library_analytics and invoke action immediately.
-              Make reasonable assumptions about what the librarian wants and provide the answer directly.
+            | Route immediately based on the message content without asking clarifying questions.
+              Keywords: "overdue|overdue items|pending|circulation|loans|reservations|fines|returns" → circulation_information
+              Keywords: "search|find|book|author|title|catalog" → catalog_search
+              Keywords: "member|user|borrower|patron" → member_lookup
+              Keywords: "analytics|statistics|counts|popularity|demand|trending" → library_analytics
+              Otherwise: Go to off_topic for escalation.
         actions:
-            go_to_escalation: @utils.transition to @subagent.escalation
-            go_to_off_topic: @utils.transition to @subagent.off_topic
-            go_to_library_analytics: @utils.transition to @subagent.library_analytics
-            go_to_catalog_search: @utils.transition to @subagent.catalog_search
-            go_to_member_lookup: @utils.transition to @subagent.member_lookup
-            go_to_circulation_information: @utils.transition to @subagent.circulation_information
+            route_to_circulation: @utils.transition to @subagent.circulation_information
+            route_to_catalog: @utils.transition to @subagent.catalog_search
+            route_to_member: @utils.transition to @subagent.member_lookup
+            route_to_analytics: @utils.transition to @subagent.library_analytics
+            route_to_off_topic: @utils.transition to @subagent.off_topic
+            escalate: @utils.escalate
 
 subagent escalation:
     label: "Escalation"
@@ -279,7 +278,7 @@ subagent library_analytics:
 
     reasoning:
         instructions: ->
-            | Immediately invoke {!@actions.get_library_analytics} for any analytics or statistics question. Pass the user's question as requestContext. Display the results directly as clear statistics. Format data clearly: show copy totals and availability, list loan counts and overdue numbers, show reservation and fine totals. Parse JSON arrays (top books, demand) as ranked lists. Do not ask about date ranges or time periods unless the user explicitly requests one. Provide complete detailed information without asking follow-up questions.
+            | Invoke get_library_analytics immediately with the user's request as context. Display all returned values clearly: show copy totals and availability, list loan counts and overdue numbers, show reservation and fine totals. Parse JSON data (top books, demand) as ranked lists. Do not ask any follow-up questions - provide the complete data.
         actions:
             get_library_analytics: @actions.get_library_analytics
                 with requestContext=...
@@ -352,7 +351,7 @@ subagent catalog_search:
 
     reasoning:
         instructions: ->
-            | Immediately invoke {!@actions.search_library_catalog} for any book search, title lookup, or catalog question. Extract search terms from the user's question and search by title, author, or category as appropriate. Display results in a clear list showing title, status, and copy counts. Never invent values. Do not ask clarifying questions - make reasonable assumptions about what the user wants and search for it.
+            | Invoke search_library_catalog immediately. Extract search keywords from the user's question and search by title, author, or category as appropriate. Display results clearly: title, status, and copy counts. Do not ask clarifying questions - search for what the user asked.
         actions:
             search_library_catalog: @actions.search_library_catalog
                 with title=...
@@ -428,7 +427,7 @@ subagent member_lookup:
 
     reasoning:
         instructions: ->
-            | Extract the member name or identifier from the librarian's question and immediately invoke {!@actions.get_member_summary}. Display member information clearly: name, email, loan counts, active loans, reservations, and fine counts. Never disclose authentication, security fields, session tokens, or passwords. Do not ask for clarification - make reasonable assumptions about the member being asked about.
+            | Invoke get_member_summary immediately with the member name or identifier from the question. Display member information clearly: name, email, loan counts, active loans, reservations, and fine counts. Never expose authentication or security fields. Do not ask clarifying questions.
         actions:
             get_member_summary: @actions.get_member_summary
                 with memberLookup=...
@@ -516,7 +515,7 @@ subagent circulation_information:
 
     reasoning:
         instructions: ->
-            | Immediately invoke {!@actions.get_circulation_analytics} for any circulation, overdue, loan, reservation, or fine question. Pass the user's question as requestContext. Display the results directly without asking any follow-up questions. Format the data clearly: highlight overdue loans, show fine totals, list reservation counts. Do not ask about time periods, formats, or summaries - provide complete detailed information.
+            | Invoke get_circulation_analytics immediately with the user's request as context. Display all returned values clearly. Show overdue loans prominently, list loan counts, display reservation and fine totals. Do not ask any follow-up questions - provide the complete data that was returned.
         actions:
             get_circulation_analytics: @actions.get_circulation_analytics
                 with requestContext=...
