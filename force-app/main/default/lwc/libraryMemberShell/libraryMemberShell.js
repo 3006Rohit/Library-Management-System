@@ -29,18 +29,13 @@ import reportDefectiveLoan from "@salesforce/apex/LibraryMemberSessionController
 import saveMyEngagement from "@salesforce/apex/LibraryMemberSessionController.saveMyEngagement";
 import followAuthor from "@salesforce/apex/LibraryMemberSessionController.followAuthor";
 import submitBookReview from "@salesforce/apex/LibraryMemberSessionController.submitBookReview";
+import startAgentSession from "@salesforce/apex/LibraryAgentApiController.startSession";
 
 const NAVIGATION = [
   ["Dashboard", "utility:home"],
   ["Explore Books", "utility:knowledge_base"],
   ["Rooms", "utility:company"],
-  ["Challenges", "utility:favorite"],
-  ["Branches", "utility:location"],
-  ["Fine Appeals", "utility:warning"],
-  ["Membership Holds", "utility:pause"],
   ["Privacy Center", "utility:lock"],
-  ["Reading Lists", "utility:bookmark"],
-  ["Followed Authors", "utility:favorite"],
   ["Scan & Borrow", "utility:scan"],
   ["My Books", "utility:bookmark"],
   ["Reservations", "utility:favorite"],
@@ -59,27 +54,9 @@ const PAGE_COPY = {
     "Room Bookings",
     "Find and reserve a library room for your next gathering"
   ],
-  Challenges: [
-    "Reading Challenges",
-    "Set goals and celebrate your reading progress"
-  ],
-  Branches: ["Library Branches", "Find nearby locations and branch inventory"],
-  "Fine Appeals": ["Fine Appeals", "Request a review of a disputed charge"],
-  "Membership Holds": [
-    "Membership Holds",
-    "Request a policy-approved pause without losing your membership history"
-  ],
   "Privacy Center": [
     "Privacy Center",
     "Export, correct, or close your library account securely"
-  ],
-  "Reading Lists": [
-    "My Reading Lists",
-    "Save books privately and track your reading progress"
-  ],
-  "Followed Authors": [
-    "Authors I Follow",
-    "Keep up with new releases from your favorite authors"
   ],
   "Scan & Borrow": [
     "Scan & Borrow",
@@ -223,26 +200,8 @@ export default class LibraryMemberShell extends LightningElement {
   get isRooms() {
     return this.section === "Rooms";
   }
-  get isChallenges() {
-    return this.section === "Challenges";
-  }
-  get isBranches() {
-    return this.section === "Branches";
-  }
-  get isFineAppeals() {
-    return this.section === "Fine Appeals";
-  }
-  get isMembershipHolds() {
-    return this.section === "Membership Holds";
-  }
   get isPrivacyCenter() {
     return this.section === "Privacy Center";
-  }
-  get isReadingLists() {
-    return this.section === "Reading Lists";
-  }
-  get isFollowedAuthors() {
-    return this.section === "Followed Authors";
   }
   get isScanner() {
     return this.section === "Scan & Borrow";
