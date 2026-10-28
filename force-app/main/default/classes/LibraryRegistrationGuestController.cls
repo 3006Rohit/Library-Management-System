@@ -1,4 +1,4 @@
-public with sharing class LibraryRegistrationGuestController {
+public without sharing class LibraryRegistrationGuestController {
   public class CatalogBook {
     @AuraEnabled
     public Id id { get; set; }
