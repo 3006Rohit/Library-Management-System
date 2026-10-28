@@ -124,154 +124,12 @@
             </div></template
           >
           <template if:true={isReady}>
-            <template if:false={isAssistant}>
-              <div class="page-heading">
-                <div>
-                  <h1>{pageTitle}</h1>
-                  <p>{pageSubtitle}</p>
-                </div>
+            <div class="page-heading">
+              <div>
+                <h1>{pageTitle}</h1>
+                <p>{pageSubtitle}</p>
               </div>
-            </template>
-
-            <template if:true={isAssistant}>
-              <section class="assistant-page" aria-label="Member Assistant">
-                <section class="assistant-hero">
-                  <div class="assistant-hero-art" aria-hidden="true">🤖</div>
-                  <div>
-                    <h1>Member Assistant</h1>
-                    <p>Your personal library assistant</p>
-                    <span
-                      >Contextual help powered by Agentforce, governed
-                      Salesforce data, and your library activity.</span
-                    >
-                  </div>
-                  <div class="assistant-hero-books" aria-hidden="true">
-                    ▥ ✦ ▥
-                  </div>
-                </section>
-                <div class="assistant-workspace">
-                  <section class="assistant-help-card">
-                    <h2>What can I help you with?</h2>
-                    <p>Ask questions or try one of the examples below.</p>
-                    <div class="assistant-topic-grid">
-                      <button
-                        class="assistant-topic blue-topic"
-                        data-question="Find books about data science"
-                        onclick={useAssistantPrompt}
-                      >
-                        <span>⌕</span><strong>Find Books</strong
-                        ><small
-                          >Search naturally and check available copies</small
-                        >
-                      </button>
-                      <button
-                        class="assistant-topic green-topic"
-                        data-question="Show my current loans and due dates"
-                        onclick={useAssistantPrompt}
-                      >
-                        <span>▣</span><strong>My Loans</strong
-                        ><small
-                          >Check borrowed books, due dates, and next
-                          steps</small
-                        >
-                      </button>
-                      <button
-                        class="assistant-topic purple-topic"
-                        data-question="Show my reservation status"
-                        onclick={useAssistantPrompt}
-                      >
-                        <span>▦</span><strong>Reservations</strong
-                        ><small
-                          >Check reservation status and queue information</small
-                        >
-                      </button>
-                      <button
-                        class="assistant-topic red-topic"
-                        data-question="Show my fines and payment history"
-                        onclick={useAssistantPrompt}
-                      >
-                        <span>₹</span><strong>Fines &amp; Payments</strong
-                        ><small
-                          >Check outstanding fines and payment history</small
-                        >
-                      </button>
-                      <button
-                        class="assistant-topic gold-topic"
-                        data-question="What is my membership plan?"
-                        onclick={useAssistantPrompt}
-                      >
-                        <span>♛</span><strong>Membership</strong
-                        ><small
-                          >View your plan details and renewal status</small
-                        >
-                      </button>
-                      <button
-                        class="assistant-topic cyan-topic"
-                        data-question="How do I borrow or reserve a book?"
-                        onclick={useAssistantPrompt}
-                      >
-                        <span>?</span><strong>Borrow or Reserve</strong
-                        ><small
-                          >Get guided steps for library processes and
-                          benefits</small
-                        >
-                      </button>
-                    </div>
-                    <div class="assistant-examples">
-                      <strong>💡 Example Questions</strong>
-                      <div>
-                        <template
-                          for:each={assistantQuestions}
-                          for:item="question"
-                        >
-                          <button
-                            key={question}
-                            data-question={question}
-                            onclick={useAssistantPrompt}
-                          >
-                            {question}
-                          </button>
-                        </template>
-                      </div>
-                    </div>
-                  </section>
-                  <section class="assistant-chat-card">
-                    <header class="assistant-chat-header">
-                      <span class="assistant-bot-avatar">✦</span>
-                      <div>
-                        <strong>Library Assistant</strong
-                        ><small>● Online</small>
-                      </div>
-                      <button type="button" onclick={clearAssistantChat}>
-                        ▱ &nbsp; Clear Chat
-                      </button>
-                    </header>
-                    <div class="assistant-messages">
-                      <template for:each={assistantMessages} for:item="message">
-                        <div key={message.id} class={message.className}>
-                          {message.text}
-                        </div>
-                      </template>
-                    </div>
-                    <form
-                      class="assistant-composer"
-                      onsubmit={sendAssistantMessage}
-                    >
-                      <span aria-hidden="true">⌕</span>
-                      <input
-                        value={assistantInput}
-                        oninput={handleAssistantInput}
-                        placeholder="Type your question here..."
-                        aria-label="Ask the member assistant"
-                      />
-                      <button type="submit" aria-label="Send question">
-                        ➤
-                      </button>
-                    </form>
-                  </section>
-                </div>
-              </section>
-            </template>
+            </div>
 
             <template if:true={isDashboard}>
               <section
@@ -443,40 +301,12 @@
               </div>
             </template>
 
-            <template if:true={isReadingLists}>
-              <c-library-member-engagement></c-library-member-engagement>
-            </template>
-
-            <template if:true={isEvents}>
-              <c-library-member-events></c-library-member-events>
-            </template>
-
             <template if:true={isRooms}>
               <c-library-member-rooms></c-library-member-rooms>
             </template>
 
-            <template if:true={isChallenges}>
-              <c-library-member-challenges></c-library-member-challenges>
-            </template>
-
-            <template if:true={isBranches}>
-              <c-library-member-branches></c-library-member-branches>
-            </template>
-
-            <template if:true={isFineAppeals}>
-              <c-library-member-fine-appeals></c-library-member-fine-appeals>
-            </template>
-
-            <template if:true={isMembershipHolds}>
-              <c-library-member-membership-holds></c-library-member-membership-holds>
-            </template>
-
             <template if:true={isPrivacyCenter}>
               <c-library-member-privacy-center></c-library-member-privacy-center>
-            </template>
-
-            <template if:true={isFollowedAuthors}>
-              <c-library-member-author-follows></c-library-member-author-follows>
             </template>
 
             <template if:true={isMyBooks}>

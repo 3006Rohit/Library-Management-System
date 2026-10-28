@@ -29,8 +29,6 @@ import reportDefectiveLoan from "@salesforce/apex/LibraryMemberSessionController
 import saveMyEngagement from "@salesforce/apex/LibraryMemberSessionController.saveMyEngagement";
 import followAuthor from "@salesforce/apex/LibraryMemberSessionController.followAuthor";
 import submitBookReview from "@salesforce/apex/LibraryMemberSessionController.submitBookReview";
-import startAgentSession from "@salesforce/apex/LibraryAgentApiController.startSession";
-import sendMessage from "@salesforce/apex/LibraryAgentApiController.sendMessage";
 
 const NAVIGATION = [
   ["Dashboard", "utility:home"],
@@ -42,7 +40,6 @@ const NAVIGATION = [
   ["Reservations", "utility:favorite"],
   ["Membership", "utility:groups"],
   ["Fines & Payments", "utility:money"],
-  ["Member Assistant", "utility:chat"],
   ["Profile", "utility:user"]
 ];
 const PAGE_COPY = {
@@ -76,7 +73,6 @@ const PAGE_COPY = {
     "Fines & Payments",
     "View your fines and payment history"
   ],
-  "Member Assistant": ["Member Assistant", "Your personal library assistant"],
   Profile: ["My Profile", "Manage your personal details and account settings"]
 };
 
@@ -120,15 +116,6 @@ export default class LibraryMemberShell extends LightningElement {
   fineTab = "Unpaid";
   profileTab = "Personal Details";
   activityFilter = "All Activities";
-  assistantInput = "";
-  assistantMessages = [
-    {
-      id: "welcome",
-      className: "assistant-message assistant-message-bubble",
-      text: "Hello, Rohit! 👋 I’m your Library Assistant powered by Agentforce. I can help you find books, check loans and due dates, view reservations, review fines, and understand your membership. How can I help you today?"
-    }
-  ];
-  agentSessionId;
   editProfile = false;
   realtimeRefreshTimer;
   firstName = "";
@@ -218,9 +205,6 @@ export default class LibraryMemberShell extends LightningElement {
   }
   get isFinesPayments() {
     return this.section === "Fines & Payments";
-  }
-  get isAssistant() {
-    return this.section === "Member Assistant";
   }
   get isProfile() {
     return this.section === "Profile";
@@ -805,86 +789,6 @@ export default class LibraryMemberShell extends LightningElement {
       Profile: () => this.loadProfileWorkspace()
     };
     return loaders[this.section]?.();
-  }
-
-  handleAssistantInput(event) {
-    this.assistantInput = event.target.value;
-  }
-
-  async useAssistantPrompt(event) {
-    this.assistantInput = event.currentTarget.dataset.question;
-    await this.sendAssistantMessage();
-  }
-
-  // eslint-disable-next-line no-undef
-  async sendAssistantMessage(event) {
-    event?.preventDefault();
-    const question = this.assistantInput.trim();
-    if (!question) return;
-    this.assistantMessages = [
-      ...this.assistantMessages,
-      {
-        id: `question-${Date.now()}`,
-        className: "assistant-message member-message-bubble",
-        text: question
-      }
-    ];
-    this.assistantInput = "";
-    try {
-      if (!this.agentSessionId) {
-        const sessionResponse = await startAgentSession({
-          agentName: "member"
-        });
-        this.agentSessionId = sessionResponse?.sessionId;
-      }
-      const sequenceId = this.assistantMessages.length / 2 + 1;
-      const response = await sendMessage({
-        sessionId: this.agentSessionId,
-        sequenceId: sequenceId,
-        text: question
-      });
-      this.assistantMessages = [
-        ...this.assistantMessages,
-        {
-          id: `answer-${Date.now()}`,
-          className: "assistant-message assistant-message-bubble",
-          text:
-            response?.message ||
-            "I encountered an issue processing your question. Please try again."
-        }
-      ];
-    } catch (error) {
-      this.assistantMessages = [
-        ...this.assistantMessages,
-        {
-          id: `answer-${Date.now()}`,
-          className: "assistant-message assistant-message-bubble",
-          text: `I'm having trouble connecting to the agent right now. Error: ${error?.message || "Unknown error"}. Please try again.`
-        }
-      ];
-    }
-  }
-
-  async clearAssistantChat() {
-    try {
-      if (this.agentSessionId) {
-        // eslint-disable-next-line no-undef
-        await endAgentSession({
-          sessionId: this.agentSessionId,
-          sessionToken: this.sessionToken
-        });
-        this.agentSessionId = undefined;
-      }
-    } catch (error) {
-      console.error("Error ending agent session:", error);
-    }
-    this.assistantMessages = [
-      {
-        id: "welcome",
-        className: "assistant-message assistant-message-bubble",
-        text: "Hello, Rohit! 👋 I'm your Library Assistant powered by Agentforce. I can help you find books, check loans and due dates, view reservations, review fines, and understand your membership. How can I help you today?"
-      }
-    ];
   }
 
   openSection(event) {
