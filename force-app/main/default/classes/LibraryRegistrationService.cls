@@ -108,7 +108,7 @@ public with sharing class LibraryRegistrationService {
       Provisioning_State__c = 'Not Started'
     );
     try {
-      insert registration;
+      Database.insert(registration, AccessLevel.SYSTEM_MODE);
     } catch (DmlException e) {
       if (
         e.getMessage() != null && e.getMessage().contains('DUPLICATE_VALUE')
