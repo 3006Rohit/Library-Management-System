@@ -119,14 +119,20 @@ public with sharing class LibraryAgentApiController {
     } catch (Exception ex) {
       System.debug(
         LoggingLevel.ERROR,
-        'Agentforce callout failed: ' + ex.getTypeName()
+        'Agentforce callout failed: ' +
+          ex.getTypeName() +
+          ': ' +
+          ex.getMessage()
       );
       throw new AuraHandledException('Agentforce is temporarily unavailable.');
     }
     if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
       System.debug(
         LoggingLevel.ERROR,
-        'Agentforce returned HTTP ' + response.getStatusCode()
+        'Agentforce returned HTTP ' +
+          response.getStatusCode() +
+          ': ' +
+          response.getBody()
       );
       throw new AuraHandledException(
         'Agentforce could not complete that request.'
@@ -137,6 +143,13 @@ public with sharing class LibraryAgentApiController {
     try {
       return (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
     } catch (Exception ex) {
+      System.debug(
+        LoggingLevel.ERROR,
+        'Agentforce returned unparseable JSON: ' +
+          ex.getTypeName() +
+          ': ' +
+          ex.getMessage()
+      );
       throw new AuraHandledException(
         'Agentforce returned an invalid response.'
       );
