@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "agentforce-generate": {
+      "source": "forcedotcom/sf-skills",
+      "sourceType": "github",
+      "skillPath": "skills/agentforce-generate/SKILL.md",
+      "computedHash": "32ec483f5d358c96f2859024bb9752eea897041280dc6a8fecf73950e8ee1afb"
+    },
+    "platform-metadata-deploy": {
+      "source": "forcedotcom/sf-skills",
+      "sourceType": "github",
+      "skillPath": "skills/platform-metadata-deploy/SKILL.md",
+      "computedHash": "1e940e140e4b1bfdecc205cfec0dafd10b1edf6198f8a8701c8458b40516f7f3"
+    }
+  }
+}

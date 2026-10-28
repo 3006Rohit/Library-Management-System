@@ -1,0 +1,81 @@
+<template>
+  <section class="room-bookings-panel" aria-label="Room bookings management">
+    <div class="bookings-header">
+      <div>
+        <p class="eyebrow">Facility operations</p>
+        <h2>Room bookings</h2>
+      </div>
+      <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+    </div>
+
+    <template if:true={loading}>
+      <div class="loading">Loading bookings…</div>
+    </template>
+
+    <template if:true={error}>
+      <div class="error" role="alert">{error}</div>
+    </template>
+
+    <div class="bookings-grid">
+      <div class="filters-card">
+        <h3>Filter by status</h3>
+        <div class="filter-options">
+          <label class="check">
+            <input
+              type="checkbox"
+              checked={filterBooked}
+              onchange={handleFilterChange}
+              data-status="Booked"
+            />
+            Booked
+          </label>
+          <label class="check">
+            <input
+              type="checkbox"
+              checked={filterCanceled}
+              onchange={handleFilterChange}
+              data-status="Canceled"
+            />
+            Canceled
+          </label>
+        </div>
+      </div>
+
+      <article class="list-card">
+        <template if:true={hasBookings}>
+          <div class="bookings-list">
+            <template for:each={filteredBookings} for:item="booking">
+              <div class="booking-row" key={booking.id}>
+                <div class="booking-info">
+                  <strong>{booking.roomName}</strong>
+                  <span class="member">{booking.memberName}</span>
+                  <span class="purpose">{booking.purpose}</span>
+                  <span class="time">
+                    {booking.startAtLabel} → {booking.endAtLabel}
+                  </span>
+                </div>
+                <div class="booking-meta">
+                  <span class={booking.statusClass}>{booking.status}</span>
+                  <template if:true={booking.canCancel}>
+                    <button
+                      type="button"
+                      class="action-button"
+                      onclick={handleCancel}
+                      data-id={booking.id}
+                    >
+                      Cancel
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <template if:false={hasBookings}>
+          <div class="empty">No bookings found.</div>
+        </template>
+      </article>
+    </div>
+  </section>
+</template>

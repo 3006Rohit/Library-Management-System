@@ -293,6 +293,10 @@
           <c-library-acquisition-dashboard></c-library-acquisition-dashboard>
         </template>
 
+        <template if:true={isRoomBookings}>
+          <c-library-librarian-room-bookings></c-library-librarian-room-bookings>
+        </template>
+
         <template if:true={isDashboard}>
           <section
             class="panel data-cloud-panel"

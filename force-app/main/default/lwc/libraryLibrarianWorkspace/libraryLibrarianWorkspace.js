@@ -61,6 +61,7 @@ const NAV = [
   ["Dashboard", "utility:home"],
   ["Librarian Assistant", "utility:einstein"],
   ["Acquisitions", "utility:light_bulb"],
+  ["Room Bookings", "utility:event"],
   ["Books", "utility:knowledge_base"],
   ["Book Copies", "utility:copy"],
   ["Members", "utility:groups"],
@@ -82,6 +83,10 @@ const PAGE_COPY = {
   Acquisitions: [
     "Acquisition Intelligence",
     "Turn collection demand into explainable purchasing decisions"
+  ],
+  "Room Bookings": [
+    "Room Bookings",
+    "Manage library room reservations and availability"
   ],
   Books: ["Books", "Manage library books, authors and categories"],
   "Book Copies": [
@@ -546,6 +551,9 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   }
   get isAcquisitions() {
     return this.section === "Acquisitions";
+  }
+  get isRoomBookings() {
+    return this.section === "Room Bookings";
   }
   get assistantQuestions() {
     return [
