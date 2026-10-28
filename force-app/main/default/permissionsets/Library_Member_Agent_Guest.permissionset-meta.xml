@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Library Member Agent Guest</label>
+    <description
+  >Lets the member portal guest context call the Agentforce API credential. Only reachable through LibraryMemberAgentController, which validates the member session token.</description>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal
+    >Library_Agent_API-LibraryAgentPrincipal</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
+    <hasActivationRequired>false</hasActivationRequired>
+</PermissionSet>

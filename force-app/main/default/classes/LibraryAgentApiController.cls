@@ -19,14 +19,23 @@ public with sharing class LibraryAgentApiController {
 
   @AuraEnabled
   public static SessionResponse startSession() {
-    String agentId = LIBRARIAN_AGENT_ID;
+    return openSession(LIBRARIAN_AGENT_ID);
+  }
 
+  public static SessionResponse openSession(String agentId) {
+    return openSession(agentId, new List<Object>());
+  }
+
+  public static SessionResponse openSession(
+    String agentId,
+    List<Object> variables
+  ) {
     Map<String, Object> body = new Map<String, Object>{
       'externalSessionKey' => createExternalSessionKey(),
       'instanceConfig' => new Map<String, Object>{
         'endpoint' => Url.getOrgDomainUrl().toExternalForm()
       },
-      'variables' => new List<Object>(),
+      'variables' => variables,
       'featureSupport' => 'Sync',
       'bypassUser' => true
     };

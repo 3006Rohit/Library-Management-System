@@ -20,6 +20,10 @@
         <apexClass>LibraryMemberSessionController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>LibraryMemberAgentController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <fieldPermissions><field
     >Reservation__c.Estimated_Available_Date__c</field><editable
     >false</editable><readable>true</readable></fieldPermissions>

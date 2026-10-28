@@ -38,6 +38,7 @@ const NAVIGATION = [
   ["Scan & Borrow", "utility:scan"],
   ["My Books", "utility:bookmark"],
   ["Reservations", "utility:favorite"],
+  ["Member Assistant", "utility:chat"],
   ["Membership", "utility:groups"],
   ["Fines & Payments", "utility:money"],
   ["Profile", "utility:user"]
@@ -64,6 +65,10 @@ const PAGE_COPY = {
   Reservations: [
     "My Reservations",
     "Track your book reservations and waiting list"
+  ],
+  "Member Assistant": [
+    "Member Assistant",
+    "Chat with the library assistant about your loans, reservations, and catalog"
   ],
   Membership: [
     "My Membership",
@@ -199,6 +204,9 @@ export default class LibraryMemberShell extends LightningElement {
   }
   get isReservations() {
     return this.section === "Reservations";
+  }
+  get isMemberAssistant() {
+    return this.section === "Member Assistant";
   }
   get isMembership() {
     return this.section === "Membership";

@@ -1,0 +1,110 @@
+<template>
+  <section class="lib-assistant-page" aria-label="Member Assistant">
+    <section class="lib-assistant-hero">
+      <div class="lib-assistant-hero-art" aria-hidden="true">🤖</div>
+      <div>
+        <h1>Library Assistant</h1>
+        <p>Your AI assistant for your library account</p>
+        <span
+          >Ask about your loans, reservations, activity, and the catalog. You
+          only ever see your own records.</span
+        >
+      </div>
+      <div class="lib-assistant-hero-books" aria-hidden="true">▥ ✦ ▥</div>
+    </section>
+
+    <div class="lib-assistant-workspace">
+      <section class="lib-assistant-help-card">
+        <h2>What can I help you with?</h2>
+        <p>Ask questions or try one of the examples below.</p>
+        <div class="lib-assistant-topic-grid">
+          <button
+            class="lib-assistant-topic blue-topic"
+            data-question="What are my current loans?"
+            onclick={useAssistantPrompt}
+          >
+            <span>▣</span><strong>My Loans</strong
+            ><small>Check your current loans and due dates.</small>
+          </button>
+          <button
+            class="lib-assistant-topic red-topic"
+            data-question="Show my reservations"
+            onclick={useAssistantPrompt}
+          >
+            <span>▦</span><strong>My Reservations</strong
+            ><small>View your holds, queue position, and availability.</small>
+          </button>
+          <button
+            class="lib-assistant-topic purple-topic"
+            data-question="Summarize my library activity"
+            onclick={useAssistantPrompt}
+          >
+            <span>↔</span><strong>My Activity</strong
+            ><small>Review recent check-outs, returns, and renewals.</small>
+          </button>
+          <button
+            class="lib-assistant-topic green-topic"
+            data-question="Search the catalog for books about science"
+            onclick={useAssistantPrompt}
+          >
+            <span>⌕</span><strong>Catalog Discovery</strong
+            ><small>Find books by title, author, subject, or genre.</small>
+          </button>
+        </div>
+        <div class="lib-assistant-examples">
+          <strong>💡 Example Questions</strong>
+          <div>
+            <template for:each={assistantQuestions} for:item="question"
+              ><button
+                key={question}
+                data-question={question}
+                onclick={useAssistantPrompt}
+              >
+                {question}
+              </button></template
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="lib-assistant-chat-card">
+        <header class="lib-assistant-chat-header">
+          <span class="lib-assistant-bot-avatar">✦</span>
+          <div>
+            <strong>Library Assistant</strong><small>● Inline Agentforce</small>
+          </div>
+          <button
+            type="button"
+            onclick={clearAssistantChat}
+            disabled={assistantBusy}
+          >
+            ▱ &nbsp; Clear Chat
+          </button>
+        </header>
+        <div class="lib-assistant-messages">
+          <template for:each={assistantMessages} for:item="message"
+            ><div key={message.id} class={message.className}>
+              {message.text}
+            </div></template
+          >
+        </div>
+        <form class="lib-assistant-composer" onsubmit={sendAssistantMessage}>
+          <span aria-hidden="true">⌕</span
+          ><input
+            value={assistantInput}
+            oninput={handleAssistantInput}
+            placeholder="Type your question here..."
+            aria-label="Ask the library assistant"
+            disabled={assistantBusy}
+          /><button
+            type="submit"
+            aria-label="Send question"
+            disabled={assistantBusy}
+          >
+            {assistantSendLabel}
+          </button>
+        </form>
+      </section>
+    </div>
+  </section>
+</template>

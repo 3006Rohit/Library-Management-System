@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ExtlClntAppOauthConfigurablePolicies
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+>
+    <clientCredentialsFlowUser
+  >library.portal.integration.20261012@arohit3009c.local</clientCredentialsFlowUser>
+    <commaSeparatedPermissionSet
+  >Library_Member_API_Integration</commaSeparatedPermissionSet>
+    <externalClientApplication>Library_Member_Portal</externalClientApplication>
+    <ipRelaxationPolicyType>Enforce</ipRelaxationPolicyType>
+    <isClientCredentialsFlowEnabled>false</isClientCredentialsFlowEnabled>
+    <isGuestCodeCredFlowEnabled>false</isGuestCodeCredFlowEnabled>
+    <isTokenExchangeFlowEnabled>false</isTokenExchangeFlowEnabled>
+    <label>Library Member Portal OAuth Policies</label>
+    <permittedUsersPolicyType
+  >AdminApprovedPreAuthorized</permittedUsersPolicyType>
+    <refreshTokenPolicyType>Zero</refreshTokenPolicyType>
+    <refreshTokenValidityPeriod>0</refreshTokenValidityPeriod>
+    <requiredSessionLevel>STANDARD</requiredSessionLevel>
+    <sessionTimeoutInMinutes>15</sessionTimeoutInMinutes>
+</ExtlClntAppOauthConfigurablePolicies>

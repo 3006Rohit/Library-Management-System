@@ -124,12 +124,14 @@
             </div></template
           >
           <template if:true={isReady}>
-            <div class="page-heading">
-              <div>
-                <h1>{pageTitle}</h1>
-                <p>{pageSubtitle}</p>
+            <template if:false={isMemberAssistant}>
+              <div class="page-heading">
+                <div>
+                  <h1>{pageTitle}</h1>
+                  <p>{pageSubtitle}</p>
+                </div>
               </div>
-            </div>
+            </template>
 
             <template if:true={isDashboard}>
               <section
@@ -461,6 +463,10 @@
                   </div></template
                 >
               </section>
+            </template>
+
+            <template if:true={isMemberAssistant}>
+              <c-library-member-assistant></c-library-member-assistant>
             </template>
 
             <template if:true={isMembership}>
