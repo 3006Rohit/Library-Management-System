@@ -33,7 +33,6 @@ import submitBookReview from "@salesforce/apex/LibraryMemberSessionController.su
 const NAVIGATION = [
   ["Dashboard", "utility:home"],
   ["Explore Books", "utility:knowledge_base"],
-  ["Events", "utility:event"],
   ["Rooms", "utility:company"],
   ["Challenges", "utility:favorite"],
   ["Branches", "utility:location"],
@@ -55,10 +54,6 @@ const PAGE_COPY = {
   "Explore Books": [
     "Explore Books",
     "Discover new books, authors and categories"
-  ],
-  Events: [
-    "Library Events",
-    "Discover talks, workshops and reading groups at your library"
   ],
   Rooms: [
     "Room Bookings",
@@ -224,9 +219,6 @@ export default class LibraryMemberShell extends LightningElement {
   }
   get isExploreBooks() {
     return this.section === "Explore Books";
-  }
-  get isEvents() {
-    return this.section === "Events";
   }
   get isRooms() {
     return this.section === "Rooms";
