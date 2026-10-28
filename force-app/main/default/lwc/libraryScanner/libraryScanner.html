@@ -31,14 +31,35 @@
           Return
         </button>
       </div>
-      <lightning-input
-        data-id="barcode"
-        label="Book copy barcode"
-        value={barcode}
-        placeholder="Scan or type a barcode"
-        onchange={handleBarcodeChange}
-        onkeydown={handleKeydown}
-      ></lightning-input>
+      <div
+        style="
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 0;
+        "
+      >
+        <label
+          style="color: var(--text-primary); font-size: 13px; font-weight: 600"
+          >Book copy barcode</label
+        >
+        <input
+          type="text"
+          data-id="barcode"
+          value={barcode}
+          placeholder="Scan or type a barcode"
+          onchange={handleBarcodeChange}
+          onkeydown={handleKeydown}
+          style="
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--text-primary);
+          "
+        />
+      </div>
       <div class="scanner-actions">
         <button
           class="button primary"

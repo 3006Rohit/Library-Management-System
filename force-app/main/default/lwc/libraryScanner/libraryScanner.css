@@ -1,13 +1,23 @@
+:host {
+  --primary-blue: #0b66e4;
+  --text-primary: #122033;
+  --text-secondary: #69788d;
+  --border-color: #dfe5ec;
+  --bg-light: #f5f7fa;
+  --bg-white: #ffffff;
+  display: block;
+}
+
 .scanner-card {
   position: relative;
   display: grid;
-  gap: 1.25rem;
-  max-width: 760px;
-  padding: 1.5rem;
-  border: 1px solid #d9e4f3;
-  border-radius: 1.25rem;
-  background: linear-gradient(145deg, #ffffff, #f4f8fd);
-  box-shadow: 0 16px 40px rgba(35, 73, 125, 0.08);
+  gap: 1.5rem;
+  max-width: 100%;
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .scanner-heading,
@@ -21,149 +31,221 @@
 
 .scanner-heading h2,
 .scan-preview h3 {
-  margin: 0.25rem 0;
-  color: #132b4f;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.scanner-heading h2 {
+  font-size: 24px;
+}
+
+.scan-preview h3 {
+  font-size: 16px;
 }
 
 .scanner-heading p,
 .scan-preview p,
 .camera-panel p {
   margin: 0;
-  color: #5a6c84;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .eyebrow {
-  color: #4674ad;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .scanner-icon {
   display: grid;
-  width: 3rem;
-  height: 3rem;
+  width: 48px;
+  height: 48px;
   place-items: center;
-  border-radius: 1rem;
-  background: #e4efff;
-  color: #2a63a5;
-  font-size: 1.8rem;
+  border-radius: 8px;
+  background: #e3f2fd;
+  color: var(--primary-blue);
+  font-size: 28px;
+  flex-shrink: 0;
 }
 
 .scanner-entry {
-  align-items: end;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .scanner-mode {
   display: flex;
-  gap: 0.25rem;
-  padding: 0.2rem;
-  border-radius: 0.65rem;
-  background: #eaf1fb;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
 }
 
 .mode-button {
-  padding: 0.5rem 0.7rem;
+  padding: 8px 12px;
   border: 0;
-  border-radius: 0.45rem;
+  border-radius: 4px;
   background: transparent;
-  color: #4d6685;
+  color: var(--text-secondary);
   font: inherit;
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-button:hover {
+  background: #f0f2f5;
+  color: var(--text-primary);
 }
 
 .mode-button.active {
-  background: #fff;
-  color: #205a99;
-  box-shadow: 0 2px 6px rgba(32, 90, 153, 0.12);
+  background: var(--bg-white);
+  color: var(--primary-blue);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .scanner-entry lightning-input {
   flex: 1;
+  min-width: 200px;
 }
 
 .scanner-actions {
   display: flex;
-  gap: 0.65rem;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .button {
-  min-height: 2.5rem;
-  padding: 0.55rem 0.9rem;
+  padding: 10px 16px;
   border: 0;
-  border-radius: 0.6rem;
+  border-radius: 4px;
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .button.primary {
-  background: #2e6bb0;
-  color: #fff;
+  background: var(--primary-blue);
+  color: white;
+}
+
+.button.primary:hover:not(:disabled) {
+  background: #0955d8;
 }
 
 .button.outline {
-  border: 1px solid #b9cce4;
-  background: #fff;
-  color: #2e5d94;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  color: var(--text-primary);
+}
+
+.button.outline:hover:not(:disabled) {
+  background: var(--bg-light);
+  border-color: #b3d9ff;
 }
 
 .button:disabled {
-  cursor: wait;
-  opacity: 0.55;
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .camera-panel {
   display: grid;
-  gap: 0.75rem;
+  gap: 1rem;
   justify-items: start;
-  padding: 0.75rem;
-  border-radius: 0.85rem;
-  background: #10213a;
+  padding: 1rem;
+  border-radius: 6px;
+  background: #0f1419;
+  border: 1px solid #1a2332;
 }
 
 .camera-video {
   width: 100%;
-  max-height: 260px;
-  border-radius: 0.6rem;
+  max-height: 300px;
+  border-radius: 4px;
   object-fit: cover;
 }
 
 .camera-panel p {
-  color: #e3edf9;
+  color: #e0e7ff;
+  font-size: 14px;
 }
 
 .scan-preview {
   padding: 1rem;
-  border: 1px solid #b9ddca;
-  border-radius: 0.85rem;
-  background: #f2fbf5;
+  border: 1px solid #b3e5b3;
+  border-radius: 6px;
+  background: #f1f8f1;
 }
 
 .scan-message {
-  padding: 0.75rem 1rem;
-  border-radius: 0.65rem;
+  padding: 12px 16px;
+  border-radius: 4px;
   font-weight: 600;
+  font-size: 14px;
 }
 
 .scan-message.success {
-  background: #e7f7ec;
-  color: #176837;
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
 .scan-message.error {
-  background: #fff0f0;
-  color: #a03535;
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@media (max-width: 1024px) {
+  .scanner-entry {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scanner-mode {
+    width: 100%;
+  }
+
+  .scanner-actions {
+    width: 100%;
+  }
+
+  .scanner-actions .button {
+    flex: 1;
+  }
 }
 
 @media (max-width: 640px) {
+  .scanner-card {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .scanner-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .scanner-entry,
-  .scanner-heading,
   .scan-preview {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .scanner-mode {
+    width: 100%;
   }
 
   .scanner-actions {
