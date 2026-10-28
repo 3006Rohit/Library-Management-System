@@ -518,12 +518,10 @@ export default class LibraryMemberShell extends LightningElement {
     );
   }
   get memberAnalyticsCadence() {
-    const cadence =
+    return (
       this.analytics?.refreshCadence ||
-      "Live Salesforce data • updates automatically";
-    return this.analytics?.lastUpdated
-      ? `Last updated: ${new Date(this.analytics.lastUpdated).toLocaleString()} • ${cadence}`
-      : cadence;
+      "Live Salesforce data • updates automatically"
+    );
   }
   get myActivityCards() {
     const a = this.analytics || {};
