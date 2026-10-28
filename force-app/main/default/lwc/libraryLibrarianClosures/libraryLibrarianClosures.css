@@ -2,9 +2,10 @@
   margin: 1rem 0;
   padding: 16px;
   overflow: hidden;
-  background: linear-gradient(145deg, #ffffff 0%, #f7fbff 100%);
-  border: 1px solid #dce8f4;
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #dfe5ec;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(19, 42, 72, 0.06);
 }
 .calendar-header {
   align-items: flex-start;
@@ -14,7 +15,7 @@
   margin-bottom: 18px;
 }
 .eyebrow {
-  color: #8a5d32;
+  color: #69788d;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -23,16 +24,17 @@
 }
 h2,
 h3 {
+  color: #122033;
   margin: 0 0 6px;
 }
 .calendar-header p:last-child {
-  color: #756f68;
+  color: #69788d;
   margin: 0;
 }
 .refresh {
   background: transparent;
   border: 0;
-  color: #8a5d32;
+  color: #0b66e4;
   cursor: pointer;
   font-weight: 700;
 }
@@ -43,13 +45,13 @@ h3 {
 }
 .form-card,
 .list-card {
-  background: #fbfaf8;
-  border: 1px solid #eee8e0;
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #dfe5ec;
+  border-radius: 8px;
   padding: 17px;
 }
 label {
-  color: #514b45;
+  color: #122033;
   display: grid;
   font-weight: 600;
   gap: 5px;
@@ -57,8 +59,8 @@ label {
 }
 input,
 select {
-  border: 1px solid #d8d0c7;
-  border-radius: 7px;
+  border: 1px solid #dfe5ec;
+  border-radius: 4px;
   font: inherit;
   padding: 8px;
 }
@@ -72,9 +74,9 @@ select {
   padding: 0;
 }
 .primary {
-  background: #8a5d32;
+  background: #0b66e4;
   border: 0;
-  border-radius: 7px;
+  border-radius: 4px;
   color: #fff;
   cursor: pointer;
   font-weight: 700;
@@ -85,25 +87,25 @@ select {
   gap: 9px;
 }
 .closure-row {
-  background: #fff;
-  border: 1px solid #eee8e0;
-  border-radius: 8px;
+  background: #f6f8fb;
+  border: 1px solid #dfe5ec;
+  border-radius: 4px;
   display: grid;
   gap: 3px;
   padding: 10px;
 }
 .closure-row span,
 .closure-row small {
-  color: #756f68;
+  color: #69788d;
 }
 .loading,
 .error,
 .empty {
-  color: #756f68;
+  color: #69788d;
   padding: 10px 0;
 }
 .error {
-  color: #a3382e;
+  color: #e2484f;
 }
 @media (max-width: 760px) {
   .calendar-header,
