@@ -152,9 +152,10 @@ export default class LibraryMemberShell extends LightningElement {
     {
       id: "welcome",
       className: "assistant-message assistant-message-bubble",
-      text: "Hello, Rohit! 👋 I’m your Library Assistant. I can help you find books, check loans and due dates, view reservations, review fines, and understand your membership. How can I help you today?"
+      text: "Hello, Rohit! 👋 I’m your Library Assistant powered by Agentforce. I can help you find books, check loans and due dates, view reservations, review fines, and understand your membership. How can I help you today?"
     }
   ];
+  agentSessionId;
   editProfile = false;
   realtimeRefreshTimer;
   firstName = "";
@@ -858,70 +859,13 @@ export default class LibraryMemberShell extends LightningElement {
     this.assistantInput = event.target.value;
   }
 
-  useAssistantPrompt(event) {
+  async useAssistantPrompt(event) {
     this.assistantInput = event.currentTarget.dataset.question;
-    this.sendAssistantMessage();
+    await this.sendAssistantMessage();
   }
 
-  assistantReply(question) {
-    const normalized = question.toLowerCase();
-    if (normalized.includes("recommend") || normalized.includes("suggest")) {
-      const recommendations = this.catalog
-        .filter((book) => book.availableCopies > 0)
-        .slice(0, 3);
-      return recommendations.length
-        ? `Based on your library activity and currently available catalog data, you may enjoy ${recommendations.map((book) => book.title).join(", ")}.`
-        : "I do not have enough current catalog activity data to make a recommendation right now.";
-    }
-    if (
-      normalized.includes("due") ||
-      normalized.includes("loan") ||
-      normalized.includes("borrow")
-    ) {
-      const activeLoans = this.activeLoans;
-      if (!activeLoans.length) {
-        return "You do not have any active loans right now.";
-      }
-      return activeLoans
-        .map((loan) => `${loan.bookName} is due ${loan.dueDateLabel}.`)
-        .join(" ");
-    }
-    if (normalized.includes("reservation")) {
-      const activeReservations = this.reservations.filter(
-        (reservation) => reservation.Status__c !== "Cancelled"
-      );
-      return activeReservations.length
-        ? `You have ${activeReservations.length} active reservation${activeReservations.length === 1 ? "" : "s"}.`
-        : "You do not have any active reservations.";
-    }
-    if (
-      normalized.includes("membership") ||
-      normalized.includes("benefit") ||
-      normalized.includes("plan")
-    ) {
-      return `Your current membership plan is ${this.planName}. It includes access to the library catalog, borrowing, reservations, and member account services available for your plan.`;
-    }
-    if (normalized.includes("fine") || normalized.includes("payment")) {
-      return `Your current outstanding balance is ${this.currency(
-        this.analytics?.totalFineAmount || this.dashboard?.outstandingFine || 0
-      )}.`;
-    }
-    if (normalized.includes("renew")) {
-      return "Open My Books to review an active loan and use Renew when the option is available.";
-    }
-    if (
-      normalized.includes("reserve") ||
-      normalized.includes("how do i borrow")
-    ) {
-      return "Open Explore Books, select a title, then choose Borrow when a copy is available or Reserve when the title is unavailable. I can also check your current reservation status.";
-    }
-    if (normalized.includes("book") || normalized.includes("available")) {
-      return "Open Explore Books to search the catalog by title, author, category, or availability.";
-    }
-    return "I can help with books, loans, reservations, fines, membership, and renewals. Try one of the example questions.";
-  }
-
-  sendAssistantMessage(event) {
+  // eslint-disable-next-line no-undef
+  async sendAssistantMessage(event) {
     event?.preventDefault();
     const question = this.assistantInput.trim();
     if (!question) return;
@@ -934,18 +878,62 @@ export default class LibraryMemberShell extends LightningElement {
       }
     ];
     this.assistantInput = "";
-    this.assistantMessages = [
-      ...this.assistantMessages,
-      {
-        id: `answer-${Date.now()}`,
-        className: "assistant-message assistant-message-bubble",
-        text: this.assistantReply(question)
+    try {
+      if (!this.agentSessionId) {
+        // eslint-disable-next-line no-undef
+        const sessionResponse = await startAgentSession({
+          sessionToken: this.sessionToken
+        });
+        this.agentSessionId = sessionResponse?.sessionId;
       }
-    ];
+      // eslint-disable-next-line no-undef
+      const response = await sendAgentMessage({
+        sessionId: this.agentSessionId,
+        message: question,
+        sessionToken: this.sessionToken
+      });
+      this.assistantMessages = [
+        ...this.assistantMessages,
+        {
+          id: `answer-${Date.now()}`,
+          className: "assistant-message assistant-message-bubble",
+          text:
+            response?.message ||
+            "I encountered an issue processing your question. Please try again."
+        }
+      ];
+    } catch (error) {
+      this.assistantMessages = [
+        ...this.assistantMessages,
+        {
+          id: `answer-${Date.now()}`,
+          className: "assistant-message assistant-message-bubble",
+          text: `I'm having trouble connecting to the agent right now. Error: ${error?.message || "Unknown error"}. Please try again.`
+        }
+      ];
+    }
   }
 
-  clearAssistantChat() {
-    this.assistantMessages = [];
+  async clearAssistantChat() {
+    try {
+      if (this.agentSessionId) {
+        // eslint-disable-next-line no-undef
+        await endAgentSession({
+          sessionId: this.agentSessionId,
+          sessionToken: this.sessionToken
+        });
+        this.agentSessionId = undefined;
+      }
+    } catch (error) {
+      console.error("Error ending agent session:", error);
+    }
+    this.assistantMessages = [
+      {
+        id: "welcome",
+        className: "assistant-message assistant-message-bubble",
+        text: "Hello, Rohit! 👋 I'm your Library Assistant powered by Agentforce. I can help you find books, check loans and due dates, view reservations, review fines, and understand your membership. How can I help you today?"
+      }
+    ];
   }
 
   openSection(event) {
