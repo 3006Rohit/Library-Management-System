@@ -303,7 +303,6 @@
                 <span class="analytics-panel-icon" aria-hidden="true">✦</span>
                 <div>
                   <h2>Data Cloud Analytics</h2>
-                  <p>{analyticsCadence}</p>
                 </div>
               </div>
               <template if:true={analyticsAvailable}>
@@ -320,7 +319,7 @@
             <template if:true={analyticsAvailable}>
               <div class="analytics-summary-grid">
                 <template for:each={copyAnalytics} for:item="metric">
-                  <article class={metric.cardClass} key={metric.label}>
+                  <article class="analytics-card" key={metric.label}>
                     <span class="analytics-stat-icon" aria-hidden="true"
                       >{metric.icon}</span
                     >
@@ -331,7 +330,7 @@
                   </article>
                 </template>
                 <template for:each={loanAnalytics} for:item="metric">
-                  <article class={metric.cardClass} key={metric.label}>
+                  <article class="analytics-card" key={metric.label}>
                     <span class="analytics-stat-icon" aria-hidden="true"
                       >{metric.icon}</span
                     >
@@ -342,7 +341,7 @@
                   </article>
                 </template>
                 <template for:each={reservationAnalytics} for:item="metric">
-                  <article class={metric.cardClass} key={metric.label}>
+                  <article class="analytics-card" key={metric.label}>
                     <span class="analytics-stat-icon" aria-hidden="true"
                       >{metric.icon}</span
                     >
@@ -353,7 +352,7 @@
                   </article>
                 </template>
                 <template for:each={fineAnalytics} for:item="metric">
-                  <article class={metric.cardClass} key={metric.label}>
+                  <article class="analytics-card" key={metric.label}>
                     <span class="analytics-stat-icon" aria-hidden="true"
                       >{metric.icon}</span
                     >
@@ -384,8 +383,13 @@
                     for:item="book"
                   >
                     <div class="analytics-row" key={book.bookId}>
-                      <span>{book.bookName}</span
+                      <span>{book.bookName || 'Book'}</span
                       ><strong>{book.totalReservations}</strong>
+                    </div>
+                  </template>
+                  <template if:false={analytics.reservationDemand}>
+                    <div class="analytics-empty">
+                      No reservation data available
                     </div>
                   </template>
                 </div>
