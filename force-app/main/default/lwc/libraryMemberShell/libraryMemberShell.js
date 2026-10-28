@@ -526,19 +526,19 @@ export default class LibraryMemberShell extends LightningElement {
   get myActivityCards() {
     const a = this.analytics || {};
     return [
-      ["Total Loans", a.totalLoans, "▤", "blue"],
-      ["Active Loans", a.activeLoans, "●", "green"],
-      ["Returned Loans", a.returnedLoans, "✓", "purple"],
-      ["Overdue Loans", a.overdueLoans, "!", "red"],
-      ["Reservations", a.totalReservations, "▦", "gold"],
-      ["Active Reservations", a.activeReservationCount, "◉", "cyan"],
-      ["Total Fines", a.totalFineCount, "₹", "orange"],
-      ["Unpaid Fines", a.unpaidFineCount, "!", "red"]
-    ].map(([label, value, icon, theme]) => ({
+      ["Total Loans", a.totalLoans, "▤"],
+      ["Active Loans", a.activeLoans, "●"],
+      ["Returned Loans", a.returnedLoans, "✓"],
+      ["Overdue Loans", a.overdueLoans, "!"],
+      ["Reservations", a.totalReservations, "▦"],
+      ["Active Reservations", a.activeReservationCount, "◉"],
+      ["Total Fines", a.totalFineCount, "₹"],
+      ["Unpaid Fines", a.unpaidFineCount, "!"]
+    ].map(([label, value, icon]) => ({
       label,
       value: value ?? 0,
       icon,
-      cardClass: `activity-metric-card ${theme}`
+      cardClass: "activity-metric-card"
     }));
   }
   get unpaidFineCount() {
