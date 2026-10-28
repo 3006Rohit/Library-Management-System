@@ -8,34 +8,44 @@
       </div>
     </div>
     <div class="search-card">
-      <lightning-input
-        name="startAt"
-        type="datetime"
-        label="Starts"
-        value={startAt}
-        onchange={handleInput}
-      ></lightning-input>
-      <lightning-input
-        name="endAt"
-        type="datetime"
-        label="Ends"
-        value={endAt}
-        onchange={handleInput}
-      ></lightning-input>
-      <lightning-input
-        name="minimumCapacity"
-        type="number"
-        min="1"
-        label="Minimum capacity"
-        value={minimumCapacity}
-        onchange={handleInput}
-      ></lightning-input>
-      <lightning-input
-        name="purpose"
-        label="Purpose"
-        value={purpose}
-        onchange={handleInput}
-      ></lightning-input>
+      <div class="search-field">
+        <label>Starts</label>
+        <input
+          type="datetime-local"
+          name="startAt"
+          value={startAt}
+          onchange={handleInput}
+        />
+      </div>
+      <div class="search-field">
+        <label>Ends</label>
+        <input
+          type="datetime-local"
+          name="endAt"
+          value={endAt}
+          onchange={handleInput}
+        />
+      </div>
+      <div class="search-field">
+        <label>Minimum capacity</label>
+        <input
+          type="number"
+          name="minimumCapacity"
+          min="1"
+          value={minimumCapacity}
+          onchange={handleInput}
+        />
+      </div>
+      <div class="search-field">
+        <label>Purpose</label>
+        <input
+          type="text"
+          name="purpose"
+          value={purpose}
+          onchange={handleInput}
+          placeholder="Optional"
+        />
+      </div>
       <button type="button" class="primary" onclick={search}>Find rooms</button>
     </div>
     <template if:true={loading}
