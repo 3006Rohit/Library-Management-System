@@ -1,4 +1,4 @@
-public with sharing class LibraryExternalRegistrationController {
+public without sharing class LibraryExternalRegistrationController {
   @AuraEnabled
   public static void approveRegistration(Id registrationId) {
     LibraryRegistrationService.requireLibrarian();
