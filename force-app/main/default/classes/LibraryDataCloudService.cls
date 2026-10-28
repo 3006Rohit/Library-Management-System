@@ -891,9 +891,13 @@ public with sharing class LibraryDataCloudService {
     Map<Id, Book__c> books = new Map<Id, Book__c>(
       [SELECT Id, Name FROM Book__c WHERE Id IN :ids]
     );
-    for (ReservationDemandDTO row : rows)
-      if (books.containsKey((Id) row.bookId))
+    for (ReservationDemandDTO row : rows) {
+      if (books.containsKey((Id) row.bookId)) {
         row.bookName = books.get((Id) row.bookId).Name;
+      } else {
+        row.bookName = 'Unknown Book';
+      }
+    }
   }
 
   private static void defaultMetrics(LibrarianAnalyticsDTO result) {
