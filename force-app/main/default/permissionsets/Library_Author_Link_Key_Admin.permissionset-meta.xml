@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Library Author Link Key Admin</label>
+    <description
+  >Lets an administrator read and maintain Book_Author__c.Book_Author_Key__c, which is otherwise invisible because a field deployed through the Metadata API has no field-level security by default.</description>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Book_Author__c.Book_Author_Key__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+</PermissionSet>
