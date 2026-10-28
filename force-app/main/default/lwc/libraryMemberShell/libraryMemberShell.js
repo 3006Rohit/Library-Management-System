@@ -30,6 +30,7 @@ import saveMyEngagement from "@salesforce/apex/LibraryMemberSessionController.sa
 import followAuthor from "@salesforce/apex/LibraryMemberSessionController.followAuthor";
 import submitBookReview from "@salesforce/apex/LibraryMemberSessionController.submitBookReview";
 import startAgentSession from "@salesforce/apex/LibraryAgentApiController.startSession";
+import sendMessage from "@salesforce/apex/LibraryAgentApiController.sendMessage";
 
 const NAVIGATION = [
   ["Dashboard", "utility:home"],
@@ -831,17 +832,16 @@ export default class LibraryMemberShell extends LightningElement {
     this.assistantInput = "";
     try {
       if (!this.agentSessionId) {
-        // eslint-disable-next-line no-undef
         const sessionResponse = await startAgentSession({
-          sessionToken: this.sessionToken
+          agentName: "member"
         });
         this.agentSessionId = sessionResponse?.sessionId;
       }
-      // eslint-disable-next-line no-undef
-      const response = await sendAgentMessage({
+      const sequenceId = this.assistantMessages.length / 2 + 1;
+      const response = await sendMessage({
         sessionId: this.agentSessionId,
-        message: question,
-        sessionToken: this.sessionToken
+        sequenceId: sequenceId,
+        text: question
       });
       this.assistantMessages = [
         ...this.assistantMessages,

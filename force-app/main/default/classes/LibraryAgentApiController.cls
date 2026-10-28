@@ -1,9 +1,10 @@
 public with sharing class LibraryAgentApiController {
   private static final String NAMED_CREDENTIAL = 'Library_Agent_API';
-  // Active Agentforce version created from docs/agent-spec-librarian.yaml.
-  // Keep this ID aligned with the activated librarian agent used by the
-  // workspace assistant; member conversations use their own agent channel.
-  private static final String AGENT_ID = '0XxgK000002QwOz';
+  // Librarian agent for workspace (docs/agent-spec-librarian.yaml)
+  private static final String LIBRARIAN_AGENT_ID = '0XxgK000002QwOz';
+  // Member agent for member portal (docs/agent-spec-member.yaml)
+  // This ID will be dynamically resolved from the activated agent
+  private static final String MEMBER_AGENT_ID = 'Library_Member_Assistant';
   private static final String API_ROOT = '/einstein/ai-agent/v1';
   private static final Integer MAX_UTTERANCE_LENGTH = 2000;
 
@@ -20,7 +21,11 @@ public with sharing class LibraryAgentApiController {
   }
 
   @AuraEnabled
-  public static SessionResponse startSession() {
+  public static SessionResponse startSession(String agentName) {
+    String agentId = agentName == 'librarian'
+      ? LIBRARIAN_AGENT_ID
+      : MEMBER_AGENT_ID;
+
     Map<String, Object> body = new Map<String, Object>{
       'externalSessionKey' => createExternalSessionKey(),
       'instanceConfig' => new Map<String, Object>{
@@ -32,7 +37,7 @@ public with sharing class LibraryAgentApiController {
     };
     Map<String, Object> response = request(
       'POST',
-      API_ROOT + '/agents/' + AGENT_ID + '/sessions',
+      API_ROOT + '/agents/' + agentId + '/sessions',
       body
     );
     String sessionId = stringValue(response.get('sessionId'));
