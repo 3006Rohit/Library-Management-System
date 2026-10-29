@@ -194,11 +194,13 @@ public without sharing class LibraryMemberSessionController {
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Member__c = :m.Id AND Return_Date__c = NULL
+      WITH SYSTEM_MODE
     ];
     d.overdueLoans = [
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Member__c = :m.Id AND Return_Date__c = NULL AND Due_Date__c < :now
+      WITH SYSTEM_MODE
     ];
     d.dueSoon = [
       SELECT COUNT()
@@ -208,6 +210,7 @@ public without sharing class LibraryMemberSessionController {
         AND Return_Date__c = NULL
         AND Due_Date__c >= :now
         AND Due_Date__c <= :soon
+      WITH SYSTEM_MODE
     ];
     d.activeReservations = systemReservationCount(
       'SELECT COUNT(Id) total FROM Reservation__c ' +
@@ -218,6 +221,7 @@ public without sharing class LibraryMemberSessionController {
       SELECT SUM(Balance__c) total
       FROM Fine__c
       WHERE Member__c = :m.Id AND Status__c IN ('Unpaid', 'Partially Paid')
+      WITH SYSTEM_MODE
     ];
     d.outstandingFine = totals.isEmpty() || totals[0].get('total') == null
       ? 0
@@ -239,6 +243,7 @@ public without sharing class LibraryMemberSessionController {
           Replacement_Required__c
         FROM Borrow_Record__c
         WHERE Member__c = :m.Id
+        WITH SYSTEM_MODE
         ORDER BY Borrow_Date__c DESC
         LIMIT 5
       ]
@@ -317,6 +322,7 @@ public without sharing class LibraryMemberSessionController {
       SELECT Book_Copy__r.Book__c, Borrow_Date__c
       FROM Borrow_Record__c
       WHERE Member__c = :m.Id AND Book_Copy__r.Book__c != NULL
+      WITH SYSTEM_MODE
       ORDER BY Borrow_Date__c DESC NULLS LAST
       LIMIT 20
     ]) {
@@ -496,6 +502,7 @@ public without sharing class LibraryMemberSessionController {
           Replacement_Required__c
         FROM Borrow_Record__c
         WHERE Member__c = :m.Id
+        WITH SYSTEM_MODE
         ORDER BY Borrow_Date__c DESC
         LIMIT 200
       ]
@@ -534,6 +541,7 @@ public without sharing class LibraryMemberSessionController {
           Paid_Date__c
         FROM Fine__c
         WHERE Member__c = :m.Id
+        WITH SYSTEM_MODE
         ORDER BY Generated_Date__c DESC
         LIMIT 200
       ]
@@ -556,6 +564,7 @@ public without sharing class LibraryMemberSessionController {
           Transaction_Reference__c
         FROM Membership_Payment__c
         WHERE Member__c = :m.Id
+        WITH SYSTEM_MODE
         ORDER BY Payment_Date__c DESC
         LIMIT 100
       ]
@@ -953,6 +962,7 @@ public without sharing class LibraryMemberSessionController {
           Read_At__c
         FROM Member_Notification__c
         WHERE Member__c = :m.Id
+        WITH SYSTEM_MODE
         ORDER BY CreatedDate DESC
         LIMIT 100
       ]
@@ -1064,13 +1074,18 @@ public without sharing class LibraryMemberSessionController {
     // member-facing availability state aligned with the reservation queue.
     LibraryReservationWorkflowService.promoteAvailableReservations(bookId);
 
-    List<Reservation__c> readyReservations = systemReservations(
-      'SELECT Book_Copy__c FROM Reservation__c ' +
-        'WHERE Member__c = :memberId AND Book__c = :bookId ' +
-        'AND Status__c = \'Ready\' AND Book_Copy__c != NULL ' +
-        'ORDER BY Ready_Date__c LIMIT 1',
-      new Map<String, Object>{ 'memberId' => m.Id, 'bookId' => bookId }
-    );
+    List<Reservation__c> readyReservations = [
+      SELECT Book_Copy__c
+      FROM Reservation__c
+      WHERE
+        Member__c = :m.Id
+        AND Book__c = :bookId
+        AND Status__c = 'Ready'
+        AND Book_Copy__c != NULL
+      WITH SYSTEM_MODE
+      ORDER BY Ready_Date__c
+      LIMIT 1
+    ];
     Id reservedCopyId = readyReservations.isEmpty()
       ? null
       : readyReservations[0].Book_Copy__c;
@@ -1080,6 +1095,7 @@ public without sharing class LibraryMemberSessionController {
         SELECT Id
         FROM Book_Copy__c
         WHERE Id = :reservedCopyId AND Status__c IN ('Available', 'Reserved')
+        WITH SYSTEM_MODE
         LIMIT 1
         FOR UPDATE
       ];
@@ -1088,6 +1104,7 @@ public without sharing class LibraryMemberSessionController {
         SELECT Id
         FROM Book_Copy__c
         WHERE Book__c = :bookId AND Status__c = 'Available'
+        WITH SYSTEM_MODE
         LIMIT 1
         FOR UPDATE
       ];
