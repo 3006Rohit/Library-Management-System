@@ -113,6 +113,72 @@ private class LibraryAcquisitionInsightServiceTest {
   }
 
   @IsTest
+  static void decisionsSurviveRefreshAndCanBeUndone() {
+    Fixture f = fixture();
+    LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
+    insert new Reservation__c(
+      Member__c = f.member.Id,
+      Book__c = f.book.Id,
+      Contact__c = f.contact.Id,
+      Reservation_Date__c = System.now(),
+      Status__c = 'Pending',
+      Queue_Position__c = 1
+    );
+    List<LibraryAcquisitionInsightService.RecommendationDTO> first = LibraryAcquisitionInsightService.getRecommendations();
+    // 1 unmet reservation (30) + 1 checkout (2) + empty shelf (10)
+    System.assertEquals(42, first[0].score);
+    System.assertEquals(1, first[0].recommendedQuantity);
+
+    LibraryAcquisitionInsightService.decide(first[0].id, 'Accepted', 'Order it');
+    List<LibraryAcquisitionInsightService.RecommendationDTO> again = LibraryAcquisitionInsightService.getRecommendations();
+    System.assertEquals(1, again.size());
+    System.assertEquals(first[0].id, again[0].id);
+    System.assertEquals('Accepted', again[0].status);
+    System.assertEquals('Order it', again[0].decisionNotes);
+    System.assertEquals(
+      1,
+      [SELECT COUNT() FROM Acquisition_Recommendation__c]
+    );
+
+    LibraryAcquisitionInsightService.decide(first[0].id, 'Open', null);
+    System.assertEquals(
+      'Open',
+      LibraryAcquisitionInsightService.getRecommendations()[0].status
+    );
+
+    Boolean rejected = false;
+    try {
+      LibraryAcquisitionInsightService.decide(first[0].id, 'Bogus', null);
+    } catch (AuraHandledException expected) {
+      rejected = true;
+    }
+    System.assertEquals(true, rejected);
+  }
+
+  @IsTest
+  static void scoreRisesWithUnmetDemandAndStaysCapped() {
+    Fixture f = fixture();
+    LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
+    List<Reservation__c> waits = new List<Reservation__c>();
+    for (Integer i = 0; i < 5; i++)
+      waits.add(
+        new Reservation__c(
+          Member__c = f.member.Id,
+          Book__c = f.book.Id,
+          Contact__c = f.contact.Id,
+          Reservation_Date__c = System.now(),
+          Status__c = 'Pending',
+          Queue_Position__c = i + 1
+        )
+      );
+    insert waits;
+    LibraryAcquisitionInsightService.RecommendationDTO row = LibraryAcquisitionInsightService.getRecommendations()[0];
+    // 5 unmet reservations cap at 60, +2 checkout, +10 empty shelf
+    System.assertEquals(72, row.score);
+    System.assertEquals(5, row.recommendedQuantity);
+  }
+
+  @IsTest
   static void telemetryStoresHashWithoutRawQuery() {
     fixture();
     Test.startTest();

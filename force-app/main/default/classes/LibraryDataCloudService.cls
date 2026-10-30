@@ -145,7 +145,15 @@ public with sharing class LibraryDataCloudService {
    * still available for historical/aggregate use, but their six-hour schedule
    * is not suitable for operational dashboard numbers.
    */
+  // Library-wide counts must cover every record. Callers authorize first
+  // (Manage_Library_Circulation), and the agent user has no record sharing on
+  // the private circulation objects, so the aggregates read without sharing.
   public static LibrarianAnalyticsDTO getRealtimeLibrarianAnalytics() {
+    return new RealtimeAnalyticsReader().read();
+  }
+
+  private without sharing class RealtimeAnalyticsReader {
+    public LibrarianAnalyticsDTO read() {
     LibrarianAnalyticsDTO result = new LibrarianAnalyticsDTO();
     result.available = true;
     result.message = null;
@@ -163,8 +171,7 @@ public with sharing class LibraryDataCloudService {
       DateTime now = System.now();
       for (AggregateResult row : [
         SELECT Status__c status, COUNT(Id) total
-        FROM Book_Copy__c
-        GROUP BY Status__c
+        FROM Book_Copy__c WITH SYSTEM_MODE GROUP BY Status__c
       ]) {
         String status = String.valueOf(row.get('status'));
         Decimal total = aggregateValue(row.get('total'));
@@ -181,8 +188,7 @@ public with sharing class LibraryDataCloudService {
 
       for (AggregateResult row : [
         SELECT Status__c status, COUNT(Id) total
-        FROM Borrow_Record__c
-        GROUP BY Status__c
+        FROM Borrow_Record__c WITH SYSTEM_MODE GROUP BY Status__c
       ]) {
         String status = String.valueOf(row.get('status'));
         Decimal total = aggregateValue(row.get('total'));
@@ -198,8 +204,7 @@ public with sharing class LibraryDataCloudService {
       List<AggregateResult> overdueRows = [
         SELECT COUNT(Id) total
         FROM Borrow_Record__c
-        WHERE Return_Date__c = NULL AND Due_Date__c < :now
-      ];
+        WHERE Return_Date__c = NULL AND Due_Date__c < :now AND Status__c != 'Lost' WITH SYSTEM_MODE ];
       if (!overdueRows.isEmpty())
         result.loanMetrics.overdueLoans = aggregateValue(
           overdueRows[0].get('total')
@@ -207,8 +212,7 @@ public with sharing class LibraryDataCloudService {
 
       for (AggregateResult row : [
         SELECT Status__c status, COUNT(Id) total
-        FROM Reservation__c
-        GROUP BY Status__c
+        FROM Reservation__c WITH SYSTEM_MODE GROUP BY Status__c
       ]) {
         String status = String.valueOf(row.get('status'));
         Decimal total = aggregateValue(row.get('total'));
@@ -227,8 +231,7 @@ public with sharing class LibraryDataCloudService {
 
       for (AggregateResult row : [
         SELECT Status__c status, COUNT(Id) total
-        FROM Fine__c
-        GROUP BY Status__c
+        FROM Fine__c WITH SYSTEM_MODE GROUP BY Status__c
       ]) {
         String status = String.valueOf(row.get('status'));
         Decimal total = aggregateValue(row.get('total'));
@@ -243,8 +246,7 @@ public with sharing class LibraryDataCloudService {
       for (AggregateResult row : [
         SELECT Book_Copy__r.Book__c bookId, COUNT(Id) total
         FROM Borrow_Record__c
-        WHERE Book_Copy__r.Book__c != NULL
-        GROUP BY Book_Copy__r.Book__c
+        WHERE Book_Copy__r.Book__c != NULL WITH SYSTEM_MODE GROUP BY Book_Copy__r.Book__c
         ORDER BY COUNT(Id) DESC
         LIMIT 10
       ]) {
@@ -262,8 +264,7 @@ public with sharing class LibraryDataCloudService {
       for (AggregateResult row : [
         SELECT Book__c bookId, COUNT(Id) total
         FROM Reservation__c
-        WHERE Book__c != NULL
-        GROUP BY Book__c
+        WHERE Book__c != NULL WITH SYSTEM_MODE GROUP BY Book__c
         ORDER BY COUNT(Id) DESC
         LIMIT 10
       ]) {
@@ -292,6 +293,7 @@ public with sharing class LibraryDataCloudService {
     }
     defaultMetrics(result);
     return result;
+    }
   }
 
   public static LibrarianAnalyticsDTO getLibrarianAnalytics() {
@@ -875,7 +877,7 @@ public with sharing class LibraryDataCloudService {
     if (ids.isEmpty())
       return;
     Map<Id, Book__c> books = new Map<Id, Book__c>(
-      [SELECT Id, Name FROM Book__c WHERE Id IN :ids]
+      [SELECT Id, Name FROM Book__c WHERE Id IN :ids WITH SYSTEM_MODE]
     );
     for (BookPopularityDTO row : rows)
       if (books.containsKey((Id) row.bookId))
@@ -889,7 +891,7 @@ public with sharing class LibraryDataCloudService {
     if (ids.isEmpty())
       return;
     Map<Id, Book__c> books = new Map<Id, Book__c>(
-      [SELECT Id, Name FROM Book__c WHERE Id IN :ids]
+      [SELECT Id, Name FROM Book__c WHERE Id IN :ids WITH SYSTEM_MODE]
     );
     List<ReservationDemandDTO> validRows = new List<ReservationDemandDTO>();
     for (ReservationDemandDTO row : rows) {

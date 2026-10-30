@@ -53,6 +53,7 @@ public with sharing class LibraryNotificationDeliveryService {
         COUNT(Id) total,
         MAX(LastModifiedDate) lastUpdated
       FROM Notification_Delivery__c
+      WITH SYSTEM_MODE
       GROUP BY Status__c
     ]) {
       Integer count = Integer.valueOf(row.get('total'));
@@ -98,6 +99,7 @@ public with sharing class LibraryNotificationDeliveryService {
         Delivered_At__c,
         Error_Code__c
       FROM Notification_Delivery__c
+      WITH SYSTEM_MODE
       ORDER BY LastModifiedDate DESC
       LIMIT :limitSize
     ]) {

@@ -101,11 +101,12 @@ public with sharing class LibraryLedgerMigrationReadinessService {
     result.generatedAt = System.now();
     result.blockers = new List<String>();
     result.operations = new List<OperationDTO>();
-    result.totalRows = [SELECT COUNT() FROM Library_Scan_Transaction__c];
+    result.totalRows = [SELECT COUNT() FROM Library_Scan_Transaction__c WITH SYSTEM_MODE];
     Integer knownRows = [
       SELECT COUNT()
       FROM Library_Scan_Transaction__c
       WHERE Operation__c IN :KNOWN_OPERATIONS
+      WITH SYSTEM_MODE
     ];
     result.unknownOperationRows = result.totalRows - knownRows;
     result.malformedRows = [
@@ -116,6 +117,7 @@ public with sharing class LibraryLedgerMigrationReadinessService {
         OR Status__c = NULL
         OR Idempotency_Key__c = NULL
         OR Created_At__c = NULL
+      WITH SYSTEM_MODE
     ];
     result.migratableRows = [
       SELECT COUNT()
@@ -125,6 +127,7 @@ public with sharing class LibraryLedgerMigrationReadinessService {
         AND Status__c != NULL
         AND Idempotency_Key__c != NULL
         AND Created_At__c != NULL
+      WITH SYSTEM_MODE
     ];
     if (result.unknownOperationRows > 0)
       result.blockers.add(
@@ -139,6 +142,7 @@ public with sharing class LibraryLedgerMigrationReadinessService {
     for (AggregateResult row : [
       SELECT Operation__c operation, COUNT(Id) total
       FROM Library_Scan_Transaction__c
+      WITH SYSTEM_MODE
       GROUP BY Operation__c
       ORDER BY COUNT(Id) DESC
       LIMIT 50

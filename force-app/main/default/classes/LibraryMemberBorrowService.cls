@@ -7,28 +7,27 @@ public without sharing class LibraryMemberBorrowService {
     Member__c member = [
       SELECT Id, Contact__c, Status__c, Email__c
       FROM Member__c
-      WHERE Id = :resolvedMember.Id
-      FOR UPDATE
+      WHERE Id = :resolvedMember.Id WITH SYSTEM_MODE FOR UPDATE
     ];
     if (member.Status__c != 'Active')
       throw new AuraHandledException(
         'Your membership must be active to request a book.'
       );
-    if (
-      [
-        SELECT COUNT()
-        FROM Borrow_Record__c
-        WHERE Member__c = :member.Id AND Status__c = 'Pending'
-      ] > 0
-    )
+    Id memberId = member.Id;
+    Integer pendingRequests = [
+      SELECT COUNT()
+      FROM Borrow_Record__c
+      WHERE Member__c = :memberId AND Status__c = 'Pending'
+      WITH SYSTEM_MODE
+    ];
+    if (pendingRequests > 0)
       throw new AuraHandledException(
         'You already have a borrowing request awaiting librarian approval.'
       );
     List<Book_Copy__c> copies = [
       SELECT Id
       FROM Book_Copy__c
-      WHERE Book__c = :bookId AND Status__c = 'Available'
-      LIMIT 1
+      WHERE Book__c = :bookId AND Status__c = 'Available' WITH SYSTEM_MODE LIMIT 1
       FOR UPDATE
     ];
     if (copies.isEmpty())
@@ -72,14 +71,12 @@ public without sharing class LibraryMemberBorrowService {
         Membership_Plan__r.Borrow_Limit__c,
         Membership_Plan__r.Loan_Duration_Days__c
       FROM Member__c
-      WHERE Id = :resolvedMember.Id
-      FOR UPDATE
+      WHERE Id = :resolvedMember.Id WITH SYSTEM_MODE FOR UPDATE
     ];
     Book_Copy__c copy = [
       SELECT Id, Book__c, Status__c
       FROM Book_Copy__c
-      WHERE Id = :copyId
-      FOR UPDATE
+      WHERE Id = :copyId WITH SYSTEM_MODE FOR UPDATE
     ];
     List<Borrow_Record__c> activeLoans = [
       SELECT Id
@@ -87,15 +84,13 @@ public without sharing class LibraryMemberBorrowService {
       WHERE
         Member__c = :member.Id
         AND Return_Date__c = NULL
-        AND Status__c IN ('Active', 'Overdue')
-      FOR UPDATE
+        AND Status__c IN ('Active', 'Overdue') WITH SYSTEM_MODE FOR UPDATE
     ];
     Decimal outstanding = 0;
     for (Fine__c fine : [
       SELECT Balance__c
       FROM Fine__c
-      WHERE Member__c = :member.Id AND Status__c IN ('Unpaid', 'Partially Paid')
-    ])
+      WHERE Member__c = :member.Id AND Status__c IN ('Unpaid', 'Partially Paid') WITH SYSTEM_MODE ])
       outstanding += fine.Balance__c == null ? 0 : fine.Balance__c;
     Reservation__c blocking;
     List<Reservation__c> reservations = [
@@ -104,8 +99,7 @@ public without sharing class LibraryMemberBorrowService {
       WHERE
         Book__c = :copy.Book__c
         AND Status__c = 'Ready'
-        AND Book_Copy__c = :copy.Id
-      ORDER BY Status__c DESC, Reservation_Date__c, Id
+        AND Book_Copy__c = :copy.Id WITH SYSTEM_MODE ORDER BY Status__c DESC, Reservation_Date__c, Id
       LIMIT 1
     ];
     if (!reservations.isEmpty())

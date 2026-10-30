@@ -121,6 +121,7 @@ public without sharing class LibraryChallengeService {
       SELECT Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Member__c = :member.Id AND Operation__c = :ENROLLMENT_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 200
     ])
       enrollments.put(
@@ -132,6 +133,7 @@ public without sharing class LibraryChallengeService {
       SELECT Id, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :CHALLENGE_OPERATION AND Status__c = 'Published'
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ]) {
@@ -174,6 +176,7 @@ public without sharing class LibraryChallengeService {
       SELECT Id, Status__c
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Member__c = :member.Id
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (existing.isEmpty()) {
@@ -221,6 +224,7 @@ public without sharing class LibraryChallengeService {
         Member__c = :member.Id
         AND Operation__c = :ENROLLMENT_OPERATION
         AND Status__c IN ('Enrolled', 'Completed')
+      WITH SYSTEM_MODE
       LIMIT 200
     ]) {
       Id challengeId = parseId(parse(enrollment.Result_Message__c).get('c'));
@@ -230,6 +234,7 @@ public without sharing class LibraryChallengeService {
         SELECT Id, Result_Message__c
         FROM Library_Scan_Transaction__c
         WHERE Id = :challengeId AND Operation__c = :CHALLENGE_OPERATION
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       if (challenges.isEmpty())
@@ -254,6 +259,7 @@ public without sharing class LibraryChallengeService {
       SELECT Id, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Member__c = :member.Id AND Operation__c = :ACHIEVEMENT_OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ])
@@ -273,6 +279,7 @@ public without sharing class LibraryChallengeService {
         Member__c = :member.Id
         AND Operation__c = :PREFERENCE_OPERATION
         AND Idempotency_Key__c = :key
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     Library_Scan_Transaction__c row = rows.isEmpty()
@@ -306,6 +313,7 @@ public without sharing class LibraryChallengeService {
       SELECT Member__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :PREFERENCE_OPERATION AND Status__c = 'OptedIn'
+      WITH SYSTEM_MODE
       LIMIT 500
     ])
       if (parse(preference.Result_Message__c).get('o') == true)
@@ -318,6 +326,7 @@ public without sharing class LibraryChallengeService {
         Operation__c = :ENROLLMENT_OPERATION
         AND Status__c IN ('Enrolled', 'Completed')
         AND Member__c != NULL
+      WITH SYSTEM_MODE
       LIMIT 500
     ]) {
       if (
@@ -362,6 +371,7 @@ public without sharing class LibraryChallengeService {
       SELECT Id
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Member__c = :member.Id
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!rows.isEmpty())
@@ -378,6 +388,7 @@ public without sharing class LibraryChallengeService {
       SELECT Borrow_Date__c
       FROM Borrow_Record__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
       LIMIT 500
     ])
       if (
@@ -396,6 +407,7 @@ public without sharing class LibraryChallengeService {
       SELECT Borrow_Date__c
       FROM Borrow_Record__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
       LIMIT 500
     ]) {
       if (loan.Borrow_Date__c == null)
@@ -424,6 +436,7 @@ public without sharing class LibraryChallengeService {
       SELECT Status__c
       FROM Library_Scan_Transaction__c
       WHERE Member__c = :memberId AND Operation__c = :PREFERENCE_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     return !rows.isEmpty() && rows[0].Status__c == 'OptedIn';
@@ -433,6 +446,7 @@ public without sharing class LibraryChallengeService {
       SELECT Id, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Member__c = :memberId AND Operation__c = :ACHIEVEMENT_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 200
     ];
     for (Library_Scan_Transaction__c row : rows)
@@ -504,6 +518,7 @@ public without sharing class LibraryChallengeService {
         Id = :challengeId
         AND Operation__c = :CHALLENGE_OPERATION
         AND Status__c = 'Published'
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (rows.isEmpty())

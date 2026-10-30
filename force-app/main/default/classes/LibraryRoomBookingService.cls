@@ -1,6 +1,7 @@
 public without sharing class LibraryRoomBookingService {
   private static final String ROOM_OPERATION = 'Library Room';
   private static final String BOOKING_OPERATION = 'Room Booking';
+  private static final Integer MAX_SEATS = 200;
 
   public class RoomDTO {
     @AuraEnabled
@@ -15,6 +16,15 @@ public without sharing class LibraryRoomBookingService {
     public String equipment;
     @AuraEnabled
     public Boolean available;
+    @AuraEnabled
+    public Integer availableSeats;
+  }
+
+  public class SeatDTO {
+    @AuraEnabled
+    public Integer seatNo;
+    @AuraEnabled
+    public Boolean taken;
   }
 
   public class BookingDTO {
@@ -24,6 +34,8 @@ public without sharing class LibraryRoomBookingService {
     public Id roomId;
     @AuraEnabled
     public String roomName;
+    @AuraEnabled
+    public Integer seatNumber;
     @AuraEnabled
     public Datetime startAt;
     @AuraEnabled
@@ -41,9 +53,16 @@ public without sharing class LibraryRoomBookingService {
     String equipment
   ) {
     LibraryPolicyService.require('Manage_Library_Catalog');
-    if (String.isBlank(name) || capacity == null || capacity <= 0)
+    if (
+      String.isBlank(name) ||
+      capacity == null ||
+      capacity < 1 ||
+      capacity > MAX_SEATS
+    )
       throw new AuraHandledException(
-        'Room name and a positive capacity are required.'
+        'Room name and a seat count between 1 and ' +
+          MAX_SEATS +
+          ' are required.'
       );
     Library_Scan_Transaction__c row = new Library_Scan_Transaction__c(
       Idempotency_Key__c = 'ROOM:' +
@@ -65,6 +84,30 @@ public without sharing class LibraryRoomBookingService {
     return row.Id;
   }
 
+  public static List<RoomDTO> listRooms() {
+    LibraryPolicyService.require('Manage_Library_Catalog');
+    List<RoomDTO> result = new List<RoomDTO>();
+    for (Library_Scan_Transaction__c row : publishedRooms())
+      result.add(toRoomDto(row));
+    return result;
+  }
+
+  public static void retireRoom(Id roomId) {
+    LibraryPolicyService.require('Manage_Library_Catalog');
+    Library_Scan_Transaction__c room = roomRow(roomId, true);
+    room.Status__c = 'Retired';
+    Database.update(room, AccessLevel.SYSTEM_MODE);
+    List<Library_Scan_Transaction__c> toCancel = new List<Library_Scan_Transaction__c>();
+    for (Library_Scan_Transaction__c row : bookingRows(true)) {
+      if (parseId(parse(row.Result_Message__c).get('r')) == roomId) {
+        row.Status__c = 'Canceled';
+        toCancel.add(row);
+      }
+    }
+    if (!toCancel.isEmpty())
+      Database.update(toCancel, AccessLevel.SYSTEM_MODE);
+  }
+
   public static List<RoomDTO> getRooms(
     String sessionToken,
     Datetime startAt,
@@ -74,16 +117,9 @@ public without sharing class LibraryRoomBookingService {
     LibraryMemberSessionService.getCurrentMember(sessionToken);
     if (minimumCapacity != null && minimumCapacity < 1)
       throw new AuraHandledException('Capacity must be positive.');
-    List<Library_Scan_Transaction__c> rooms = [
-      SELECT Id, Result_Message__c
-      FROM Library_Scan_Transaction__c
-      WHERE Operation__c = :ROOM_OPERATION AND Status__c = 'Published'
-      ORDER BY Created_At__c ASC
-      LIMIT 200
-    ];
-    Set<Id> unavailable = bookedRoomIds(startAt, endAt);
+    Map<Id, Set<Integer>> taken = takenSeats(startAt, endAt, false);
     List<RoomDTO> result = new List<RoomDTO>();
-    for (Library_Scan_Transaction__c row : rooms) {
+    for (Library_Scan_Transaction__c row : publishedRooms()) {
       RoomDTO dto = toRoomDto(row);
       if (
         minimumCapacity != null &&
@@ -91,8 +127,32 @@ public without sharing class LibraryRoomBookingService {
         dto.capacity < minimumCapacity)
       )
         continue;
-      dto.available = !unavailable.contains(row.Id);
+      Integer used = taken.containsKey(row.Id) ? taken.get(row.Id).size() : 0;
+      dto.availableSeats = Math.max(
+        (dto.capacity == null ? 0 : dto.capacity) - used,
+        0
+      );
+      dto.available = dto.availableSeats > 0;
       result.add(dto);
+    }
+    return result;
+  }
+
+  public static List<SeatDTO> getSeats(
+    String sessionToken,
+    Id roomId,
+    Datetime startAt,
+    Datetime endAt
+  ) {
+    LibraryMemberSessionService.getCurrentMember(sessionToken);
+    Integer capacity = toRoomDto(roomRow(roomId, false)).capacity;
+    Set<Integer> taken = takenSeats(startAt, endAt, false).get(roomId);
+    List<SeatDTO> result = new List<SeatDTO>();
+    for (Integer n = 1; n <= (capacity == null ? 0 : capacity); n++) {
+      SeatDTO seat = new SeatDTO();
+      seat.seatNo = n;
+      seat.taken = taken != null && taken.contains(n);
+      result.add(seat);
     }
     return result;
   }
@@ -100,6 +160,7 @@ public without sharing class LibraryRoomBookingService {
   public static BookingDTO book(
     String sessionToken,
     Id roomId,
+    Integer seatNumber,
     Datetime startAt,
     Datetime endAt,
     String purpose
@@ -108,39 +169,59 @@ public without sharing class LibraryRoomBookingService {
       sessionToken
     );
     validateWindow(startAt, endAt);
-    Library_Scan_Transaction__c room = roomRow(roomId);
+    Library_Scan_Transaction__c room = roomRow(roomId, true);
+    Integer capacity = toRoomDto(room).capacity;
+    if (
+      seatNumber == null ||
+      seatNumber < 1 ||
+      capacity == null ||
+      seatNumber > capacity
+    )
+      throw new AuraHandledException('Choose a valid seat in this room.');
     String key =
       'ROOM_BOOK:' +
       String.valueOf(member.Id) +
       ':' +
       String.valueOf(roomId) +
       ':' +
+      String.valueOf(seatNumber) +
+      ':' +
       String.valueOf(startAt);
     List<Library_Scan_Transaction__c> existing = [
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Member__c = :member.Id
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
-    if (!existing.isEmpty())
+    if (!existing.isEmpty() && existing[0].Status__c == 'Booked')
       return toBookingDto(existing[0], roomName(room));
-    for (Library_Scan_Transaction__c row : bookingRows()) {
+    for (Library_Scan_Transaction__c row : bookingRows(true)) {
       Map<String, Object> payload = parse(row.Result_Message__c);
       if (
-        parseId(payload.get('r')) == roomId &&
-        overlaps(
+        !overlaps(
           startAt,
           endAt,
           parseDate(payload.get('s')),
           parseDate(payload.get('e'))
         )
       )
+        continue;
+      if (
+        parseId(payload.get('r')) == roomId &&
+        integerValue(payload.get('k')) == seatNumber
+      )
         throw new AuraHandledException(
-          'This room is already booked for that time.'
+          'That seat is already reserved for that time.'
+        );
+      if (row.Member__c == member.Id)
+        throw new AuraHandledException(
+          'You already have a seat reserved during that time.'
         );
     }
     Library_Scan_Transaction__c booking = new Library_Scan_Transaction__c(
-      Idempotency_Key__c = key,
+      Idempotency_Key__c = key +
+        (existing.isEmpty() ? '' : ':' + String.valueOf(Crypto.getRandomLong())),
       Operation__c = BOOKING_OPERATION,
       Member__c = member.Id,
       Status__c = 'Booked',
@@ -148,6 +229,7 @@ public without sharing class LibraryRoomBookingService {
       Result_Message__c = JSON.serialize(
           new Map<String, Object>{
             'r' => String.valueOf(roomId),
+            'k' => seatNumber,
             's' => String.valueOf(startAt),
             'e' => String.valueOf(endAt),
             'p' => String.isBlank(purpose) ? null : purpose.trim().left(100)
@@ -168,7 +250,11 @@ public without sharing class LibraryRoomBookingService {
     for (Library_Scan_Transaction__c row : [
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
-      WHERE Member__c = :member.Id AND Operation__c = :BOOKING_OPERATION
+      WHERE
+        Member__c = :member.Id
+        AND Operation__c = :BOOKING_OPERATION
+        AND Status__c = 'Booked'
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ]) {
@@ -190,66 +276,107 @@ public without sharing class LibraryRoomBookingService {
         Id = :bookingId
         AND Member__c = :member.Id
         AND Operation__c = :BOOKING_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (rows.isEmpty())
       throw new AuraHandledException('The booking could not be found.');
-    Database.delete(rows[0], AccessLevel.SYSTEM_MODE);
+    Library_Scan_Transaction__c booking = rows[0];
+    booking.Status__c = 'Canceled';
+    Database.update(booking, AccessLevel.SYSTEM_MODE);
   }
 
-  private static Library_Scan_Transaction__c roomRow(Id roomId) {
-    List<Library_Scan_Transaction__c> rows = [
+  private static List<Library_Scan_Transaction__c> publishedRooms() {
+    return [
       SELECT Id, Result_Message__c
       FROM Library_Scan_Transaction__c
-      WHERE
-        Id = :roomId
-        AND Operation__c = :ROOM_OPERATION
-        AND Status__c = 'Published'
-      LIMIT 1
-      FOR UPDATE
+      WHERE Operation__c = :ROOM_OPERATION AND Status__c = 'Published'
+      WITH SYSTEM_MODE
+      ORDER BY Created_At__c ASC
+      LIMIT 200
     ];
+  }
+
+  private static Library_Scan_Transaction__c roomRow(Id roomId, Boolean lock) {
+    List<Library_Scan_Transaction__c> rows = lock
+      ? [
+          SELECT Id, Status__c, Result_Message__c
+          FROM Library_Scan_Transaction__c
+          WHERE
+            Id = :roomId
+            AND Operation__c = :ROOM_OPERATION
+            AND Status__c = 'Published'
+          WITH SYSTEM_MODE
+          LIMIT 1
+          FOR UPDATE
+        ]
+      : [
+          SELECT Id, Status__c, Result_Message__c
+          FROM Library_Scan_Transaction__c
+          WHERE
+            Id = :roomId
+            AND Operation__c = :ROOM_OPERATION
+            AND Status__c = 'Published'
+          WITH SYSTEM_MODE
+          LIMIT 1
+        ];
     if (rows.isEmpty())
       throw new AuraHandledException('The room could not be found.');
     return rows[0];
   }
 
-  private static List<Library_Scan_Transaction__c> bookingRows() {
-    return [
-      SELECT Id, Result_Message__c
-      FROM Library_Scan_Transaction__c
-      WHERE Operation__c = :BOOKING_OPERATION AND Status__c = 'Booked'
-      LIMIT 2000
-      FOR UPDATE
-    ];
+  private static List<Library_Scan_Transaction__c> bookingRows(Boolean lock) {
+    return lock
+      ? [
+          SELECT Id, Member__c, Status__c, Result_Message__c
+          FROM Library_Scan_Transaction__c
+          WHERE Operation__c = :BOOKING_OPERATION AND Status__c = 'Booked'
+          WITH SYSTEM_MODE
+          LIMIT 2000
+          FOR UPDATE
+        ]
+      : [
+          SELECT Id, Member__c, Status__c, Result_Message__c
+          FROM Library_Scan_Transaction__c
+          WHERE Operation__c = :BOOKING_OPERATION AND Status__c = 'Booked'
+          WITH SYSTEM_MODE
+          LIMIT 2000
+        ];
   }
 
-  private static Set<Id> bookedRoomIds(Datetime startAt, Datetime endAt) {
-    Set<Id> result = new Set<Id>();
+  private static Map<Id, Set<Integer>> takenSeats(
+    Datetime startAt,
+    Datetime endAt,
+    Boolean lock
+  ) {
+    Map<Id, Set<Integer>> result = new Map<Id, Set<Integer>>();
     if (startAt == null || endAt == null)
       return result;
-    for (Library_Scan_Transaction__c row : bookingRows()) {
+    for (Library_Scan_Transaction__c row : bookingRows(lock)) {
       Map<String, Object> payload = parse(row.Result_Message__c);
+      Id roomId = parseId(payload.get('r'));
+      Integer seat = integerValue(payload.get('k'));
       if (
-        overlaps(
+        roomId == null ||
+        seat == null ||
+        !overlaps(
           startAt,
           endAt,
           parseDate(payload.get('s')),
           parseDate(payload.get('e'))
         )
       )
-        result.add(parseId(payload.get('r')));
+        continue;
+      if (!result.containsKey(roomId))
+        result.put(roomId, new Set<Integer>());
+      result.get(roomId).add(seat);
     }
     return result;
   }
 
   private static Map<Id, String> roomNames() {
     Map<Id, String> result = new Map<Id, String>();
-    for (Library_Scan_Transaction__c row : [
-      SELECT Id, Result_Message__c
-      FROM Library_Scan_Transaction__c
-      WHERE Operation__c = :ROOM_OPERATION AND Status__c = 'Published'
-      LIMIT 200
-    ])
+    for (Library_Scan_Transaction__c row : publishedRooms())
       result.put(row.Id, stringValue(parse(row.Result_Message__c).get('n')));
     return result;
   }
@@ -266,7 +393,7 @@ public without sharing class LibraryRoomBookingService {
       endAt > startAt.addHours(8)
     )
       throw new AuraHandledException(
-        'Choose a future room window of eight hours or less.'
+        'Choose a future window of eight hours or less.'
       );
   }
   private static Boolean overlaps(
@@ -289,6 +416,7 @@ public without sharing class LibraryRoomBookingService {
     dto.id = row.Id;
     dto.roomId = parseId(payload.get('r'));
     dto.roomName = roomNameValue;
+    dto.seatNumber = integerValue(payload.get('k'));
     dto.startAt = parseDate(payload.get('s'));
     dto.endAt = parseDate(payload.get('e'));
     dto.purpose = stringValue(payload.get('p'));

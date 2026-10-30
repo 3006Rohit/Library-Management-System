@@ -59,6 +59,7 @@ public without sharing class LibraryRiskInsightService {
       SELECT Id, Member__c
       FROM Fine__c
       WHERE Status__c = 'Waived' AND Generated_Date__c >= :windowStart
+      WITH SYSTEM_MODE
       LIMIT 5000
     ]) {
       if (fine.Member__c == null)
@@ -89,6 +90,7 @@ public without sharing class LibraryRiskInsightService {
       WHERE
         Replacement_Required__c = TRUE
         AND Defect_Reported_Date__c >= :windowStart
+      WITH SYSTEM_MODE
       LIMIT 5000
     ]) {
       if (loan.Member__c == null)
@@ -121,7 +123,7 @@ public without sharing class LibraryRiskInsightService {
     Map<Id, Member__c> members = memberIds.isEmpty()
       ? new Map<Id, Member__c>()
       : new Map<Id, Member__c>(
-          [SELECT Id, Name FROM Member__c WHERE Id IN :memberIds]
+          [SELECT Id, Name FROM Member__c WHERE Id IN :memberIds WITH SYSTEM_MODE]
         );
     RunDTO result = new RunDTO();
     result.created = 0;
@@ -132,6 +134,7 @@ public without sharing class LibraryRiskInsightService {
         SELECT Id
         FROM Library_Scan_Transaction__c
         WHERE Idempotency_Key__c = :key AND Operation__c = :OPERATION
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       if (!existing.isEmpty()) {
@@ -183,13 +186,14 @@ public without sharing class LibraryRiskInsightService {
   public static List<AlertDTO> getAll(String status) {
     LibraryPolicyService.require('Manage_Library_Registrations');
     Map<Id, Member__c> members = new Map<Id, Member__c>(
-      [SELECT Id, Name FROM Member__c LIMIT 5000]
+      [SELECT Id, Name FROM Member__c WITH SYSTEM_MODE LIMIT 5000]
     );
     List<AlertDTO> result = new List<AlertDTO>();
     for (Library_Scan_Transaction__c row : [
       SELECT Id, Member__c, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 1000
     ]) {
@@ -216,6 +220,7 @@ public without sharing class LibraryRiskInsightService {
       SELECT Id, Member__c, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :alertId AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];

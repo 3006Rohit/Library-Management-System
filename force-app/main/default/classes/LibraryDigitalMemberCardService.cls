@@ -54,6 +54,7 @@ public without sharing class LibraryDigitalMemberCardService {
           rawToken.trim()
         )
         AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -75,6 +76,7 @@ public without sharing class LibraryDigitalMemberCardService {
         Status__c
       FROM Member__c
       WHERE Id = :rows[0].Member__c
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (members.isEmpty() || members[0].Status__c != 'Active')

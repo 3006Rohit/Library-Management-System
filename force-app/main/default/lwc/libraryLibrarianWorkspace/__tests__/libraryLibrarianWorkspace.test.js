@@ -6,7 +6,6 @@ import getNotificationDeliverySummary from "@salesforce/apex/LibraryLibrarianCon
 import retryFailedNotificationDeliveries from "@salesforce/apex/LibraryLibrarianController.retryFailedNotificationDeliveries";
 import getDataCloudReadiness from "@salesforce/apex/LibraryLibrarianController.getDataCloudReadiness";
 import getLedgerMigrationReadiness from "@salesforce/apex/LibraryLibrarianController.getLedgerMigrationReadiness";
-import getLedgerMigrationReview from "@salesforce/apex/LibraryLibrarianController.getLedgerMigrationReview";
 import recordLedgerMigrationReview from "@salesforce/apex/LibraryLibrarianController.recordLedgerMigrationReview";
 import searchBooks from "@salesforce/apex/LibraryLibrarianController.searchBooks";
 import searchCopies from "@salesforce/apex/LibraryLibrarianController.searchCopies";
@@ -218,7 +217,7 @@ describe("libraryLibrarianWorkspace", () => {
     document.body.appendChild(element);
     await flushPromises();
 
-    expect(element.shadowRoot.querySelectorAll(".nav-item")).toHaveLength(14);
+    expect(element.shadowRoot.querySelectorAll(".nav-item")).toHaveLength(15);
     expect(element.shadowRoot.querySelectorAll(".metric-card")).toHaveLength(0);
     expect(
       element.shadowRoot.querySelector(".page-heading h1").textContent

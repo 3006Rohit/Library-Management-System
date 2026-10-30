@@ -80,6 +80,7 @@ public without sharing class LibraryNotificationPreferenceService {
         Timezone__c
       FROM Notification_Preference__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
       ORDER BY Notification_Type__c ASC, Channel__c ASC
     ]) {
       results.add(toDto(row));
@@ -113,6 +114,7 @@ public without sharing class LibraryNotificationPreferenceService {
         Preference_Key__c
       FROM Notification_Preference__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
     ]) {
       String rowKey = String.isBlank(row.Preference_Key__c)
         ? key(memberId, row.Channel__c, row.Notification_Type__c)
@@ -163,6 +165,7 @@ public without sharing class LibraryNotificationPreferenceService {
         Member__c = :memberId
         AND Channel__c = :channel
         AND Notification_Type__c = :notificationType
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     return rows.isEmpty() || rows[0].Enabled__c;
@@ -187,6 +190,7 @@ public without sharing class LibraryNotificationPreferenceService {
         Member__c IN :memberIds
         AND Channel__c = 'Email'
         AND Notification_Type__c IN :notificationTypes
+      WITH SYSTEM_MODE
     ]) {
       decisions.put(
         key(row.Member__c, 'Email', row.Notification_Type__c),
@@ -202,6 +206,7 @@ public without sharing class LibraryNotificationPreferenceService {
       SELECT Channel__c, Notification_Type__c, Preference_Key__c
       FROM Notification_Preference__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
     ]) {
       existingKeys.add(
         String.isBlank(row.Preference_Key__c)

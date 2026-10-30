@@ -49,6 +49,7 @@ public without sharing class LibraryOperationAuditService {
       SELECT Id
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!existing.isEmpty())
@@ -99,6 +100,7 @@ public without sharing class LibraryOperationAuditService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 500
     ]) {

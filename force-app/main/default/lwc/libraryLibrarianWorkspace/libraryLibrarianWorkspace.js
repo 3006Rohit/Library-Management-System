@@ -61,7 +61,6 @@ const NAV = [
   ["Dashboard", "utility:home"],
   ["Librarian Assistant", "utility:einstein"],
   ["Acquisitions", "utility:light_bulb"],
-  ["Room Bookings", "utility:event"],
   ["Books", "utility:knowledge_base"],
   ["Book Copies", "utility:copy"],
   ["Members", "utility:groups"],
@@ -71,6 +70,7 @@ const NAV = [
   ["Fines", "utility:money"],
   ["Memberships", "utility:contract"],
   ["Payments", "utility:payment_gateway"],
+  ["Rooms", "utility:company"],
   ["Reports", "utility:chart"],
   ["Settings", "utility:settings"]
 ];
@@ -83,10 +83,6 @@ const PAGE_COPY = {
   Acquisitions: [
     "Acquisition Intelligence",
     "Turn collection demand into explainable purchasing decisions"
-  ],
-  "Room Bookings": [
-    "Room Bookings",
-    "Manage library room reservations and availability"
   ],
   Books: ["Books", "Manage library books, authors and categories"],
   "Book Copies": [
@@ -109,6 +105,7 @@ const PAGE_COPY = {
     "Manage membership plans and subscriptions"
   ],
   Payments: ["Payments", "View and manage membership and fine payments"],
+  Rooms: ["Rooms", "Add study rooms and seats, and review seat reservations"],
   Reports: ["Reports", "Review operational performance and trends"],
   Settings: ["Settings", "Review configured library policies and rules"]
 };
@@ -552,9 +549,6 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   get isAcquisitions() {
     return this.section === "Acquisitions";
   }
-  get isRoomBookings() {
-    return this.section === "Room Bookings";
-  }
   get assistantQuestions() {
     return [
       "Show overdue loans",
@@ -612,6 +606,9 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   }
   get isPayments() {
     return this.section === "Payments";
+  }
+  get isRooms() {
+    return this.section === "Rooms";
   }
   get isReports() {
     return this.section === "Reports";
@@ -1146,6 +1143,7 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
       Fines: () => this.loadFines(),
       Memberships: () => Promise.all([this.loadPlans(), this.loadMembers()]),
       Payments: () => this.loadPayments(),
+      Rooms: () => undefined,
       Reports: () => this.loadDashboard(),
       Settings: () => Promise.all([this.loadPlans(), this.loadSettings()])
     };

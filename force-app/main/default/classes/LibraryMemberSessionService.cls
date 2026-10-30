@@ -18,6 +18,9 @@ public without sharing class LibraryMemberSessionService {
         Member__r.Membership_Plan__c,
         Member__r.Membership_Plan__r.Name,
         Member__r.Membership_Plan__r.Reservation_Limit__c,
+        Member__r.Membership_Plan__r.Borrow_Limit__c,
+        Member__r.Membership_Plan__r.Loan_Duration_Days__c,
+        Member__r.Membership_Plan__r.Renewal_Limit__c,
         Member__r.Registration_Status__c,
         Member__r.Phone__c,
         Member__r.Address__c,
@@ -33,8 +36,7 @@ public without sharing class LibraryMemberSessionService {
         Expires_At__c,
         Revoked__c
       FROM Member_Session__c
-      WHERE Token_Hash__c = :digest
-      LIMIT 1
+      WHERE Token_Hash__c = :digest WITH SYSTEM_MODE LIMIT 1
     ];
     if (
       sessions.isEmpty() ||
@@ -59,7 +61,7 @@ public without sharing class LibraryMemberSessionService {
   public static Member__c browserMember(Member__c source) {
     if (source == null)
       return null;
-    Member__c safe = source.clone(true, true, false, false);
+    Member__c safe = source.clone(true, true, false, true);
     safe.Password_Hash__c = null;
     safe.Password_Salt__c = null;
     safe.Activation_Token_Hash__c = null;
@@ -102,6 +104,7 @@ public without sharing class LibraryMemberSessionService {
       SELECT Id, Revoked__c
       FROM Member_Session__c
       WHERE Token_Hash__c = :LibraryMemberPasswordService.tokenHash(rawToken)
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!rows.isEmpty()) {
@@ -113,8 +116,7 @@ public without sharing class LibraryMemberSessionService {
     List<Member_Session__c> rows = [
       SELECT Id, Revoked__c
       FROM Member_Session__c
-      WHERE Member__c = :memberId AND Revoked__c = FALSE
-    ];
+      WHERE Member__c = :memberId AND Revoked__c = FALSE WITH SYSTEM_MODE ];
     for (Member_Session__c row : rows)
       row.Revoked__c = true;
     if (!rows.isEmpty())

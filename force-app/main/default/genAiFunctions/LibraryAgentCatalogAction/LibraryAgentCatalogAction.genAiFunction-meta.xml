@@ -8,6 +8,5 @@
     <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
     <localDeveloperName>LibraryAgentCatalogAction</localDeveloperName>
     <masterLabel>Search Library Catalog</masterLabel>
-    <language>en_US</language>
     <progressIndicatorMessage>Searching the library catalog</progressIndicatorMessage>
 </GenAiFunction>

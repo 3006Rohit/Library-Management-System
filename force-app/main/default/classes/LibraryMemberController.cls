@@ -132,16 +132,14 @@ public with sharing class LibraryMemberController {
       d.activeLoans = [
         SELECT COUNT()
         FROM Borrow_Record__c
-        WHERE Member__c = :m.Id AND Return_Date__c = NULL
-      ];
+        WHERE Member__c = :m.Id AND Return_Date__c = NULL WITH SYSTEM_MODE ];
       d.overdueLoans = [
         SELECT COUNT()
         FROM Borrow_Record__c
         WHERE
           Member__c = :m.Id
           AND Return_Date__c = NULL
-          AND Due_Date__c < :System.now()
-      ];
+          AND Due_Date__c < :System.now() WITH SYSTEM_MODE ];
       d.dueSoon = [
         SELECT COUNT()
         FROM Borrow_Record__c
@@ -149,18 +147,15 @@ public with sharing class LibraryMemberController {
           Member__c = :m.Id
           AND Return_Date__c = NULL
           AND Due_Date__c >= :System.now()
-          AND Due_Date__c <= :soon
-      ];
+          AND Due_Date__c <= :soon WITH SYSTEM_MODE ];
       d.activeReservations = [
         SELECT COUNT()
         FROM Reservation__c
-        WHERE Member__c = :m.Id AND Status__c IN ('Pending', 'Ready')
-      ];
+        WHERE Member__c = :m.Id AND Status__c IN ('Pending', 'Ready') WITH SYSTEM_MODE ];
       List<AggregateResult> fines = [
         SELECT SUM(Balance__c) total
         FROM Fine__c
-        WHERE Member__c = :m.Id AND Status__c IN ('Unpaid', 'Partially Paid')
-      ];
+        WHERE Member__c = :m.Id AND Status__c IN ('Unpaid', 'Partially Paid') WITH SYSTEM_MODE ];
       d.outstandingFine = fines.isEmpty() || fines[0].get('total') == null
         ? 0
         : (Decimal) fines[0].get('total');
@@ -179,8 +174,7 @@ public with sharing class LibraryMemberController {
             Status__c,
             Renewal_Count__c
           FROM Borrow_Record__c
-          WHERE Member__c = :m.Id
-          ORDER BY Borrow_Date__c DESC
+          WHERE Member__c = :m.Id WITH SYSTEM_MODE ORDER BY Borrow_Date__c DESC
           LIMIT 5
         ]
       );
@@ -202,8 +196,7 @@ public with sharing class LibraryMemberController {
             ETA_Last_Calculated__c,
             ETA_Reason__c
           FROM Reservation__c
-          WHERE Member__c = :m.Id
-          ORDER BY Reservation_Date__c DESC
+          WHERE Member__c = :m.Id WITH SYSTEM_MODE ORDER BY Reservation_Date__c DESC
           LIMIT 5
         ]
       );
@@ -243,6 +236,7 @@ public with sharing class LibraryMemberController {
         SELECT Book__c
         FROM Book_Author__c
         WHERE Author__r.Name LIKE :term
+        WITH SYSTEM_MODE
         LIMIT 1000
       ])
         authorBookIds.add(link.Book__c);
@@ -261,7 +255,7 @@ public with sharing class LibraryMemberController {
     if (!c.isEmpty())
       q += ' WHERE ' + String.join(c, ' AND ');
     q += ' ORDER BY Name LIMIT :size OFFSET :off';
-    return readableBooks((List<Book__c>) Database.query(q));
+    return readableBooks((List<Book__c>) Database.query(q, AccessLevel.SYSTEM_MODE));
   }
   @AuraEnabled(cacheable=true)
   public static List<Book_Category__c> getCatalogCategories() {
@@ -271,6 +265,7 @@ public with sharing class LibraryMemberController {
         SELECT Id, Name, Description__c
         FROM Book_Category__c
         WHERE Active__c = TRUE
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 100
       ]
@@ -299,6 +294,7 @@ public with sharing class LibraryMemberController {
         (SELECT Book_Category__r.Name FROM Book_Category_Links__r)
       FROM Book__c
       WHERE Id = :bookId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (books.isEmpty())
@@ -319,8 +315,7 @@ public with sharing class LibraryMemberController {
         Member__c = :member.Id
         AND Book__c = :bookId
         AND Status__c = 'Ready'
-        AND Book_Copy__c != NULL
-      ORDER BY Ready_Date__c
+        AND Book_Copy__c != NULL WITH SYSTEM_MODE ORDER BY Ready_Date__c
       LIMIT 1
     ];
     Id reservedCopyId = readyReservations.isEmpty()
@@ -331,16 +326,14 @@ public with sharing class LibraryMemberController {
       availableCopies = [
         SELECT Id
         FROM Book_Copy__c
-        WHERE Id = :reservedCopyId AND Status__c IN ('Available', 'Reserved')
-        LIMIT 1
+        WHERE Id = :reservedCopyId AND Status__c IN ('Available', 'Reserved') WITH SYSTEM_MODE LIMIT 1
         FOR UPDATE
       ];
     else
       availableCopies = [
         SELECT Id
         FROM Book_Copy__c
-        WHERE Book__c = :bookId AND Status__c = 'Available'
-        LIMIT 1
+        WHERE Book__c = :bookId AND Status__c = 'Available' WITH SYSTEM_MODE LIMIT 1
         FOR UPDATE
       ];
     if (availableCopies.isEmpty())
@@ -367,8 +360,7 @@ public with sharing class LibraryMemberController {
           Status__c,
           Renewal_Count__c
         FROM Borrow_Record__c
-        WHERE Member__c = :m.Id
-        ORDER BY Borrow_Date__c DESC
+        WHERE Member__c = :m.Id WITH SYSTEM_MODE ORDER BY Borrow_Date__c DESC
         LIMIT 200
       ]
     );
@@ -399,8 +391,7 @@ public with sharing class LibraryMemberController {
           ETA_Last_Calculated__c,
           ETA_Reason__c
         FROM Reservation__c
-        WHERE Member__c = :m.Id
-        ORDER BY Reservation_Date__c DESC
+        WHERE Member__c = :m.Id WITH SYSTEM_MODE ORDER BY Reservation_Date__c DESC
         LIMIT 200
       ]
     );
@@ -438,8 +429,7 @@ public with sharing class LibraryMemberController {
           Generated_Date__c,
           Paid_Date__c
         FROM Fine__c
-        WHERE Member__c = :m.Id
-        ORDER BY Generated_Date__c DESC
+        WHERE Member__c = :m.Id WITH SYSTEM_MODE ORDER BY Generated_Date__c DESC
         LIMIT 200
       ]
     );
@@ -460,8 +450,7 @@ public with sharing class LibraryMemberController {
           Payment_Date__c,
           Transaction_Reference__c
         FROM Membership_Payment__c
-        WHERE Member__c = :m.Id
-        ORDER BY Payment_Date__c DESC
+        WHERE Member__c = :m.Id WITH SYSTEM_MODE ORDER BY Payment_Date__c DESC
         LIMIT 100
       ]
     );
@@ -483,8 +472,7 @@ public with sharing class LibraryMemberController {
             CreatedDate,
             Read_At__c
           FROM Member_Notification__c
-          WHERE Member__c = :m.Id
-          ORDER BY CreatedDate DESC
+          WHERE Member__c = :m.Id WITH SYSTEM_MODE ORDER BY CreatedDate DESC
           LIMIT 100
         ]
       )

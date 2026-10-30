@@ -1,10 +1,206 @@
 {
-  "unevaluatedProperties": false,
-  "properties": {
-    "activeLoans": { "title": "Active Loans", "description": "Active governed loans.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
-    "totalFineCount": { "title": "Total Fine Count", "description": "Total governed fines.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
-    "totalLoans": { "title": "Total Loans", "description": "Total governed loans.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true },
-    "totalReservations": { "title": "Total Reservations", "description": "Total governed reservations.", "lightning:type": "lightning__numberType", "lightning:isPII": false, "copilotAction:isDisplayable": false, "copilotAction:isUsedByPlanner": true }
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "available" : {
+      "title" : "Available",
+      "description" : "Whether analytics data is available.",
+      "lightning:type" : "lightning__booleanType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "message" : {
+      "title" : "Message",
+      "description" : "Status message when analytics are unavailable.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "lastUpdated" : {
+      "title" : "Last Updated",
+      "description" : "When the figures were computed.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "totalCopies" : {
+      "title" : "Total Copies",
+      "description" : "Total physical copies.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "availableCopies" : {
+      "title" : "Available Copies",
+      "description" : "Copies currently available.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "borrowedCopies" : {
+      "title" : "Borrowed Copies",
+      "description" : "Copies currently borrowed.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "reservedCopies" : {
+      "title" : "Reserved Copies",
+      "description" : "Copies currently reserved.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "lostCopies" : {
+      "title" : "Lost Copies",
+      "description" : "Copies marked lost.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "totalLoans" : {
+      "title" : "Total Loans",
+      "description" : "Total loans.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "activeLoans" : {
+      "title" : "Active Loans",
+      "description" : "Active loans, including overdue.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "returnedLoans" : {
+      "title" : "Returned Loans",
+      "description" : "Returned loans.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "overdueLoans" : {
+      "title" : "Overdue Loans",
+      "description" : "Overdue loans.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "totalReservations" : {
+      "title" : "Total Reservations",
+      "description" : "Total reservations.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "fulfilledReservations" : {
+      "title" : "Fulfilled Reservations",
+      "description" : "Fulfilled reservations.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "cancelledReservations" : {
+      "title" : "Cancelled Reservations",
+      "description" : "Cancelled reservations.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "pendingReservations" : {
+      "title" : "Pending Reservations",
+      "description" : "Pending reservations.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "readyReservations" : {
+      "title" : "Ready Reservations",
+      "description" : "Reservations ready for pickup.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "expiredReservations" : {
+      "title" : "Expired Reservations",
+      "description" : "Expired reservations.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "totalFineCount" : {
+      "title" : "Total Fine Count",
+      "description" : "Total fines.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "paidFineCount" : {
+      "title" : "Paid Fine Count",
+      "description" : "Paid fines.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "unpaidFineCount" : {
+      "title" : "Unpaid Fine Count",
+      "description" : "Unpaid or partially paid fines.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "topBorrowedBooksJson" : {
+      "title" : "Top Borrowed Books JSON",
+      "description" : "JSON list of the most borrowed books.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "reservationDemandJson" : {
+      "title" : "Reservation Demand JSON",
+      "description" : "JSON list of books with the most reservations.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "dataCloudTrendsJson" : {
+      "title" : "Data Cloud Trends JSON",
+      "description" : "JSON of Data Cloud trend snapshots; may lag live counts and may be empty.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "dataCloudRefreshNote" : {
+      "title" : "Data Cloud Refresh Note",
+      "description" : "Refresh time and reliability note for the Data Cloud snapshot.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    }
   },
-  "lightning:type": "lightning__objectType"
+  "lightning:type" : "lightning__objectType"
 }

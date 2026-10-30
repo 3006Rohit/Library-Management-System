@@ -22,6 +22,7 @@ public without sharing class LibraryRegistrationUserQueueable implements Queueab
         SELECT Id, Email__c
         FROM Library_Registration__c
         WHERE Id = :registrationId
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       if (registrations.isEmpty())
@@ -30,6 +31,7 @@ public without sharing class LibraryRegistrationUserQueueable implements Queueab
         SELECT Id, FirstName, LastName, Email
         FROM Contact
         WHERE Id = :contactId
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       if (contacts.isEmpty())
@@ -39,6 +41,7 @@ public without sharing class LibraryRegistrationUserQueueable implements Queueab
         SELECT Id, User__c
         FROM Member__c
         WHERE Id = :memberId
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       if (members.isEmpty())
@@ -49,7 +52,7 @@ public without sharing class LibraryRegistrationUserQueueable implements Queueab
       if (newlyCreated)
         u = findOrCreateUser(c);
       else {
-        List<User> users = [SELECT Id FROM User WHERE Id = :m.User__c LIMIT 1];
+        List<User> users = [SELECT Id FROM User WHERE Id = :m.User__c WITH SYSTEM_MODE LIMIT 1];
         if (users.isEmpty())
           throw new AuraHandledException(
             'The previously created external user could not be found.'
@@ -60,6 +63,7 @@ public without sharing class LibraryRegistrationUserQueueable implements Queueab
         SELECT Id
         FROM PermissionSet
         WHERE Name = :LibraryRegistrationService.permissionSetName()
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       if (permissionSets.isEmpty())
@@ -72,6 +76,7 @@ public without sharing class LibraryRegistrationUserQueueable implements Queueab
           SELECT COUNT()
           FROM PermissionSetAssignment
           WHERE AssigneeId = :u.Id AND PermissionSetId = :ps.Id
+          WITH SYSTEM_MODE
         ] == 0
       )
         insert new PermissionSetAssignment(
@@ -91,13 +96,14 @@ public without sharing class LibraryRegistrationUserQueueable implements Queueab
     }
   }
   private static User findOrCreateUser(Contact c) {
-    List<User> existing = [SELECT Id FROM User WHERE ContactId = :c.Id LIMIT 1];
+    List<User> existing = [SELECT Id FROM User WHERE ContactId = :c.Id WITH SYSTEM_MODE LIMIT 1];
     if (!existing.isEmpty())
       return existing[0];
     List<Profile> profiles = [
       SELECT Id
       FROM Profile
       WHERE Name = :LibraryRegistrationService.profileName()
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (profiles.isEmpty())
@@ -119,7 +125,7 @@ public without sharing class LibraryRegistrationUserQueueable implements Queueab
       tag +
       '@' +
       domainPart;
-    if ([SELECT COUNT() FROM User WHERE Username = :username] > 0) {
+    if ([SELECT COUNT() FROM User WHERE Username = :username WITH SYSTEM_MODE] > 0) {
       String randomTag =
         '.' + String.valueOf(Crypto.getRandomInteger()).replace('-', '');
       Integer randomLocalLength =

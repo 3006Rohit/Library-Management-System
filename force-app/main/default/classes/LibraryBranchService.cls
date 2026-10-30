@@ -78,6 +78,7 @@ public without sharing class LibraryBranchService {
       SELECT Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :INVENTORY_OPERATION AND Status__c = 'Assigned'
+      WITH SYSTEM_MODE
       LIMIT 2000
     ]) {
       Id branchId = parseId(parse(row.Result_Message__c).get('b'));
@@ -92,6 +93,7 @@ public without sharing class LibraryBranchService {
       SELECT Id, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :BRANCH_OPERATION AND Status__c = 'Active'
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c ASC
       LIMIT 200
     ]) {
@@ -117,6 +119,7 @@ public without sharing class LibraryBranchService {
       SELECT Id
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Operation__c = :INVENTORY_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     Library_Scan_Transaction__c row = rows.isEmpty()
@@ -152,6 +155,7 @@ public without sharing class LibraryBranchService {
       WHERE
         Operation__c = :TRANSFER_OPERATION
         AND Status__c IN ('Requested', 'In Transit')
+      WITH SYSTEM_MODE
       LIMIT 2000
     ])
       if (parseId(parse(row.Result_Message__c).get('c')) == copyId)
@@ -199,6 +203,7 @@ public without sharing class LibraryBranchService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :TRANSFER_OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ])
@@ -221,6 +226,7 @@ public without sharing class LibraryBranchService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :id AND Operation__c = :TRANSFER_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -235,6 +241,7 @@ public without sharing class LibraryBranchService {
       WHERE
         Idempotency_Key__c = :('BRANCH_INV:' + String.valueOf(copyId))
         AND Operation__c = :INVENTORY_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -245,7 +252,7 @@ public without sharing class LibraryBranchService {
   private static void verifyCopy(Id copyId) {
     if (
       copyId == null ||
-      [SELECT COUNT() FROM Book_Copy__c WHERE Id = :copyId] == 0
+      [SELECT COUNT() FROM Book_Copy__c WHERE Id = :copyId WITH SYSTEM_MODE] == 0
     )
       throw new AuraHandledException('The copy could not be found.');
   }
@@ -259,6 +266,7 @@ public without sharing class LibraryBranchService {
           Id = :branchId
           AND Operation__c = :BRANCH_OPERATION
           AND Status__c = 'Active'
+        WITH SYSTEM_MODE
       ] == 0
     )
       throw new AuraHandledException('The branch could not be found.');

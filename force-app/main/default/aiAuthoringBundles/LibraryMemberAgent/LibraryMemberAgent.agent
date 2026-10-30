@@ -25,9 +25,9 @@ variables:
         description: "This variable may also be referred to as MessagingSession EndUserLanguage"
     VerifiedCustomerId: mutable string
           description: "This variable may also be referred to as VerifiedCustomerId"
-    SessionToken: linked string
-        source: @MessagingSession.SessionKey
-        description: "Server-validated member session token supplied by the portal. Passed only to member actions. Never show or repeat it."
+    SessionToken: mutable string
+        description: "Server-validated member session token supplied by the portal through the Agent API. Passed only to member actions. Never show or repeat it."
+        visibility: "External"
 
 language:
     default_locale: "en_US"
@@ -246,7 +246,7 @@ subagent my_loans:
 
     reasoning:
         instructions: ->
-            | Use {!@actions.get_my_loans} immediately to retrieve the member's loans. Present only loans the action returns, with title, due date, and status, and mention approaching due dates or overdue items. If the action returns no loans, tell the member they have no current loans. Never invent a book or date.
+            | Use {!@actions.get_my_loans} immediately to retrieve the member's loans. The action returns the member's full loan history, including returned loans. A "current" loan is any loan whose status is not Returned and whose returnDate is empty. This includes Pending, Active, Renewed, and Overdue loans; never exclude a loan because its status is not Active. Present current loans with title, due date, and status, and call out overdue items and approaching due dates. If the member asks about past or returned loans, include those instead. Only say the member has no current loans when the action succeeded and every returned loan is Returned, or the list is empty. If the action fails, errors, or returns no data at all, say you could not load the loans right now and ask the member to try again; do not claim they have no loans. Never invent a book or date, and never show the session token.
         actions:
             get_my_loans: @actions.get_my_loans
                 with sessionToken=@variables.SessionToken

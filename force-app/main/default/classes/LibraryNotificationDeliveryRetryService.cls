@@ -32,6 +32,7 @@ public without sharing class LibraryNotificationDeliveryRetryService {
         Member_Notification__r.Member__r.Email__c
       FROM Notification_Delivery__c
       WHERE Channel__c = 'Email' AND Status__c = 'Failed'
+      WITH SYSTEM_MODE
       LIMIT 100
       FOR UPDATE
     ];

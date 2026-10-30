@@ -47,6 +47,7 @@ public with sharing class LibraryRegistrationService {
       SELECT Id
       FROM Membership_Plan__c
       WHERE Id = :input.requestedPlanId AND Active__c = TRUE
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (plans.isEmpty())
@@ -61,6 +62,7 @@ public with sharing class LibraryRegistrationService {
       WHERE
         Status__c = 'Pending'
         AND Registration_Email_Key__c = :normalizedEmail
+      WITH SYSTEM_MODE
     ];
     for (Library_Registration__c existing : pending) {
       if (existing.Registration_Email_Key__c == email)
@@ -74,6 +76,7 @@ public with sharing class LibraryRegistrationService {
         WHERE
           Registration_Email_Key__c = :normalizedEmail
           AND CreatedDate >= :rateWindow
+        WITH SYSTEM_MODE
       ] >= 3
     )
       throw new AuraHandledException(
@@ -84,6 +87,7 @@ public with sharing class LibraryRegistrationService {
         SELECT Id, Email__c
         FROM Member__c
         WHERE Status__c = 'Active' AND Normalized_Email__c = :normalizedEmail
+        WITH SYSTEM_MODE
       ];
       for (Member__c member : activeMembers) {
         if (normalizeEmail(member.Email__c) == email) {
@@ -167,6 +171,7 @@ public with sharing class LibraryRegistrationService {
       SELECT Id, Status__c, Provisioning_State__c, Email__c, First_Name__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (rows.isEmpty())
@@ -199,6 +204,7 @@ public with sharing class LibraryRegistrationService {
         First_Name__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (rows.isEmpty())
@@ -237,6 +243,7 @@ public with sharing class LibraryRegistrationService {
       SELECT Id, Status__c, Provisioning_State__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (rows.isEmpty())

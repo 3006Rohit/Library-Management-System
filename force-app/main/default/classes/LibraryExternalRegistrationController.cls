@@ -14,6 +14,7 @@ public without sharing class LibraryExternalRegistrationController {
         Requested_Plan__r.Borrow_Limit__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (rows.isEmpty())
@@ -72,6 +73,7 @@ public without sharing class LibraryExternalRegistrationController {
         First_Name__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (rows.isEmpty())
@@ -143,6 +145,7 @@ public without sharing class LibraryExternalRegistrationController {
         External_Auth_Id__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
   }

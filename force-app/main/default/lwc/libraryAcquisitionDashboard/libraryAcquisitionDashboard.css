@@ -6,15 +6,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
-  margin-bottom: 22px;
-}
-.eyebrow {
-  margin: 0 0 4px;
-  color: #6875f5;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
+  margin-bottom: 18px;
 }
 h2 {
   margin: 0;
@@ -22,82 +14,105 @@ h2 {
   font-size: 24px;
 }
 .subheading {
-  margin: 7px 0 0;
+  margin: 6px 0 0;
   color: #687089;
+  font-size: 14px;
 }
-.refresh-button,
-.actions button {
+button {
   border: 1px solid #d7dced;
   border-radius: 8px;
   background: #fff;
   color: #34405c;
   cursor: pointer;
-  padding: 9px 13px;
+  padding: 8px 14px;
   font-weight: 600;
 }
-.refresh-button:disabled {
+button:disabled {
   opacity: 0.55;
   cursor: wait;
 }
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.tab {
+  border-radius: 999px;
+}
+.tab.active {
+  background: #5362d9;
+  border-color: #5362d9;
+  color: #fff;
+}
 .recommendation-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 16px;
 }
 .recommendation-card {
   border: 1px solid #e4e7f1;
-  border-radius: 14px;
+  border-radius: 12px;
   background: #fff;
   padding: 18px;
-  box-shadow: 0 5px 18px rgba(29, 44, 84, 0.06);
-}
-.card-topline,
-.signal-row,
-.metrics,
-.actions {
-  display: flex;
-  align-items: center;
+  display: grid;
   gap: 10px;
+  align-content: start;
 }
 .card-topline {
+  display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 .action-label {
-  color: #6875f5;
+  color: #5362d9;
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 h3 {
-  margin: 14px 0 9px;
-  color: #1d2741;
-  font-size: 20px;
-}
-.score {
+  margin: 0;
   color: #1d2741;
   font-size: 19px;
-  font-weight: 800;
 }
-.confidence {
+.headline {
+  margin: 0;
+  color: #25304b;
+  font-weight: 600;
+}
+.score-row {
+  display: grid;
+  gap: 6px;
+}
+.score-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #edf0f6;
+  overflow: hidden;
+}
+.score-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #5362d9;
+}
+.priority {
   font-size: 12px;
   font-weight: 700;
 }
-.confidence-high {
-  color: #0d8c65;
+.priority-high {
+  color: #ae5149;
 }
-.confidence-medium {
+.priority-medium {
   color: #b16a00;
 }
-.confidence-low {
-  color: #a34f47;
+.priority-low {
+  color: #0d8c65;
 }
 .status-pill {
   border-radius: 999px;
-  padding: 4px 8px;
+  padding: 3px 9px;
   font-size: 11px;
   font-weight: 700;
-  text-transform: capitalize;
 }
 .status-open {
   background: #eef0ff;
@@ -115,36 +130,27 @@ h3 {
   background: #fceceb;
   color: #ae5149;
 }
-.evidence {
-  min-height: 58px;
+.evidence,
+.note {
+  margin: 0;
   color: #5e6780;
+  font-size: 13px;
   line-height: 1.5;
 }
-.metrics {
-  flex-wrap: wrap;
-  padding: 11px 0;
-  border-top: 1px solid #edf0f6;
-  border-bottom: 1px solid #edf0f6;
-  color: #737b90;
-  font-size: 12px;
-}
-.metrics strong {
-  color: #25304b;
-}
-.window {
-  color: #8990a2;
-  font-size: 11px;
+.note {
+  font-style: italic;
 }
 .actions {
+  display: flex;
   justify-content: flex-end;
-  margin-top: 12px;
+  gap: 8px;
 }
-.actions button:first-child {
+.actions .primary {
   background: #5362d9;
   border-color: #5362d9;
   color: #fff;
 }
-.actions button:last-child {
+.actions .danger {
   color: #ae5149;
 }
 .empty,

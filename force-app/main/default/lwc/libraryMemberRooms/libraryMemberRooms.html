@@ -1,16 +1,17 @@
 <template>
-  <section class="rooms-page" aria-label="Room bookings">
+  <section class="rooms-page" aria-label="Study room seats">
     <div class="rooms-header">
       <div>
         <p class="eyebrow">Quiet spaces</p>
-        <h2>Book a room</h2>
-        <p>Find a room for study groups, workshops, or community meetings.</p>
+        <h2>Reserve a seat</h2>
+        <p>Pick a time, choose a room, then reserve a seat.</p>
       </div>
     </div>
     <div class="search-card">
       <div class="search-field">
-        <label>Starts</label>
+        <label for="startAt">Starts</label>
         <input
+          id="startAt"
           type="datetime-local"
           name="startAt"
           value={startAt}
@@ -18,8 +19,9 @@
         />
       </div>
       <div class="search-field">
-        <label>Ends</label>
+        <label for="endAt">Ends</label>
         <input
+          id="endAt"
           type="datetime-local"
           name="endAt"
           value={endAt}
@@ -27,8 +29,9 @@
         />
       </div>
       <div class="search-field">
-        <label>Minimum capacity</label>
+        <label for="minimumCapacity">Minimum seats</label>
         <input
+          id="minimumCapacity"
           type="number"
           name="minimumCapacity"
           min="1"
@@ -37,8 +40,9 @@
         />
       </div>
       <div class="search-field">
-        <label>Purpose</label>
+        <label for="purpose">Purpose</label>
         <input
+          id="purpose"
           type="text"
           name="purpose"
           value={purpose}
@@ -59,29 +63,68 @@
         <article class="room-card" key={room.id}>
           <div>
             <h3>{room.name}</h3>
-            <p>{room.location}</p>
-            <span>{room.capacity} seats · {room.equipment}</span>
+            <span>{room.details}</span>
+            <span>{room.seatSummary}</span>
           </div>
           <button
             type="button"
             class="primary"
             data-id={room.id}
-            onclick={book}
+            onclick={chooseRoom}
             disabled={room.disabled}
           >
-            Book
+            Choose seat
           </button>
         </article>
       </template>
+      <template if:false={hasRooms}>
+        <p class="empty">No rooms match this time.</p>
+      </template>
     </div>
-    <section class="bookings" aria-label="My room bookings">
-      <h3>My bookings</h3>
+    <template if:true={selectedRoom}>
+      <section class="seat-panel" aria-label="Seat map">
+        <h3>{selectedRoom.name} – choose a seat</h3>
+        <template if:true={loadingSeats}
+          ><div class="loading">Loading seats…</div></template
+        >
+        <div class="seat-grid">
+          <template for:each={seatItems} for:item="seat">
+            <button
+              type="button"
+              key={seat.seatNo}
+              class={seat.className}
+              data-number={seat.seatNo}
+              aria-label={seat.label}
+              aria-pressed={seat.pressed}
+              disabled={seat.taken}
+              onclick={chooseSeat}
+            >
+              {seat.seatNo}
+            </button>
+          </template>
+        </div>
+        <div class="seat-legend">
+          <span class="swatch free"></span>Free
+          <span class="swatch selected"></span>Selected
+          <span class="swatch taken"></span>Taken
+        </div>
+        <button
+          type="button"
+          class="primary"
+          onclick={reserve}
+          disabled={reserveDisabled}
+        >
+          {reserveLabel}
+        </button>
+      </section>
+    </template>
+    <section class="bookings" aria-label="My seat reservations">
+      <h3>My reservations</h3>
       <template for:each={bookings} for:item="booking">
         <article class="booking-row" key={booking.id}>
           <div>
-            <strong>{booking.roomName}</strong
-            ><span>{booking.startAt} – {booking.endAt}</span
-            ><span>{booking.purpose}</span>
+            <strong>{booking.roomName} · Seat {booking.seatNumber}</strong
+            ><span>{booking.when}</span><span>{booking.purpose}</span>
           </div>
           <button
             type="button"
@@ -94,7 +137,7 @@
         </article>
       </template>
       <template if:false={hasBookings}
-        ><p class="empty">You have no room bookings.</p></template
+        ><p class="empty">You have no seat reservations.</p></template
       >
     </section>
   </section>

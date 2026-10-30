@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Returns record-level circulation detail for authorized librarians: overdue loans, unpaid fines, or pending reservations, with member names and IDs.</description>
+    <developerName>LibraryAgentCirculationDetailAction</developerName>
+    <invocationTarget>LibraryAgentCirculationDetailAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryAgentCirculationDetailAction</localDeveloperName>
+    <masterLabel>Get Circulation Details</masterLabel>
+    <progressIndicatorMessage>Loading circulation details</progressIndicatorMessage>
+</GenAiFunction>

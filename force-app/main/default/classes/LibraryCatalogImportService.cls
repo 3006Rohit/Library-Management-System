@@ -55,6 +55,7 @@ public without sharing class LibraryCatalogImportService {
       SELECT Id, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION AND Idempotency_Key__c = :key
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!existing.isEmpty())
@@ -173,7 +174,7 @@ public without sharing class LibraryCatalogImportService {
       row.dto.error = 'Title and ISBN are required.';
     else if (seenIsbns.contains(row.dto.isbn))
       row.dto.error = 'ISBN is duplicated in this file.';
-    else if ([SELECT COUNT() FROM Book__c WHERE ISBN__c = :row.dto.isbn] > 0)
+    else if ([SELECT COUNT() FROM Book__c WHERE ISBN__c = :row.dto.isbn WITH SYSTEM_MODE] > 0)
       row.dto.error = 'ISBN already exists in the catalog.';
     else if (row.dto.title.length() > 255)
       row.dto.error = 'Title is too long.';

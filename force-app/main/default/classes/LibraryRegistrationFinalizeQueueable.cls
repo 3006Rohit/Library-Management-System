@@ -28,6 +28,7 @@ public without sharing class LibraryRegistrationFinalizeQueueable implements Que
         First_Name__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (registrations.isEmpty())
@@ -37,6 +38,7 @@ public without sharing class LibraryRegistrationFinalizeQueueable implements Que
       SELECT Id, User__c
       FROM Member__c
       WHERE Id = :memberId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (members.isEmpty())

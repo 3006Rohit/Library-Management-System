@@ -1,0 +1,14 @@
+{
+  "required" : [ "detailType" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "detailType" : {
+      "title" : "Detail Type",
+      "description" : "OVERDUE_LOANS, UNPAID_FINES, or PENDING_RESERVATIONS.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

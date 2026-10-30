@@ -47,7 +47,7 @@
             <template for:each={filteredBookings} for:item="booking">
               <div class="booking-row" key={booking.id}>
                 <div class="booking-info">
-                  <strong>{booking.roomName}</strong>
+                  <strong>{booking.roomName} · Seat {booking.seatNumber}</strong>
                   <span class="member">{booking.memberName}</span>
                   <span class="purpose">{booking.purpose}</span>
                   <span class="time">

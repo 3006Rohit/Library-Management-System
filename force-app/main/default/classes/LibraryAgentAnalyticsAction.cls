@@ -51,17 +51,21 @@ global with sharing class LibraryAgentAnalyticsAction {
     public String topBorrowedBooksJson;
     @InvocableVariable
     public String reservationDemandJson;
+    @InvocableVariable
+    public String dataCloudTrendsJson;
+    @InvocableVariable
+    public String dataCloudRefreshNote;
   }
 
   @InvocableMethod(
     label='Get Library Analytics'
-    description='Read-only librarian analytics from validated Data 360 Calculated Insights. Use for library-wide summaries; do not invent values.'
+    description='Read-only librarian analytics. Current counts come live from library records. Data Cloud trend snapshots are returned separately with their refresh time. Use for library-wide summaries; do not invent values.'
   )
   global static List<Response> execute(List<Request> requests) {
     Response output = new Response();
     try {
       LibraryPolicyService.require('Manage_Library_Circulation');
-      LibraryDataCloudService.LibrarianAnalyticsDTO source = LibraryDataCloudService.getLibrarianAnalytics();
+      LibraryDataCloudService.LibrarianAnalyticsDTO source = LibraryDataCloudService.getRealtimeLibrarianAnalytics();
       output.available = source.available;
       output.message = source.message;
       output.lastUpdated = source.lastUpdated == null
@@ -87,6 +91,28 @@ global with sharing class LibraryAgentAnalyticsAction {
       output.unpaidFineCount = source.fineMetrics.unpaidFineCount;
       output.topBorrowedBooksJson = JSON.serialize(source.topBorrowedBooks);
       output.reservationDemandJson = JSON.serialize(source.reservationDemand);
+      try {
+        LibraryDataCloudService.LibrarianAnalyticsDTO trend = LibraryDataCloudService.getLibrarianAnalytics();
+        if (trend.available == true) {
+          output.dataCloudTrendsJson = JSON.serialize(
+            new Map<String, Object>{
+              'topBorrowedBooks' => trend.topBorrowedBooks,
+              'reservationDemand' => trend.reservationDemand
+            }
+          );
+          output.dataCloudRefreshNote =
+            'Data Cloud snapshot last refreshed ' +
+            (trend.lastUpdated == null
+              ? 'at an unknown time'
+              : String.valueOf(trend.lastUpdated)) +
+            '. It can lag the live counts.';
+        } else {
+          output.dataCloudRefreshNote =
+            'Data Cloud trends unavailable: ' + trend.message;
+        }
+      } catch (Exception trendEx) {
+        output.dataCloudRefreshNote = 'Data Cloud trends unavailable.';
+      }
     } catch (Exception ex) {
       output.available = false;
       output.message = 'Library analytics are temporarily unavailable.';

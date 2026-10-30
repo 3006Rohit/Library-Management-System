@@ -303,14 +303,6 @@
               </div>
             </template>
 
-            <template if:true={isRooms}>
-              <c-library-member-rooms></c-library-member-rooms>
-            </template>
-
-            <template if:true={isPrivacyCenter}>
-              <c-library-member-privacy-center></c-library-member-privacy-center>
-            </template>
-
             <template if:true={isMyBooks}>
               <div class="tabs">
                 <template for:each={loanTabs} for:item="tab"
@@ -463,6 +455,10 @@
                   </div></template
                 >
               </section>
+            </template>
+
+            <template if:true={isStudyRooms}>
+              <c-library-member-rooms></c-library-member-rooms>
             </template>
 
             <template if:true={isMemberAssistant}>

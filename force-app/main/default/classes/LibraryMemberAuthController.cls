@@ -31,8 +31,7 @@ public without sharing class LibraryMemberAuthController {
         Membership_Plan__c,
         Membership_Plan__r.Name
       FROM Member__c
-      WHERE Normalized_Email__c = :normalized
-      LIMIT 1
+      WHERE Normalized_Email__c = :normalized WITH SYSTEM_MODE LIMIT 1
       FOR UPDATE
     ];
     if (rows.isEmpty())
@@ -99,8 +98,7 @@ public without sharing class LibraryMemberAuthController {
         Activation_Token_Hash__c,
         Activation_Token_Expires_At__c
       FROM Member__c
-      WHERE Activation_Token_Hash__c = :digest
-      LIMIT 1
+      WHERE Activation_Token_Hash__c = :digest WITH SYSTEM_MODE LIMIT 1
       FOR UPDATE
     ];
     if (
@@ -127,8 +125,7 @@ public without sharing class LibraryMemberAuthController {
     List<Member__c> rows = [
       SELECT Id, Email__c, First_Name__c, Status__c
       FROM Member__c
-      WHERE Normalized_Email__c = :normalized AND Status__c = 'Active'
-      LIMIT 1
+      WHERE Normalized_Email__c = :normalized AND Status__c = 'Active' WITH SYSTEM_MODE LIMIT 1
     ];
     if (!rows.isEmpty()) {
       String raw = LibraryMemberPasswordService.token();
@@ -156,8 +153,7 @@ public without sharing class LibraryMemberAuthController {
     List<Member__c> rows = [
       SELECT Id, Reset_Token_Hash__c, Reset_Token_Expires_At__c
       FROM Member__c
-      WHERE Reset_Token_Hash__c = :digest
-      LIMIT 1
+      WHERE Reset_Token_Hash__c = :digest WITH SYSTEM_MODE LIMIT 1
       FOR UPDATE
     ];
     if (rows.isEmpty() || rows[0].Reset_Token_Expires_At__c <= System.now())
@@ -184,8 +180,7 @@ public without sharing class LibraryMemberAuthController {
     Member__c m = [
       SELECT Id, Password_Hash__c, Password_Salt__c
       FROM Member__c
-      WHERE Id = :sessionMember.Id
-      LIMIT 1
+      WHERE Id = :sessionMember.Id WITH SYSTEM_MODE LIMIT 1
     ];
     if (!LibraryMemberPasswordService.matches(m, currentPassword))
       throw new AuraHandledException('The current password is incorrect.');

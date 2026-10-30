@@ -24,6 +24,7 @@ public with sharing class LibraryRegistrationController {
       SELECT Id, Name, Description__c, Duration_Days__c, Borrow_Limit__c
       FROM Membership_Plan__c
       WHERE Active__c = TRUE
+      WITH SYSTEM_MODE
       ORDER BY Name
     ];
   }
@@ -58,6 +59,7 @@ public with sharing class LibraryRegistrationController {
         Created_Contact__c,
         Created_Member__c
       FROM Library_Registration__c
+      WITH SYSTEM_MODE
       ORDER BY Registration_Date__c DESC
       LIMIT 200
     ];
@@ -112,6 +114,7 @@ public with sharing class LibraryRegistrationController {
         External_User__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
   }

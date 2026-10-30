@@ -23,6 +23,7 @@ public without sharing class LibraryReservationEtaService {
       SELECT Book__c bookId, COUNT(Id) total
       FROM Book_Copy__c
       WHERE Book__c IN :bookIds AND Status__c = 'Available'
+      WITH SYSTEM_MODE
       GROUP BY Book__c
     ]) {
       availableByBook.put(
@@ -40,6 +41,7 @@ public without sharing class LibraryReservationEtaService {
         AND Return_Date__c = NULL
         AND Status__c IN ('Active', 'Overdue')
         AND Due_Date__c != NULL
+      WITH SYSTEM_MODE
       ORDER BY Due_Date__c ASC, Id ASC
     ]) {
       Id bookId = loan.Book_Copy__r.Book__c;
@@ -62,6 +64,7 @@ public without sharing class LibraryReservationEtaService {
         ETA_Reason__c
       FROM Reservation__c
       WHERE Book__c IN :bookIds AND Status__c IN ('Pending', 'Ready')
+      WITH SYSTEM_MODE
       ORDER BY Book__c, Reservation_Date__c ASC, Id ASC
     ]) {
       if (!activeByBook.containsKey(reservation.Book__c))

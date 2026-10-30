@@ -36,6 +36,7 @@ public without sharing class LibraryExecutiveSummaryService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION AND Idempotency_Key__c = :key
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!existing.isEmpty())
@@ -49,26 +50,31 @@ public without sharing class LibraryExecutiveSummaryService {
       SELECT COUNT()
       FROM Member__c
       WHERE Status__c = 'Active'
+      WITH SYSTEM_MODE
     ];
     summary.pendingRegistrations = [
       SELECT COUNT()
       FROM Library_Registration__c
       WHERE Status__c = 'Pending'
+      WITH SYSTEM_MODE
     ];
     summary.activeLoans = [
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Return_Date__c = NULL AND Status__c IN ('Active', 'Overdue')
+      WITH SYSTEM_MODE
     ];
     summary.overdueLoans = [
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Return_Date__c = NULL AND Due_Date__c < :reportDate
+      WITH SYSTEM_MODE
     ];
     summary.pendingReservations = [
       SELECT COUNT()
       FROM Reservation__c
       WHERE Status__c IN ('Pending', 'Ready')
+      WITH SYSTEM_MODE
     ];
     summary.unpaidFines = 0;
     summary.unpaidFineBalance = 0;
@@ -76,6 +82,7 @@ public without sharing class LibraryExecutiveSummaryService {
       SELECT Balance__c
       FROM Fine__c
       WHERE Status__c IN ('Unpaid', 'Partially Paid')
+      WITH SYSTEM_MODE
       LIMIT 5000
     ]) {
       summary.unpaidFines++;
@@ -87,11 +94,13 @@ public without sharing class LibraryExecutiveSummaryService {
       SELECT COUNT()
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = 'Risk Alert' AND Status__c = 'Open'
+      WITH SYSTEM_MODE
     ];
     summary.noShows = [
       SELECT COUNT()
       FROM Library_Scan_Transaction__c
       WHERE Status__c = 'No-show' AND Created_At__c = LAST_N_DAYS:90
+      WITH SYSTEM_MODE
     ];
     Map<String, Object> payload = new Map<String, Object>{
       'd' => String.valueOf(summary.reportingDate),
@@ -138,6 +147,7 @@ public without sharing class LibraryExecutiveSummaryService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 100
     ]) {

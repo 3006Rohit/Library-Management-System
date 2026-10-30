@@ -10,7 +10,7 @@ public with sharing class LibraryMemberAgentController {
       MEMBER_AGENT_ID,
       new List<Object>{
         new Map<String, Object>{
-          'name' => '$Context.SessionKey',
+          'name' => 'SessionToken',
           'type' => 'Text',
           'value' => sessionToken
         }

@@ -25,6 +25,7 @@ public without sharing class LibraryRegistrationProvisioningQueueable implements
         Created_Member__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (rows.isEmpty() || rows[0].Status__c != 'Pending')
@@ -40,6 +41,7 @@ public without sharing class LibraryRegistrationProvisioningQueueable implements
         WHERE
           Normalized_Email__c = :registration.Registration_Email_Key__c
           OR Email__c = :registration.Registration_Email_Key__c
+        WITH SYSTEM_MODE
         LIMIT 2
       ];
       if (existing.size() > 1)

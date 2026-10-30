@@ -62,7 +62,7 @@ global with sharing class LibraryAgentCatalogAction {
     Set<Id> bookIds = new Set<Id>();
     if (authorTerm != null) {
       Set<Id> authorIds = new Map<Id, Author__c>(
-          [SELECT Id FROM Author__c WHERE Name LIKE :authorTerm LIMIT 200]
+          [SELECT Id FROM Author__c WHERE Name LIKE :authorTerm WITH SYSTEM_MODE LIMIT 200]
         )
         .keySet();
       if (!authorIds.isEmpty())
@@ -70,6 +70,7 @@ global with sharing class LibraryAgentCatalogAction {
           SELECT Book__c
           FROM Book_Author__c
           WHERE Author__c IN :authorIds
+          WITH SYSTEM_MODE
           LIMIT 200
         ])
           bookIds.add(link.Book__c);
@@ -80,6 +81,7 @@ global with sharing class LibraryAgentCatalogAction {
             SELECT Id
             FROM Book_Category__c
             WHERE Name LIKE :categoryTerm
+            WITH SYSTEM_MODE
             LIMIT 200
           ]
         )
@@ -89,6 +91,7 @@ global with sharing class LibraryAgentCatalogAction {
           SELECT Book__c
           FROM Book_Category_Link__c
           WHERE Book_Category__c IN :categoryIds
+          WITH SYSTEM_MODE
           LIMIT 200
         ])
           bookIds.add(link.Book__c);
@@ -105,6 +108,7 @@ global with sharing class LibraryAgentCatalogAction {
         SELECT Id, Name, Status__c, Total_Copies__c, Available_Copies__c
         FROM Book__c
         WHERE Id IN :bookIds
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 50
       ];
@@ -129,6 +133,7 @@ global with sharing class LibraryAgentCatalogAction {
         SELECT Id, Name, Status__c, Total_Copies__c, Available_Copies__c
         FROM Book__c
         WHERE Name LIKE :titleTerm AND Available_Copies__c > 0
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 50
       ];
@@ -137,6 +142,7 @@ global with sharing class LibraryAgentCatalogAction {
         SELECT Id, Name, Status__c, Total_Copies__c, Available_Copies__c
         FROM Book__c
         WHERE Name LIKE :titleTerm
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 50
       ];
@@ -145,6 +151,7 @@ global with sharing class LibraryAgentCatalogAction {
         SELECT Id, Name, Status__c, Total_Copies__c, Available_Copies__c
         FROM Book__c
         WHERE Available_Copies__c > 0
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 50
       ];
@@ -152,6 +159,7 @@ global with sharing class LibraryAgentCatalogAction {
       books = [
         SELECT Id, Name, Status__c, Total_Copies__c, Available_Copies__c
         FROM Book__c
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 50
       ];

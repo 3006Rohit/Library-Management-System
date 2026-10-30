@@ -3,6 +3,10 @@
     <div class="acquisition-header">
       <div>
         <h2>Acquisition intelligence</h2>
+        <p class="subheading">
+          Books that need more copies or replacements, based on the last 90
+          days.
+        </p>
       </div>
       <button
         class="refresh-button"
@@ -13,72 +17,105 @@
         ↻ Refresh
       </button>
     </div>
+
+    <div class="tabs" role="tablist">
+      <template for:each={filters} for:item="item">
+        <button
+          key={item.value}
+          type="button"
+          role="tab"
+          class={item.className}
+          aria-selected={item.selected}
+          data-value={item.value}
+          onclick={handleFilter}
+        >
+          {item.label}
+        </button>
+      </template>
+    </div>
+
     <template if:true={error}
       ><div class="error" role="alert">{error}</div></template
     >
-    <template if:true={hasRecommendations}>
+
+    <template if:true={hasRows}>
       <div class="recommendation-grid">
-        <template for:each={recommendations} for:item="row">
+        <template for:each={visibleRows} for:item="row">
           <article class="recommendation-card" key={row.id}>
             <div class="card-topline">
-              <span class="action-label">{row.recommendationType}</span
-              ><span class={row.statusClass}>{row.status}</span>
+              <span class="action-label">{row.actionLabel}</span>
+              <span class={row.statusClass}>{row.status}</span>
             </div>
             <h3>{row.bookTitle}</h3>
-            <div class="signal-row">
-              <span class="score">{row.scoreLabel}</span
-              ><span class={row.confidenceClass}
-                >{row.confidence} confidence</span
-              ><span>Order {row.quantityLabel}</span>
+            <p class="headline">{row.headline}</p>
+
+            <div class="score-row">
+              <div class="score-bar" aria-hidden="true">
+                <div class="score-fill" style={row.scoreStyle}></div>
+              </div>
+              <span class={row.priorityClass}>{row.priority} · {row.scoreLabel}</span>
             </div>
+
             <p class="evidence">{row.evidence}</p>
-            <div class="metrics">
-              <span><strong>{row.reservations}</strong> waits</span
-              ><span><strong>{row.recentCheckouts}</strong> checkouts</span
-              ><span><strong>{row.availableCopies}</strong> available</span
-              ><span><strong>{row.damagedCopies}</strong> damaged</span
-              ><span><strong>{row.agingCopies}</strong> aging</span>
-            </div>
-            <p class="window">Evidence window: {row.windowLabel}</p>
-            <lightning-input
-              label="Decision note"
-              variant="label-hidden"
-              placeholder="Optional note"
-              value={row.notes}
-              data-id={row.id}
-              onchange={handleNotes}
-            ></lightning-input>
-            <div class="actions">
-              <button
-                type="button"
+
+            <template if:true={row.isOpen}>
+              <lightning-input
+                label="Note"
+                variant="label-hidden"
+                placeholder="Optional note"
+                value={row.notes}
                 data-id={row.id}
-                data-status="Accepted"
-                onclick={decide}
-              >
-                Accept
-              </button>
-              <button
-                type="button"
-                data-id={row.id}
-                data-status="Deferred"
-                onclick={decide}
-              >
-                Defer
-              </button>
-              <button
-                type="button"
-                data-id={row.id}
-                data-status="Rejected"
-                onclick={decide}
-              >
-                Reject
-              </button>
-            </div>
+                onchange={handleNotes}
+              ></lightning-input>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="primary"
+                  data-id={row.id}
+                  data-status="Accepted"
+                  onclick={decide}
+                >
+                  Accept
+                </button>
+                <button
+                  type="button"
+                  data-id={row.id}
+                  data-status="Deferred"
+                  onclick={decide}
+                >
+                  Later
+                </button>
+                <button
+                  type="button"
+                  class="danger"
+                  data-id={row.id}
+                  data-status="Rejected"
+                  onclick={decide}
+                >
+                  Reject
+                </button>
+              </div>
+            </template>
+            <template if:false={row.isOpen}>
+              <template if:true={row.decisionNotes}>
+                <p class="note">“{row.decisionNotes}”</p>
+              </template>
+              <div class="actions">
+                <button
+                  type="button"
+                  data-id={row.id}
+                  data-status="Open"
+                  onclick={decide}
+                >
+                  Undo
+                </button>
+              </div>
+            </template>
           </article>
         </template>
       </div>
     </template>
-    <template if:false={hasRecommendations}
+    <template if:false={hasRows}
       ><div class="empty">{emptyMessage}</div></template
     >
   </section>

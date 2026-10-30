@@ -62,26 +62,31 @@ public without sharing class LibraryTransactionContactService {
       SELECT Id, Member__c, Contact__c
       FROM Borrow_Record__c
       WHERE Member__c IN :changedMemberIds
+      WITH SYSTEM_MODE
     ];
     List<Reservation__c> reservations = [
       SELECT Id, Member__c, Contact__c
       FROM Reservation__c
       WHERE Member__c IN :changedMemberIds
+      WITH SYSTEM_MODE
     ];
     List<Fine__c> fines = [
       SELECT Id, Member__c, Contact__c
       FROM Fine__c
       WHERE Member__c IN :changedMemberIds
+      WITH SYSTEM_MODE
     ];
     List<Membership_Payment__c> membershipPayments = [
       SELECT Id, Member__c
       FROM Membership_Payment__c
       WHERE Member__c IN :changedMemberIds
+      WITH SYSTEM_MODE
     ];
     List<Member_Notification__c> memberNotifications = [
       SELECT Id, Member__c
       FROM Member_Notification__c
       WHERE Member__c IN :changedMemberIds
+      WITH SYSTEM_MODE
     ];
 
     for (Borrow_Record__c record : borrowRecords) {

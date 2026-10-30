@@ -33,8 +33,7 @@ public without sharing class LibraryMemberEngagementService {
     List<Library_Scan_Transaction__c> rows = [
       SELECT Id, Idempotency_Key__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
-      WHERE Member__c = :member.Id AND Operation__c = :OPERATION
-      ORDER BY Created_At__c DESC
+      WHERE Member__c = :member.Id AND Operation__c = :OPERATION WITH SYSTEM_MODE ORDER BY Created_At__c DESC
       LIMIT 200
     ];
     Map<Id, Map<String, Object>> payloads = new Map<Id, Map<String, Object>>();
@@ -54,6 +53,7 @@ public without sharing class LibraryMemberEngagementService {
             SELECT Id, Name
             FROM Book__c
             WHERE Id IN :bookIds
+            WITH SYSTEM_MODE
           ]
         );
     List<EngagementDTO> result = new List<EngagementDTO>();
@@ -92,6 +92,7 @@ public without sharing class LibraryMemberEngagementService {
       SELECT Id, Name
       FROM Book__c
       WHERE Id = :bookId AND Status__c != 'Archived'
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     String key =
@@ -105,8 +106,7 @@ public without sharing class LibraryMemberEngagementService {
       WHERE
         Idempotency_Key__c = :key
         AND Member__c = :member.Id
-        AND Operation__c = :OPERATION
-      LIMIT 1
+        AND Operation__c = :OPERATION WITH SYSTEM_MODE LIMIT 1
     ];
     Library_Scan_Transaction__c row = existing.isEmpty()
       ? new Library_Scan_Transaction__c(
@@ -139,8 +139,7 @@ public without sharing class LibraryMemberEngagementService {
       WHERE
         Id = :engagementId
         AND Member__c = :member.Id
-        AND Operation__c = :OPERATION
-      LIMIT 1
+        AND Operation__c = :OPERATION WITH SYSTEM_MODE LIMIT 1
     ];
     Database.delete(row, AccessLevel.SYSTEM_MODE);
   }

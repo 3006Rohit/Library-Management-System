@@ -88,6 +88,7 @@ public without sharing class LibraryEventService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :EVENT_OPERATION AND Status__c = 'Published'
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ];
@@ -96,6 +97,7 @@ public without sharing class LibraryEventService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Member__c = :member.Id AND Operation__c = :REGISTRATION_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 200
     ]) {
       Map<String, Object> payload = parse(row.Result_Message__c);
@@ -136,6 +138,7 @@ public without sharing class LibraryEventService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Member__c = :member.Id
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!existing.isEmpty()) {
@@ -187,6 +190,7 @@ public without sharing class LibraryEventService {
       SELECT Id, Status__c
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Member__c = :member.Id
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!rows.isEmpty()) {
@@ -211,6 +215,7 @@ public without sharing class LibraryEventService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Member__c = :member.Id
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -241,6 +246,7 @@ public without sharing class LibraryEventService {
       WHERE
         Operation__c = :REGISTRATION_OPERATION
         AND Status__c IN ('Registered', 'Attended')
+      WITH SYSTEM_MODE
       LIMIT 2000
       FOR UPDATE
     ];
@@ -278,6 +284,7 @@ public without sharing class LibraryEventService {
         Id = :eventId
         AND Operation__c = :EVENT_OPERATION
         AND Status__c = 'Published'
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -292,6 +299,7 @@ public without sharing class LibraryEventService {
       SELECT Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :REGISTRATION_OPERATION AND Status__c = 'Registered'
+      WITH SYSTEM_MODE
       LIMIT 2000
     ]) {
       Id eventId = parseId(parse(row.Result_Message__c).get('e'));
@@ -309,6 +317,7 @@ public without sharing class LibraryEventService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :REGISTRATION_OPERATION AND Status__c = 'Waitlisted'
+      WITH SYSTEM_MODE
       LIMIT 2000
       FOR UPDATE
     ];

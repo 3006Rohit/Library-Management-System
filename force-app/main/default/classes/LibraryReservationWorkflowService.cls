@@ -4,6 +4,7 @@ public without sharing class LibraryReservationWorkflowService {
       SELECT Id, Book__c, Status__c
       FROM Reservation__c
       WHERE Id = :reservationId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (reservations.isEmpty() || reservations[0].Status__c != 'Pending')
@@ -11,7 +12,7 @@ public without sharing class LibraryReservationWorkflowService {
         'Only a waiting reservation can be prepared.'
       );
     promoteAvailableReservations(reservations[0].Book__c);
-    return [SELECT Status__c FROM Reservation__c WHERE Id = :reservationId]
+    return [SELECT Status__c FROM Reservation__c WHERE Id = :reservationId WITH SYSTEM_MODE]
       .Status__c == 'Ready';
   }
 
@@ -22,6 +23,7 @@ public without sharing class LibraryReservationWorkflowService {
       SELECT Id
       FROM Book__c
       WHERE Id = :bookId
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -31,6 +33,7 @@ public without sharing class LibraryReservationWorkflowService {
       SELECT Id
       FROM Book_Copy__c
       WHERE Book__c = :bookId AND Status__c = 'Available'
+      WITH SYSTEM_MODE
       ORDER BY Name
       LIMIT 50
     ];
@@ -43,6 +46,7 @@ public without sharing class LibraryReservationWorkflowService {
         Queue_Position__c
       FROM Reservation__c
       WHERE Book__c = :bookId AND Status__c = 'Pending'
+      WITH SYSTEM_MODE
       ORDER BY Reservation_Date__c ASC, Id ASC
       LIMIT 50
     ];

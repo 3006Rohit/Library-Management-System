@@ -44,6 +44,7 @@ public without sharing class LibraryCalendarService {
       SELECT Id
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!existing.isEmpty())
@@ -90,6 +91,7 @@ public without sharing class LibraryCalendarService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION AND Status__c = 'Active'
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 500
     ])
@@ -133,6 +135,7 @@ public without sharing class LibraryCalendarService {
       SELECT Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION AND Status__c = 'Active'
+      WITH SYSTEM_MODE
       LIMIT 500
     ];
     for (Integer offset = 0; offset <= MAX_LOOKAHEAD_DAYS; offset++) {
@@ -196,6 +199,7 @@ public without sharing class LibraryCalendarService {
           Id = :branchId
           AND Operation__c = 'Library Branch'
           AND Status__c = 'Active'
+        WITH SYSTEM_MODE
       ] == 0
     )
       throw new AuraHandledException('The branch could not be found.');

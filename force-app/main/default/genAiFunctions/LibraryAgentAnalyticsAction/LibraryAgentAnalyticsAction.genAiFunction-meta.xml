@@ -8,6 +8,5 @@
     <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
     <localDeveloperName>LibraryAgentAnalyticsAction</localDeveloperName>
     <masterLabel>Get Library Analytics</masterLabel>
-    <language>en_US</language>
     <progressIndicatorMessage>Loading library analytics</progressIndicatorMessage>
 </GenAiFunction>

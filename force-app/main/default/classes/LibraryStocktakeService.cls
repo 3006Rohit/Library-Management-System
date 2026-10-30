@@ -84,6 +84,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Id, Status__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :auditId AND Operation__c = :AUDIT_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (audit.Status__c != 'Open')
@@ -94,6 +95,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Id, Name, Barcode__c, Status__c
       FROM Book_Copy__c
       WHERE Barcode__c = :barcode.trim()
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     String key = 'STOCKTAKE_LINE:' + String.valueOf(auditId) + ':' + copy.Id;
@@ -101,6 +103,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Id, Member__c, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :LINE_OPERATION AND Idempotency_Key__c = :key
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!existing.isEmpty())
@@ -140,6 +143,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :auditId AND Operation__c = :AUDIT_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -170,6 +174,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :AUDIT_OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 100
     ])
@@ -184,6 +189,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :LINE_OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 1000
     ]) {
@@ -197,6 +203,7 @@ public without sharing class LibraryStocktakeService {
             SELECT Id, Name, Barcode__c, Status__c
             FROM Book_Copy__c
             WHERE Id = :copyId
+            WITH SYSTEM_MODE
             LIMIT 1
           ];
       result.add(toLine(row, auditId, copy));
@@ -210,6 +217,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :LINE_OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1000
     ]) {
       Map<String, Object> p = parse(line.Result_Message__c);
@@ -223,6 +231,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Id, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :auditId
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -237,6 +246,7 @@ public without sharing class LibraryStocktakeService {
       SELECT Id
       FROM Book_Copy__c
       WHERE Barcode__c = :barcode
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     return rows.isEmpty() ? null : rows[0].Id;

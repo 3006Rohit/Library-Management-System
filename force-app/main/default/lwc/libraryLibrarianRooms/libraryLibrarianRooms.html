@@ -1,0 +1,99 @@
+<template>
+  <section class="rooms-panel" aria-label="Manage study rooms">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Facility operations</p>
+        <h2>Rooms and seats</h2>
+        <p class="summary">{summary}</p>
+      </div>
+    </div>
+
+    <form class="room-form" onsubmit={addRoom}>
+      <div class="field">
+        <label for="roomName">Room name</label>
+        <input
+          id="roomName"
+          type="text"
+          name="name"
+          value={name}
+          maxlength="80"
+          placeholder="Study Room A"
+          required
+          onchange={handleInput}
+        />
+      </div>
+      <div class="field">
+        <label for="roomSeats">Number of seats</label>
+        <input
+          id="roomSeats"
+          type="number"
+          name="seats"
+          value={seats}
+          min="1"
+          max="200"
+          step="1"
+          required
+          onchange={handleInput}
+        />
+      </div>
+      <div class="field">
+        <label for="roomLocation">Location</label>
+        <input
+          id="roomLocation"
+          type="text"
+          name="location"
+          value={location}
+          maxlength="80"
+          placeholder="First floor"
+          onchange={handleInput}
+        />
+      </div>
+      <div class="field">
+        <label for="roomEquipment">Equipment</label>
+        <input
+          id="roomEquipment"
+          type="text"
+          name="equipment"
+          value={equipment}
+          maxlength="80"
+          placeholder="Whiteboard, projector"
+          onchange={handleInput}
+        />
+      </div>
+      <button type="submit" class="primary" disabled={saveDisabled}>
+        Add room
+      </button>
+    </form>
+
+    <template if:true={loading}>
+      <div class="notice">Loading rooms…</div>
+    </template>
+    <template if:true={error}>
+      <div class="notice error" role="alert">{error}</div>
+    </template>
+
+    <div class="room-list">
+      <template for:each={roomRows} for:item="room">
+        <article class="room-row" key={room.id}>
+          <div>
+            <strong>{room.name}</strong>
+            <span>{room.capacity} seats</span>
+            <span>{room.details}</span>
+          </div>
+          <button
+            type="button"
+            class="danger"
+            data-id={room.id}
+            data-name={room.name}
+            onclick={retire}
+          >
+            Remove
+          </button>
+        </article>
+      </template>
+      <template if:false={hasRooms}>
+        <div class="notice">No rooms yet. Add the first one above.</div>
+      </template>
+    </div>
+  </section>
+</template>

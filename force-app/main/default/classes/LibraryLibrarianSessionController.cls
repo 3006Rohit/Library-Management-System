@@ -7,6 +7,8 @@ public with sharing class LibraryLibrarianSessionController {
     @AuraEnabled
     public String roomName;
     @AuraEnabled
+    public Integer seatNumber;
+    @AuraEnabled
     public Id memberId;
     @AuraEnabled
     public String memberName;
@@ -36,6 +38,7 @@ public with sharing class LibraryLibrarianSessionController {
         Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = 'Room Booking'
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 500
     ];
@@ -53,6 +56,8 @@ public with sharing class LibraryLibrarianSessionController {
       dto.id = booking.Id;
       dto.roomId = roomId;
       dto.roomName = roomNames.get(roomId);
+      Object seat = payload.get('k');
+      dto.seatNumber = seat == null ? null : Integer.valueOf(String.valueOf(seat));
       dto.memberId = booking.Member__c;
       dto.memberName = booking.Member__r == null
         ? null
@@ -74,6 +79,7 @@ public with sharing class LibraryLibrarianSessionController {
       SELECT Id, Status__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :bookingId AND Operation__c = 'Room Booking'
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -89,6 +95,7 @@ public with sharing class LibraryLibrarianSessionController {
       SELECT Id, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :roomId AND Operation__c = 'Library Room'
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (rooms.isEmpty())

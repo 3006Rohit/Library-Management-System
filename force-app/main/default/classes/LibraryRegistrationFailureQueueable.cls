@@ -18,6 +18,7 @@ public without sharing class LibraryRegistrationFailureQueueable implements Queu
       SELECT Id, Status__c, Provisioning_State__c
       FROM Library_Registration__c
       WHERE Id = :registrationId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (rows.isEmpty())

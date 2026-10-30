@@ -28,6 +28,7 @@ public without sharing class LibraryRegistrationGuestController {
       SELECT Id, Name, Description__c, Duration_Days__c, Borrow_Limit__c
       FROM Membership_Plan__c
       WHERE Active__c = TRUE
+      WITH SYSTEM_MODE
       ORDER BY Name
     ];
   }
@@ -49,6 +50,7 @@ public without sharing class LibraryRegistrationGuestController {
         SELECT Book__c
         FROM Book_Author__c
         WHERE Author__r.Name LIKE :likeTerm
+        WITH SYSTEM_MODE
         LIMIT 200
       ])
         relatedBookIds.add(link.Book__c);
@@ -56,6 +58,7 @@ public without sharing class LibraryRegistrationGuestController {
         SELECT Book__c
         FROM Book_Category_Link__c
         WHERE Book_Category__r.Name LIKE :likeTerm
+        WITH SYSTEM_MODE
         LIMIT 200
       ])
         relatedBookIds.add(link.Book__c);
@@ -77,6 +80,7 @@ public without sharing class LibraryRegistrationGuestController {
           (SELECT Book_Category__r.Name FROM Book_Category_Links__r)
         FROM Book__c
         WHERE Status__c = 'Active'
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 40
       ];
@@ -100,6 +104,7 @@ public without sharing class LibraryRegistrationGuestController {
           OR ISBN__c LIKE :likeTerm
           OR Publisher__c LIKE :likeTerm
           OR Id IN :relatedBookIds)
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 40
       ];

@@ -61,6 +61,7 @@ public without sharing class LibraryLedgerMigrationReviewService {
     for (Library_Scan_Transaction__c row : [
       SELECT Id, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ]) {

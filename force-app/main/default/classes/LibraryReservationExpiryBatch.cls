@@ -5,6 +5,7 @@ global without sharing class LibraryReservationExpiryBatch implements Database.B
         SELECT Id
         FROM Reservation__c
         WHERE Status__c = 'Ready' AND Expiry_Date__c < :System.now()
+        WITH SYSTEM_MODE
         ORDER BY Expiry_Date__c, Id
       ]
     );

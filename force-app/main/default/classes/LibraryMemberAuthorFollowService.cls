@@ -19,8 +19,7 @@ public without sharing class LibraryMemberAuthorFollowService {
     List<Library_Scan_Transaction__c> rows = [
       SELECT Id, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
-      WHERE Member__c = :member.Id AND Operation__c = :OPERATION
-      ORDER BY Created_At__c DESC
+      WHERE Member__c = :member.Id AND Operation__c = :OPERATION WITH SYSTEM_MODE ORDER BY Created_At__c DESC
       LIMIT 200
     ];
     Set<Id> authorIds = new Set<Id>();
@@ -35,7 +34,7 @@ public without sharing class LibraryMemberAuthorFollowService {
     Map<Id, Author__c> authors = authorIds.isEmpty()
       ? new Map<Id, Author__c>()
       : new Map<Id, Author__c>(
-          [SELECT Id, Name FROM Author__c WHERE Id IN :authorIds]
+          [SELECT Id, Name FROM Author__c WHERE Id IN :authorIds WITH SYSTEM_MODE]
         );
     List<FollowDTO> result = new List<FollowDTO>();
     for (Library_Scan_Transaction__c row : rows) {
@@ -62,6 +61,7 @@ public without sharing class LibraryMemberAuthorFollowService {
       SELECT Id, Name
       FROM Author__c
       WHERE Id = :authorId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     String key =
@@ -75,8 +75,7 @@ public without sharing class LibraryMemberAuthorFollowService {
       WHERE
         Idempotency_Key__c = :key
         AND Member__c = :member.Id
-        AND Operation__c = :OPERATION
-      LIMIT 1
+        AND Operation__c = :OPERATION WITH SYSTEM_MODE LIMIT 1
     ];
     Library_Scan_Transaction__c row = existing.isEmpty()
       ? new Library_Scan_Transaction__c(
@@ -110,8 +109,7 @@ public without sharing class LibraryMemberAuthorFollowService {
       WHERE
         Id = :followId
         AND Member__c = :member.Id
-        AND Operation__c = :OPERATION
-      LIMIT 1
+        AND Operation__c = :OPERATION WITH SYSTEM_MODE LIMIT 1
     ];
     Database.delete(row, AccessLevel.SYSTEM_MODE);
   }

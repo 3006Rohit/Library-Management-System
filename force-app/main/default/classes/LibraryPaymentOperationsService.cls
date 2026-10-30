@@ -50,6 +50,7 @@ public without sharing class LibraryPaymentOperationsService {
         Reconciliation_Status__c
       FROM Membership_Payment__c
       WHERE Id = :paymentId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (payment.Status__c != 'Paid')
@@ -61,6 +62,7 @@ public without sharing class LibraryPaymentOperationsService {
       SELECT Id, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :RECEIPT_OPERATION AND Idempotency_Key__c = :key
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     Library_Scan_Transaction__c row;
@@ -136,6 +138,7 @@ public without sharing class LibraryPaymentOperationsService {
         Status__c = 'Paid'
         AND (Reconciliation_Status__c = 'Pending'
         OR Reconciliation_Status__c = 'Exception')
+      WITH SYSTEM_MODE
       ORDER BY Payment_Date__c DESC
       LIMIT 200
     ])
@@ -157,6 +160,7 @@ public without sharing class LibraryPaymentOperationsService {
       SELECT Id, Member__c, Status__c, Reconciliation_Status__c
       FROM Membership_Payment__c
       WHERE Id = :paymentId
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];

@@ -15,6 +15,7 @@ global without sharing class LibraryNotificationScheduler implements Schedulable
         Return_Date__c = NULL
         AND Due_Date__c != NULL
         AND Due_Date__c <= :soon
+      WITH SYSTEM_MODE
       ORDER BY Due_Date__c, Id
       LIMIT 500
     ]) {
@@ -47,6 +48,7 @@ global without sharing class LibraryNotificationScheduler implements Schedulable
       SELECT Id, Member__c, Amount__c, Member__r.Email__c
       FROM Fine__c
       WHERE Status__c IN ('Unpaid', 'Partially Paid') AND Balance__c > 0
+      WITH SYSTEM_MODE
       ORDER BY Id
       LIMIT 500
     ]) {

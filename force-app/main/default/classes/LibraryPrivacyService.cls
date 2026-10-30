@@ -185,6 +185,7 @@ public without sharing class LibraryPrivacyService {
       SELECT Id, Member__c, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Member__c = :member.Id AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ])
@@ -203,6 +204,7 @@ public without sharing class LibraryPrivacyService {
         Id = :requestId
         AND Member__c = :member.Id
         AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -220,6 +222,7 @@ public without sharing class LibraryPrivacyService {
       [
         SELECT Id, Name
         FROM Member__c
+        WITH SYSTEM_MODE
         LIMIT 5000
       ]
     );
@@ -228,6 +231,7 @@ public without sharing class LibraryPrivacyService {
       SELECT Id, Member__c, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 1000
     ])
@@ -253,6 +257,7 @@ public without sharing class LibraryPrivacyService {
       SELECT Id, Member__c, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :requestId AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -305,6 +310,7 @@ public without sharing class LibraryPrivacyService {
         Password_Salt__c
       FROM Member__c
       WHERE Id = :sessionMember.Id
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!LibraryMemberPasswordService.matches(member, currentPassword))
@@ -332,6 +338,7 @@ public without sharing class LibraryPrivacyService {
         Membership_Plan__r.Name
       FROM Member__c
       WHERE Id = :memberId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     data.put(
@@ -366,6 +373,7 @@ public without sharing class LibraryPrivacyService {
           Renewal_Count__c
         FROM Borrow_Record__c
         WHERE Member__c = :memberId
+        WITH SYSTEM_MODE
         LIMIT 500
       ]
     );
@@ -382,6 +390,7 @@ public without sharing class LibraryPrivacyService {
           Expiry_Date__c
         FROM Reservation__c
         WHERE Member__c = :memberId
+        WITH SYSTEM_MODE
         LIMIT 500
       ]
     );
@@ -400,6 +409,7 @@ public without sharing class LibraryPrivacyService {
           Paid_Date__c
         FROM Fine__c
         WHERE Member__c = :memberId
+        WITH SYSTEM_MODE
         LIMIT 500
       ]
     );
@@ -415,6 +425,7 @@ public without sharing class LibraryPrivacyService {
           Payment_Date__c
         FROM Membership_Payment__c
         WHERE Member__c = :memberId
+        WITH SYSTEM_MODE
         LIMIT 200
       ]
     );
@@ -424,6 +435,7 @@ public without sharing class LibraryPrivacyService {
         SELECT Id, Type__c, Subject__c, Message__c, Status__c, CreatedDate
         FROM Member_Notification__c
         WHERE Member__c = :memberId
+        WITH SYSTEM_MODE
         LIMIT 500
       ]
     );
@@ -432,6 +444,7 @@ public without sharing class LibraryPrivacyService {
       SELECT Operation__c, Status__c, Created_At__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Member__c = :memberId AND Operation__c NOT IN ('Privacy Request')
+      WITH SYSTEM_MODE
       LIMIT 1000
     ]) {
       Map<String, Object> safePayload = parse(row.Result_Message__c);
@@ -504,6 +517,7 @@ public without sharing class LibraryPrivacyService {
         Idempotency_Key__c = :key
         AND Member__c = :memberId
         AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
   }

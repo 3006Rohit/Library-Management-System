@@ -73,6 +73,7 @@ public without sharing class LibraryMemberNotificationService {
         SELECT Dedup_Key__c
         FROM Member_Notification__c
         WHERE Dedup_Key__c IN :keys
+        WITH SYSTEM_MODE
       ])
         existingKeys.add(row.Dedup_Key__c);
     }
@@ -234,6 +235,7 @@ public without sharing class LibraryMemberNotificationService {
       SELECT Id, Name
       FROM Book__c
       WHERE Id = :bookId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (books.isEmpty())
@@ -242,8 +244,7 @@ public without sharing class LibraryMemberNotificationService {
     for (Member__c member : [
       SELECT Id, Email__c
       FROM Member__c
-      WHERE Status__c = 'Active' AND Email__c != NULL
-      LIMIT 500
+      WHERE Status__c = 'Active' AND Email__c != NULL WITH SYSTEM_MODE LIMIT 500
     ]) {
       inputs.add(
         new NotificationInput(
@@ -264,8 +265,7 @@ public without sharing class LibraryMemberNotificationService {
     List<Member_Notification__c> rows = [
       SELECT Id, Status__c
       FROM Member_Notification__c
-      WHERE Id = :notificationId AND Member__c = :memberId
-      LIMIT 1
+      WHERE Id = :notificationId AND Member__c = :memberId WITH SYSTEM_MODE LIMIT 1
     ];
     if (rows.isEmpty())
       throw new AuraHandledException('Notification was not found.');

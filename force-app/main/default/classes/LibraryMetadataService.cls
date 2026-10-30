@@ -81,6 +81,7 @@ public without sharing class LibraryMetadataService {
       SELECT Id, Name, ISBN__c
       FROM Book__c
       WHERE ISBN__c = :normalized OR ISBN__c = :isbn.trim()
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!duplicates.isEmpty())
@@ -129,6 +130,7 @@ public without sharing class LibraryMetadataService {
       SELECT Id, ISBN__c
       FROM Book__c
       WHERE Id = :bookId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     Book__c updateRecord = new Book__c(Id = bookId);
@@ -141,6 +143,7 @@ public without sharing class LibraryMetadataService {
           SELECT COUNT()
           FROM Book__c
           WHERE ISBN__c = :normalized AND Id != :bookId
+          WITH SYSTEM_MODE
         ] > 0
       )
         throw new AuraHandledException('Another book already uses this ISBN.');

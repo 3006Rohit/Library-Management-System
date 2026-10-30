@@ -33,11 +33,10 @@ import submitBookReview from "@salesforce/apex/LibraryMemberSessionController.su
 const NAVIGATION = [
   ["Dashboard", "utility:home"],
   ["Explore Books", "utility:knowledge_base"],
-  ["Rooms", "utility:company"],
-  ["Privacy Center", "utility:lock"],
   ["Scan & Borrow", "utility:scan"],
   ["My Books", "utility:bookmark"],
   ["Reservations", "utility:favorite"],
+  ["Study Rooms", "utility:company"],
   ["Member Assistant", "utility:chat"],
   ["Membership", "utility:groups"],
   ["Fines & Payments", "utility:money"],
@@ -49,14 +48,6 @@ const PAGE_COPY = {
     "Explore Books",
     "Discover new books, authors and categories"
   ],
-  Rooms: [
-    "Room Bookings",
-    "Find and reserve a library room for your next gathering"
-  ],
-  "Privacy Center": [
-    "Privacy Center",
-    "Export, correct, or close your library account securely"
-  ],
   "Scan & Borrow": [
     "Scan & Borrow",
     "Use your camera or enter a copy barcode for self-checkout"
@@ -65,6 +56,10 @@ const PAGE_COPY = {
   Reservations: [
     "My Reservations",
     "Track your book reservations and waiting list"
+  ],
+  "Study Rooms": [
+    "Study Rooms",
+    "Browse rooms and reserve a seat for a study session"
   ],
   "Member Assistant": [
     "Member Assistant",
@@ -190,12 +185,6 @@ export default class LibraryMemberShell extends LightningElement {
   get isExploreBooks() {
     return this.section === "Explore Books";
   }
-  get isRooms() {
-    return this.section === "Rooms";
-  }
-  get isPrivacyCenter() {
-    return this.section === "Privacy Center";
-  }
   get isScanner() {
     return this.section === "Scan & Borrow";
   }
@@ -204,6 +193,9 @@ export default class LibraryMemberShell extends LightningElement {
   }
   get isReservations() {
     return this.section === "Reservations";
+  }
+  get isStudyRooms() {
+    return this.section === "Study Rooms";
   }
   get isMemberAssistant() {
     return this.section === "Member Assistant";
@@ -320,17 +312,21 @@ export default class LibraryMemberShell extends LightningElement {
   get hasCurrentLoans() {
     return this.currentLoansPreview.length > 0;
   }
+  get onTimeLoans() {
+    const overdue = new Set(this.overdueLoans);
+    return this.activeLoans.filter((loan) => !overdue.has(loan));
+  }
   get selectedLoans() {
     if (this.loanTab === "Overdue") return this.overdueLoans;
     if (this.loanTab === "Returned") return this.returnedLoans;
-    return this.activeLoans.filter((loan) => loan.Status__c !== "Overdue");
+    return this.onTimeLoans;
   }
   get hasSelectedLoans() {
     return this.selectedLoans.length > 0;
   }
   get loanTabs() {
     return [
-      ["Active", this.activeLoans.length],
+      ["Active", this.onTimeLoans.length],
       ["Overdue", this.overdueLoans.length],
       ["Returned", this.returnedLoans.length]
     ].map(([label, count]) => ({

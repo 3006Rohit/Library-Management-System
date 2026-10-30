@@ -57,8 +57,7 @@ public without sharing class LibraryMembershipHoldService {
       FROM Library_Scan_Transaction__c
       WHERE
         Idempotency_Key__c = :key(member.Id, startDate, endDate)
-        AND Member__c = :member.Id
-      LIMIT 1
+        AND Member__c = :member.Id WITH SYSTEM_MODE LIMIT 1
     ];
     if (!existing.isEmpty())
       return toDto(existing[0], member);
@@ -120,8 +119,7 @@ public without sharing class LibraryMembershipHoldService {
       WHERE
         Id = :holdId
         AND Member__c = :member.Id
-        AND Operation__c = :OPERATION
-      LIMIT 1
+        AND Operation__c = :OPERATION WITH SYSTEM_MODE LIMIT 1
       FOR UPDATE
     ];
     if (rows.isEmpty() || rows[0].Status__c != 'Pending')
@@ -137,16 +135,14 @@ public without sharing class LibraryMembershipHoldService {
     Map<Id, Member__c> members = new Map<Id, Member__c>(
       [
         SELECT Id, Name, Membership_End_Date__c
-        FROM Member__c
-        LIMIT 5000
+        FROM Member__c WITH SYSTEM_MODE LIMIT 5000
       ]
     );
     List<HoldDTO> result = new List<HoldDTO>();
     for (Library_Scan_Transaction__c row : [
       SELECT Id, Member__c, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
-      WHERE Operation__c = :OPERATION
-      ORDER BY Created_At__c DESC
+      WHERE Operation__c = :OPERATION WITH SYSTEM_MODE ORDER BY Created_At__c DESC
       LIMIT 1000
     ]) {
       if (members.containsKey(row.Member__c))
@@ -167,8 +163,7 @@ public without sharing class LibraryMembershipHoldService {
     Library_Scan_Transaction__c row = [
       SELECT Id, Member__c, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
-      WHERE Id = :holdId AND Operation__c = :OPERATION
-      LIMIT 1
+      WHERE Id = :holdId AND Operation__c = :OPERATION WITH SYSTEM_MODE LIMIT 1
       FOR UPDATE
     ];
     if (row.Status__c != 'Pending')
@@ -181,8 +176,7 @@ public without sharing class LibraryMembershipHoldService {
     Member__c member = [
       SELECT Id, Name, Membership_End_Date__c
       FROM Member__c
-      WHERE Id = :row.Member__c
-      LIMIT 1
+      WHERE Id = :row.Member__c WITH SYSTEM_MODE LIMIT 1
       FOR UPDATE
     ];
     Date beforeMembershipEndDate = member.Membership_End_Date__c;
@@ -226,15 +220,13 @@ public without sharing class LibraryMembershipHoldService {
     Member__c member = [
       SELECT Id, Name, Membership_End_Date__c
       FROM Member__c
-      WHERE Id = :memberId
-      LIMIT 1
+      WHERE Id = :memberId WITH SYSTEM_MODE LIMIT 1
     ];
     List<HoldDTO> result = new List<HoldDTO>();
     for (Library_Scan_Transaction__c row : [
       SELECT Id, Member__c, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
-      WHERE Member__c = :memberId AND Operation__c = :OPERATION
-      ORDER BY Created_At__c DESC
+      WHERE Member__c = :memberId AND Operation__c = :OPERATION WITH SYSTEM_MODE ORDER BY Created_At__c DESC
       LIMIT 200
     ])
       result.add(toDto(row, member));
@@ -298,8 +290,7 @@ public without sharing class LibraryMembershipHoldService {
       WHERE
         Member__c = :memberId
         AND Operation__c = :OPERATION
-        AND Status__c IN ('Pending', 'Approved')
-      LIMIT 500
+        AND Status__c IN ('Pending', 'Approved') WITH SYSTEM_MODE LIMIT 500
     ]) {
       if (excludedId != null && row.Id == excludedId)
         continue;

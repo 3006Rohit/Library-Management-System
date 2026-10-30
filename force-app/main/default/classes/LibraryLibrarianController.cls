@@ -73,6 +73,7 @@ public with sharing class LibraryLibrarianController {
         SUM(Total_Copies__c) copies,
         SUM(Available_Copies__c) available
       FROM Book__c
+      WITH SYSTEM_MODE
     ];
     d.totalBooks = Integer.valueOf(books[0].get('total'));
     d.totalCopies = books[0].get('copies') == null
@@ -82,41 +83,48 @@ public with sharing class LibraryLibrarianController {
       ? 0
       : Integer.valueOf(books[0].get('available'));
     d.borrowedCopies = d.totalCopies - d.availableCopies;
-    d.totalMembers = [SELECT COUNT() FROM Member__c];
+    d.totalMembers = [SELECT COUNT() FROM Member__c WITH SYSTEM_MODE];
     d.activeMembers = [
       SELECT COUNT()
       FROM Member__c
       WHERE Status__c = 'Active' AND Membership_End_Date__c >= :Date.today()
+      WITH SYSTEM_MODE
     ];
     d.pendingRegistrations = [
       SELECT COUNT()
       FROM Library_Registration__c
       WHERE Status__c = 'Pending'
+      WITH SYSTEM_MODE
     ];
     d.activeLoans = [
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Return_Date__c = NULL AND Status__c IN ('Active', 'Overdue')
+      WITH SYSTEM_MODE
     ];
     d.overdueLoans = [
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Return_Date__c = NULL AND Due_Date__c < :System.now()
+      WITH SYSTEM_MODE
     ];
     d.pendingReservations = [
       SELECT COUNT()
       FROM Reservation__c
       WHERE Status__c = 'Pending'
+      WITH SYSTEM_MODE
     ];
     d.unpaidFines = [
       SELECT COUNT()
       FROM Fine__c
       WHERE Status__c IN ('Unpaid', 'Partially Paid')
+      WITH SYSTEM_MODE
     ];
     List<AggregateResult> revenue = [
       SELECT SUM(Amount__c) total
       FROM Membership_Payment__c
       WHERE Status__c = 'Paid'
+      WITH SYSTEM_MODE
     ];
     d.membershipRevenue = revenue[0].get('total') == null
       ? 0
@@ -133,6 +141,7 @@ public with sharing class LibraryLibrarianController {
         Return_Date__c,
         Status__c
       FROM Borrow_Record__c
+      WITH SYSTEM_MODE
       ORDER BY Borrow_Date__c DESC
       LIMIT 10
     ];
@@ -149,6 +158,7 @@ public with sharing class LibraryLibrarianController {
         Provisioning_State__c
       FROM Library_Registration__c
       WHERE Status__c = 'Pending'
+      WITH SYSTEM_MODE
       ORDER BY Registration_Date__c ASC
       LIMIT 10
     ];
@@ -166,6 +176,7 @@ public with sharing class LibraryLibrarianController {
         ETA_Reason__c
       FROM Reservation__c
       WHERE Status__c = 'Ready'
+      WITH SYSTEM_MODE
       ORDER BY Ready_Date__c ASC
       LIMIT 10
     ];
@@ -175,7 +186,7 @@ public with sharing class LibraryLibrarianController {
   @AuraEnabled(cacheable=false)
   public static LibraryDataCloudService.LibrarianAnalyticsDTO getDashboardAnalytics() {
     LibraryPolicyService.require('Manage_Library_Circulation');
-    return LibraryDataCloudService.getLibrarianAnalytics();
+    return LibraryDataCloudService.getRealtimeLibrarianAnalytics();
   }
   @AuraEnabled(cacheable=true)
   public static LibraryDataCloudReadinessService.StatusDTO getDataCloudReadiness() {
@@ -293,13 +304,13 @@ public with sharing class LibraryLibrarianController {
     if (!clauses.isEmpty())
       q += ' WHERE ' + String.join(clauses, ' AND ');
     q += ' ORDER BY Name LIMIT :size OFFSET :offsetValue';
-    List<Book__c> results = Database.query(q);
+    List<Book__c> results = Database.query(q, AccessLevel.SYSTEM_MODE);
     return results;
   }
   @AuraEnabled(cacheable=true)
   public static List<Author__c> getAuthors() {
     LibraryPolicyService.require('Manage_Library_Catalog');
-    return [SELECT Id, Name FROM Author__c ORDER BY Name LIMIT 500];
+    return [SELECT Id, Name FROM Author__c WITH SYSTEM_MODE ORDER BY Name LIMIT 500];
   }
   @AuraEnabled(cacheable=true)
   public static List<Book_Category__c> getCategories() {
@@ -308,6 +319,7 @@ public with sharing class LibraryLibrarianController {
       SELECT Id, Name
       FROM Book_Category__c
       WHERE Active__c = TRUE
+      WITH SYSTEM_MODE
       ORDER BY Name
       LIMIT 500
     ];
@@ -349,6 +361,7 @@ public with sharing class LibraryLibrarianController {
         )
       FROM Book__c
       WHERE Id = :bookId
+      WITH SYSTEM_MODE
     ];
   }
   @AuraEnabled(cacheable=true)
@@ -371,7 +384,7 @@ public with sharing class LibraryLibrarianController {
     if (!clauses.isEmpty())
       q += ' WHERE ' + String.join(clauses, ' AND ');
     q += ' ORDER BY Last_Name__c LIMIT 100';
-    return Database.query(q);
+    return Database.query(q, AccessLevel.SYSTEM_MODE);
   }
   @AuraEnabled(cacheable=true)
   public static List<Book_Copy__c> getAvailableCopies(Id bookId) {
@@ -387,6 +400,7 @@ public with sharing class LibraryLibrarianController {
         Book__r.Name
       FROM Book_Copy__c
       WHERE Book__c = :bookId AND Status__c = 'Available'
+      WITH SYSTEM_MODE
       ORDER BY Name
       LIMIT 100
     ];
@@ -422,7 +436,7 @@ public with sharing class LibraryLibrarianController {
     if (!clauses.isEmpty())
       q += ' WHERE ' + String.join(clauses, ' AND ');
     q += ' ORDER BY Name LIMIT :size OFFSET :off';
-    return Database.query(q);
+    return Database.query(q, AccessLevel.SYSTEM_MODE);
   }
   @AuraEnabled
   public static Id addBook(
@@ -569,6 +583,7 @@ public with sharing class LibraryLibrarianController {
       SELECT Id, Contact__c
       FROM Member__c
       WHERE Id = :memberId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (existing.Contact__c != null) {
@@ -620,6 +635,7 @@ public with sharing class LibraryLibrarianController {
           SELECT COUNT()
           FROM Member__c
           WHERE Normalized_Email__c = :normalizedEmail
+          WITH SYSTEM_MODE
         ]
       : [
           SELECT COUNT()
@@ -627,6 +643,7 @@ public with sharing class LibraryLibrarianController {
           WHERE
             Normalized_Email__c = :normalizedEmail
             AND Id != :excludedMemberId
+          WITH SYSTEM_MODE
         ];
     if (duplicates > 0)
       throw new AuraHandledException(
@@ -643,6 +660,7 @@ public with sharing class LibraryLibrarianController {
       SELECT Id, Duration_Days__c, Borrow_Limit__c
       FROM Membership_Plan__c
       WHERE Id = :planId AND Active__c = TRUE
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (plans.isEmpty())
@@ -669,6 +687,7 @@ public with sharing class LibraryLibrarianController {
         Price__c
       FROM Book_Copy__c
       WHERE Book__c = :bookId
+      WITH SYSTEM_MODE
       ORDER BY Name
       LIMIT 200
     ];
@@ -683,7 +702,7 @@ public with sharing class LibraryLibrarianController {
     if (!String.isBlank(status))
       q += ' WHERE Status__c=:status';
     q += ' ORDER BY Registration_Date__c DESC LIMIT 200';
-    return Database.query(q);
+    return Database.query(q, AccessLevel.SYSTEM_MODE);
   }
   @AuraEnabled
   public static void approveRegistration(Id registrationId) {
@@ -707,7 +726,7 @@ public with sharing class LibraryLibrarianController {
     if (!String.isBlank(status))
       q += ' WHERE Status__c=:status';
     q += ' ORDER BY Reservation_Date__c DESC LIMIT 200';
-    return Database.query(q);
+    return Database.query(q, AccessLevel.SYSTEM_MODE);
   }
   public static List<Fine__c> getFines() {
     return getFines(null);
@@ -719,7 +738,7 @@ public with sharing class LibraryLibrarianController {
     if (!String.isBlank(status))
       q += ' WHERE Status__c=:status';
     q += ' ORDER BY Generated_Date__c DESC LIMIT 200';
-    return Database.query(q);
+    return Database.query(q, AccessLevel.SYSTEM_MODE);
   }
   @AuraEnabled(cacheable=true)
   public static MemberDetail getMemberDetail(Id memberId) {
@@ -743,6 +762,7 @@ public with sharing class LibraryLibrarianController {
         Account_Status__c
       FROM Member__c
       WHERE Id = :memberId
+      WITH SYSTEM_MODE
     ];
     d.loans = [
       SELECT
@@ -757,6 +777,7 @@ public with sharing class LibraryLibrarianController {
         Renewal_Count__c
       FROM Borrow_Record__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
       ORDER BY Borrow_Date__c DESC
       LIMIT 100
     ];
@@ -777,6 +798,7 @@ public with sharing class LibraryLibrarianController {
         ETA_Reason__c
       FROM Reservation__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
       ORDER BY Reservation_Date__c DESC
       LIMIT 100
     ];
@@ -792,6 +814,7 @@ public with sharing class LibraryLibrarianController {
         Generated_Date__c
       FROM Fine__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
       ORDER BY Generated_Date__c DESC
       LIMIT 100
     ];
@@ -808,6 +831,7 @@ public with sharing class LibraryLibrarianController {
         Transaction_Reference__c
       FROM Membership_Payment__c
       WHERE Member__c = :memberId
+      WITH SYSTEM_MODE
       ORDER BY Payment_Date__c DESC
       LIMIT 100
     ];
@@ -829,6 +853,7 @@ public with sharing class LibraryLibrarianController {
       SELECT Id, External_Auth_Id__c, Email_Verified__c
       FROM Member__c
       WHERE Id = :memberId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (
@@ -856,6 +881,7 @@ public with sharing class LibraryLibrarianController {
       SELECT Id, User__c
       FROM Member__c
       WHERE Id = :memberId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (members.isEmpty() || members[0].User__c == null)
@@ -883,6 +909,7 @@ public with sharing class LibraryLibrarianController {
       SELECT Id, Member__c, Book_Copy__c, Status__c
       FROM Reservation__c
       WHERE Id = :reservationId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (
@@ -934,6 +961,7 @@ public with sharing class LibraryLibrarianController {
       SELECT Book_Copy__r.Book__c
       FROM Borrow_Record__c
       WHERE Id = :loanId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (loans.isEmpty() || loans[0].Book_Copy__r == null)
@@ -944,6 +972,7 @@ public with sharing class LibraryLibrarianController {
       SELECT Id, Name, Barcode__c, Shelf_Location__c, Condition__c
       FROM Book_Copy__c
       WHERE Book__c = :loans[0].Book_Copy__r.Book__c AND Status__c = 'Available'
+      WITH SYSTEM_MODE
       ORDER BY Name
       LIMIT 100
     ];
@@ -965,6 +994,7 @@ public with sharing class LibraryLibrarianController {
         Fee__c,
         Active__c
       FROM Membership_Plan__c
+      WITH SYSTEM_MODE
       ORDER BY Fee__c
       LIMIT 200
     ];
@@ -1022,7 +1052,7 @@ public with sharing class LibraryLibrarianController {
     List<PaymentRow> result = new List<PaymentRow>();
     for (
       Membership_Payment__c payment : (List<Membership_Payment__c>) Database.query(
-        q
+        q, AccessLevel.SYSTEM_MODE
       )
     ) {
       PaymentRow row = new PaymentRow();
@@ -1040,7 +1070,7 @@ public with sharing class LibraryLibrarianController {
     if (!String.isBlank(status))
       fineQuery += ' AND Status__c=:status';
     fineQuery += ' ORDER BY Paid_Date__c DESC LIMIT 200';
-    for (Fine__c fine : (List<Fine__c>) Database.query(fineQuery)) {
+    for (Fine__c fine : (List<Fine__c>) Database.query(fineQuery, AccessLevel.SYSTEM_MODE)) {
       PaymentRow row = new PaymentRow();
       row.id = fine.Id;
       row.name = fine.Name;
@@ -1065,7 +1095,7 @@ public with sharing class LibraryLibrarianController {
     if (!String.isBlank(status))
       q += ' WHERE Status__c=:status';
     q += ' ORDER BY Borrow_Date__c DESC LIMIT 200';
-    return Database.query(q);
+    return Database.query(q, AccessLevel.SYSTEM_MODE);
   }
   @AuraEnabled
   public static Id createReservation(Id memberId, Id bookId) {
@@ -1126,6 +1156,14 @@ public with sharing class LibraryLibrarianController {
       capacity,
       equipment
     );
+  }
+  @AuraEnabled
+  public static List<LibraryRoomBookingService.RoomDTO> getLibraryRoomsForLibrarian() {
+    return LibraryRoomBookingService.listRooms();
+  }
+  @AuraEnabled
+  public static void retireLibraryRoom(Id roomId) {
+    LibraryRoomBookingService.retireRoom(roomId);
   }
   @AuraEnabled
   public static Id createReadingChallenge(

@@ -37,6 +37,7 @@ public without sharing class LibraryMemberReviewService {
       SELECT Id, Name
       FROM Book__c
       WHERE Id = :bookId AND Status__c != 'Archived'
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     String key =
@@ -50,8 +51,7 @@ public without sharing class LibraryMemberReviewService {
       WHERE
         Idempotency_Key__c = :key
         AND Member__c = :member.Id
-        AND Operation__c = :OPERATION
-      LIMIT 1
+        AND Operation__c = :OPERATION WITH SYSTEM_MODE LIMIT 1
     ];
     Library_Scan_Transaction__c row = existing.isEmpty()
       ? new Library_Scan_Transaction__c(
@@ -83,8 +83,7 @@ public without sharing class LibraryMemberReviewService {
     List<Library_Scan_Transaction__c> rows = [
       SELECT Id, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
-      WHERE Member__c = :member.Id AND Operation__c = :OPERATION
-      ORDER BY Created_At__c DESC
+      WHERE Member__c = :member.Id AND Operation__c = :OPERATION WITH SYSTEM_MODE ORDER BY Created_At__c DESC
       LIMIT 200
     ];
     return mapRows(rows);
@@ -94,12 +93,13 @@ public without sharing class LibraryMemberReviewService {
     LibraryMemberSessionService.getCurrentMember(sessionToken);
     if (bookId == null)
       return new List<ReviewDTO>();
-    Book__c book = [SELECT Id, Name FROM Book__c WHERE Id = :bookId LIMIT 1];
+    Book__c book = [SELECT Id, Name FROM Book__c WHERE Id = :bookId WITH SYSTEM_MODE LIMIT 1];
     String bookPattern = '%"b":"' + String.valueOf(bookId) + '"%';
     List<Library_Scan_Transaction__c> rows = [
       SELECT Id, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION AND Result_Message__c LIKE :bookPattern
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ];
@@ -120,6 +120,7 @@ public without sharing class LibraryMemberReviewService {
       SELECT Id, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :reviewId AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     Map<String, Object> payload = parse(row.Result_Message__c);
@@ -143,7 +144,7 @@ public without sharing class LibraryMemberReviewService {
     }
     Map<Id, Book__c> books = ids.isEmpty()
       ? new Map<Id, Book__c>()
-      : new Map<Id, Book__c>([SELECT Id, Name FROM Book__c WHERE Id IN :ids]);
+      : new Map<Id, Book__c>([SELECT Id, Name FROM Book__c WHERE Id IN :ids WITH SYSTEM_MODE]);
     List<ReviewDTO> result = new List<ReviewDTO>();
     for (Library_Scan_Transaction__c row : rows)
       if (payloads.containsKey(row.Id)) {

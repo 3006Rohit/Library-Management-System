@@ -14,7 +14,7 @@ public without sharing class LibraryCatalogService {
     LibraryPolicyService.require('Manage_Library_Catalog');
     if (String.isBlank(title) || String.isBlank(isbn))
       throw new AuraHandledException('Title and ISBN are required.');
-    if ([SELECT COUNT() FROM Book__c WHERE ISBN__c = :isbn.trim()] > 0)
+    if ([SELECT COUNT() FROM Book__c WHERE ISBN__c = :isbn.trim() WITH SYSTEM_MODE] > 0)
       throw new AuraHandledException('A book with this ISBN already exists.');
     Book__c book = new Book__c(
       Name = title.trim(),
@@ -45,9 +45,9 @@ public without sharing class LibraryCatalogService {
     LibraryPolicyService.require('Manage_Library_Catalog');
     if (bookId == null || String.isBlank(barcode))
       throw new AuraHandledException('Book and barcode are required.');
-    Book__c book = [SELECT Id FROM Book__c WHERE Id = :bookId FOR UPDATE];
+    Book__c book = [SELECT Id FROM Book__c WHERE Id = :bookId WITH SYSTEM_MODE FOR UPDATE];
     if (
-      [SELECT COUNT() FROM Book_Copy__c WHERE Barcode__c = :barcode.trim()] > 0
+      [SELECT COUNT() FROM Book_Copy__c WHERE Barcode__c = :barcode.trim() WITH SYSTEM_MODE] > 0
     )
       throw new AuraHandledException(
         'A copy with this barcode already exists.'
@@ -73,6 +73,7 @@ public without sharing class LibraryCatalogService {
       SELECT Id, Status__c
       FROM Book_Copy__c
       WHERE Id = :copyId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     if (copy.Status__c == 'Borrowed')
@@ -100,6 +101,7 @@ public without sharing class LibraryCatalogService {
         SELECT COUNT()
         FROM Book__c
         WHERE ISBN__c = :isbn.trim() AND Id != :bookId
+        WITH SYSTEM_MODE
       ] > 0
     )
       throw new AuraHandledException('A book with this ISBN already exists.');
@@ -114,8 +116,8 @@ public without sharing class LibraryCatalogService {
       Description__c = description,
       Cover_Image_URL__c = coverUrl
     );
-    delete [SELECT Id FROM Book_Author__c WHERE Book__c = :bookId];
-    delete [SELECT Id FROM Book_Category_Link__c WHERE Book__c = :bookId];
+    delete [SELECT Id FROM Book_Author__c WHERE Book__c = :bookId WITH SYSTEM_MODE];
+    delete [SELECT Id FROM Book_Category_Link__c WHERE Book__c = :bookId WITH SYSTEM_MODE];
     createLinks(bookId, authorIds, categoryIds);
   }
   public static void updateCopy(
@@ -131,6 +133,7 @@ public without sharing class LibraryCatalogService {
       SELECT Id, Book__c, Status__c
       FROM Book_Copy__c
       WHERE Id = :copyId
+      WITH SYSTEM_MODE
       FOR UPDATE
     ];
     Set<String> allowed = new Set<String>{
@@ -157,6 +160,7 @@ public without sharing class LibraryCatalogService {
           Book_Copy__c = :copyId
           AND Return_Date__c = NULL
           AND Status__c IN ('Active', 'Overdue')
+        WITH SYSTEM_MODE
       ] > 0
     )
       throw new AuraHandledException(

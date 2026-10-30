@@ -11,7 +11,7 @@ public without sharing class LibraryReservationAuditService {
       return;
     try {
       Database.query(
-        'SELECT Id,Reservation__c,Action__c,From_Status__c,To_Status__c,Queue_Position__c,Actor__c,Occurred_At__c,Notes__c FROM Reservation_Audit__c LIMIT 0'
+        'SELECT Id,Reservation__c,Action__c,From_Status__c,To_Status__c,Queue_Position__c,Actor__c,Occurred_At__c,Notes__c FROM Reservation_Audit__c LIMIT 0', AccessLevel.SYSTEM_MODE
       );
       Database.insert(
         new Reservation_Audit__c(

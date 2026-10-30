@@ -98,6 +98,7 @@ public without sharing class LibraryMembershipPaymentService {
       SELECT Id, Name, Fee__c, Duration_Days__c
       FROM Membership_Plan__c
       WHERE Id = :newPlanId AND Active__c = TRUE
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (plans.isEmpty())
@@ -126,8 +127,7 @@ public without sharing class LibraryMembershipPaymentService {
         WHERE
           Member__c = :member.Id
           AND New_Plan__c = :plan.Id
-          AND Status__c = 'Paid'
-      ] > 0
+          AND Status__c = 'Paid' WITH SYSTEM_MODE ] > 0
     )
       throw new AuraHandledException(
         'A completed payment already exists for this membership upgrade.'

@@ -338,18 +338,21 @@ public without sharing class LibraryMemberSessionController {
         SELECT Book_Category__c
         FROM Book_Category_Link__c
         WHERE Book__c IN :borrowedBookIds
+        WITH SYSTEM_MODE
       ])
         preferredCategoryIds.add(link.Book_Category__c);
       for (Book_Category_Link__c link : [
         SELECT Book_Category__c
         FROM Book_Category_Link__c
         WHERE Book__c IN :recentBorrowedBookIds
+        WITH SYSTEM_MODE
       ])
         recentCategoryIds.add(link.Book_Category__c);
       for (Book_Author__c link : [
         SELECT Author__c
         FROM Book_Author__c
         WHERE Book__c IN :borrowedBookIds
+        WITH SYSTEM_MODE
       ])
         preferredAuthorIds.add(link.Author__c);
     }
@@ -383,6 +386,7 @@ public without sharing class LibraryMemberSessionController {
         )
       FROM Book__c
       WHERE Status__c = 'Active' AND Id NOT IN :borrowedBookIds
+      WITH SYSTEM_MODE
       ORDER BY Available_Copies__c DESC NULLS LAST, Name
       LIMIT 200
     ];
@@ -431,6 +435,7 @@ public without sharing class LibraryMemberSessionController {
         SELECT Id, Name, Description__c
         FROM Book_Category__c
         WHERE Active__c = TRUE
+        WITH SYSTEM_MODE
         ORDER BY Name
         LIMIT 100
       ]
@@ -460,8 +465,28 @@ public without sharing class LibraryMemberSessionController {
       : '%' + searchTerm.trim() + '%';
     String q = 'SELECT Id,Name,ISBN__c,Publisher__c,Publication_Year__c,Edition__c,Language__c,Description__c,Cover_Image_URL__c,Total_Copies__c,Available_Copies__c,Status__c,(SELECT Author__r.Name FROM Book_Authors__r),(SELECT Book_Category__r.Name FROM Book_Category_Links__r) FROM Book__c';
     List<String> c = new List<String>();
-    if (term != null)
-      c.add('(Name LIKE :term OR ISBN__c LIKE :term)');
+    Set<Id> relatedBookIds = new Set<Id>();
+    if (term != null) {
+      for (Book_Author__c link : [
+        SELECT Book__c
+        FROM Book_Author__c
+        WHERE Author__r.Name LIKE :term
+        WITH SYSTEM_MODE
+        LIMIT 200
+      ])
+        relatedBookIds.add(link.Book__c);
+      for (Book_Category_Link__c link : [
+        SELECT Book__c
+        FROM Book_Category_Link__c
+        WHERE Book_Category__r.Name LIKE :term
+        WITH SYSTEM_MODE
+        LIMIT 200
+      ])
+        relatedBookIds.add(link.Book__c);
+      c.add(
+        '(Name LIKE :term OR ISBN__c LIKE :term OR Publisher__c LIKE :term OR Id IN :relatedBookIds)'
+      );
+    }
     if (!String.isBlank(categoryId))
       c.add(
         'Id IN (SELECT Book__c FROM Book_Category_Link__c WHERE Book_Category__c=:categoryId)'
@@ -473,7 +498,7 @@ public without sharing class LibraryMemberSessionController {
     if (!c.isEmpty())
       q += ' WHERE ' + String.join(c, ' AND ');
     q += ' ORDER BY Name LIMIT :size OFFSET :off';
-    List<Book__c> results = readableBooks((List<Book__c>) Database.query(q));
+    List<Book__c> results = readableBooks((List<Book__c>) Database.query(q, AccessLevel.SYSTEM_MODE));
     if (!String.isBlank(searchTerm))
       LibraryAcquisitionInsightService.recordSearchTelemetry(
         searchTerm,
@@ -716,7 +741,7 @@ public without sharing class LibraryMemberSessionController {
   public static String issueEventCheckInToken(String sessionToken, Id eventId) {
     return LibraryEventService.issueCheckInToken(sessionToken, eventId);
   }
-  @AuraEnabled(cacheable=true)
+  @AuraEnabled
   public static List<LibraryRoomBookingService.RoomDTO> getLibraryRooms(
     String sessionToken,
     Datetime startAt,
@@ -731,9 +756,24 @@ public without sharing class LibraryMemberSessionController {
     );
   }
   @AuraEnabled
+  public static List<LibraryRoomBookingService.SeatDTO> getLibraryRoomSeats(
+    String sessionToken,
+    Id roomId,
+    Datetime startAt,
+    Datetime endAt
+  ) {
+    return LibraryRoomBookingService.getSeats(
+      sessionToken,
+      roomId,
+      startAt,
+      endAt
+    );
+  }
+  @AuraEnabled
   public static LibraryRoomBookingService.BookingDTO bookLibraryRoom(
     String sessionToken,
     Id roomId,
+    Integer seatNumber,
     Datetime startAt,
     Datetime endAt,
     String purpose
@@ -741,12 +781,13 @@ public without sharing class LibraryMemberSessionController {
     return LibraryRoomBookingService.book(
       sessionToken,
       roomId,
+      seatNumber,
       startAt,
       endAt,
       purpose
     );
   }
-  @AuraEnabled(cacheable=true)
+  @AuraEnabled
   public static List<LibraryRoomBookingService.BookingDTO> getMyRoomBookings(
     String sessionToken
   ) {
@@ -1060,6 +1101,7 @@ public without sharing class LibraryMemberSessionController {
           (SELECT Book_Category__r.Name FROM Book_Category_Links__r)
         FROM Book__c
         WHERE Id = :bookId
+        WITH SYSTEM_MODE
         LIMIT 1
       ]
     )[0];

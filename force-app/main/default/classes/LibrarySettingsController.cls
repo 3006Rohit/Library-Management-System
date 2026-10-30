@@ -22,6 +22,7 @@ public with sharing class LibrarySettingsController {
         Fine_Payment_Enabled__c
       FROM Library_Settings__c
       WHERE Settings_Key__c = 'Default'
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!settings.isEmpty())

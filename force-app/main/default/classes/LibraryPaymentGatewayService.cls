@@ -73,6 +73,7 @@ public without sharing class LibraryPaymentGatewayService {
         Webhook_Secret__c
       FROM Payment_Gateway_Config__mdt
       WHERE DeveloperName = 'Default'
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (rows.isEmpty()) {
@@ -132,6 +133,7 @@ public without sharing class LibraryPaymentGatewayService {
         Gateway_Payment_Id__c
       FROM Membership_Payment__c
       WHERE Idempotency_Key__c = :idempotencyKey.trim()
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     Membership_Payment__c payment;
@@ -198,6 +200,7 @@ public without sharing class LibraryPaymentGatewayService {
       WHERE
         Operation__c = :WEBHOOK_OPERATION
         AND Idempotency_Key__c = :('PAYMENT-EVENT:' + eventId)
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     WebhookDTO result = new WebhookDTO();
@@ -292,6 +295,7 @@ public without sharing class LibraryPaymentGatewayService {
       WHERE
         Operation__c = :REFUND_OPERATION
         AND Idempotency_Key__c = :idempotencyKey.trim()
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     Library_Scan_Transaction__c row;
@@ -302,6 +306,7 @@ public without sharing class LibraryPaymentGatewayService {
         SELECT Id, Member__c, Amount__c, Refund_Amount__c, Status__c
         FROM Membership_Payment__c
         WHERE Id = :paymentId
+        WITH SYSTEM_MODE
         LIMIT 1
         FOR UPDATE
       ];
@@ -409,6 +414,7 @@ public without sharing class LibraryPaymentGatewayService {
         Transaction_Reference__c
       FROM Membership_Payment__c
       WHERE Gateway_Payment_Id__c = :gatewayId
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -428,6 +434,7 @@ public without sharing class LibraryPaymentGatewayService {
           Transaction_Reference__c
         FROM Membership_Payment__c
         WHERE Idempotency_Key__c = :idempotencyKey
+        WITH SYSTEM_MODE
         LIMIT 1
         FOR UPDATE
       ];
@@ -452,6 +459,7 @@ public without sharing class LibraryPaymentGatewayService {
       SELECT Webhook_Secret__c
       FROM Payment_Gateway_Config__mdt
       WHERE DeveloperName = 'Default'
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!rows.isEmpty() && !String.isBlank(rows[0].Webhook_Secret__c))

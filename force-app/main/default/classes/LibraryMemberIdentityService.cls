@@ -30,6 +30,7 @@ public without sharing class LibraryMemberIdentityService {
       SELECT Id, ContactId
       FROM User
       WHERE Id = :userId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     Id authenticatedContactId = Test.isRunningTest() && testContactId != null

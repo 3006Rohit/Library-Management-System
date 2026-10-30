@@ -35,6 +35,7 @@ public without sharing class LibraryAgentConfirmationService {
           Renewal_Count__c
         FROM Borrow_Record__c
         WHERE Id = :targetId AND Member__c = :member.Id
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       previewText =
@@ -48,6 +49,7 @@ public without sharing class LibraryAgentConfirmationService {
         SELECT Id, Member__c, Book__r.Name, Status__c
         FROM Reservation__c
         WHERE Id = :targetId AND Member__c = :member.Id
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       previewText =
@@ -115,6 +117,7 @@ public without sharing class LibraryAgentConfirmationService {
         Idempotency_Key__c = :tokenHash
         AND Member__c = :member.Id
         AND Operation__c IN ('RENEW_LOAN', 'CANCEL_RESERVATION')
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];

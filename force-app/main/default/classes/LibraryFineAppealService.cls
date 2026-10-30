@@ -43,6 +43,7 @@ public without sharing class LibraryFineAppealService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Member__c = :member.Id
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (!existing.isEmpty())
@@ -74,13 +75,14 @@ public without sharing class LibraryFineAppealService {
   public static List<AppealDTO> getAll() {
     LibraryPolicyService.require('Manage_Library_Fines');
     Map<Id, Fine__c> fines = new Map<Id, Fine__c>(
-      [SELECT Id, Name, Amount__c FROM Fine__c LIMIT 2000]
+      [SELECT Id, Name, Amount__c FROM Fine__c WITH SYSTEM_MODE LIMIT 2000]
     );
     List<AppealDTO> result = new List<AppealDTO>();
     for (Library_Scan_Transaction__c row : [
       SELECT Id, Member__c, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 500
     ]) {
@@ -103,6 +105,7 @@ public without sharing class LibraryFineAppealService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :appealId AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -121,6 +124,7 @@ public without sharing class LibraryFineAppealService {
         SELECT Id, Name, Amount__c
         FROM Fine__c
         WHERE Member__c = :memberId
+        WITH SYSTEM_MODE
         LIMIT 500
       ]
     );
@@ -129,6 +133,7 @@ public without sharing class LibraryFineAppealService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Member__c = :memberId AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 200
     ]) {
@@ -143,6 +148,7 @@ public without sharing class LibraryFineAppealService {
       SELECT Id, Name, Amount__c, Status__c
       FROM Fine__c
       WHERE Id = :fineId AND Member__c = :memberId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (rows.isEmpty())

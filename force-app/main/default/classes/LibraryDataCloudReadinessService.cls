@@ -87,16 +87,18 @@ public with sharing class LibraryDataCloudReadinessService {
       'Member_Session__c',
       'Contact Point Phone'
     };
-    result.totalMembers = [SELECT COUNT() FROM Member__c];
+    result.totalMembers = [SELECT COUNT() FROM Member__c WITH SYSTEM_MODE];
     result.productionMembers = [
       SELECT COUNT()
       FROM Member__c
       WHERE Member_Type__c = 'Production'
+      WITH SYSTEM_MODE
     ];
     result.unclassifiedMembers = [
       SELECT COUNT()
       FROM Member__c
       WHERE Member_Type__c = NULL
+      WITH SYSTEM_MODE
     ];
     result.productionMembersMissingEmail = [
       SELECT COUNT()
@@ -105,51 +107,61 @@ public with sharing class LibraryDataCloudReadinessService {
         Member_Type__c = 'Production'
         AND (Email__c = NULL
         OR Email_Verified__c = FALSE)
+      WITH SYSTEM_MODE
     ];
     result.nonProductionLoans = [
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Member__c != NULL AND Member__r.Member_Type__c != 'Production'
+      WITH SYSTEM_MODE
     ];
     result.productionLoans = [
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Member__c != NULL AND Member__r.Member_Type__c = 'Production'
+      WITH SYSTEM_MODE
     ];
     result.orphanLoans = [
       SELECT COUNT()
       FROM Borrow_Record__c
       WHERE Member__c = NULL
+      WITH SYSTEM_MODE
     ];
     result.nonProductionReservations = [
       SELECT COUNT()
       FROM Reservation__c
       WHERE Member__c != NULL AND Member__r.Member_Type__c != 'Production'
+      WITH SYSTEM_MODE
     ];
     result.productionReservations = [
       SELECT COUNT()
       FROM Reservation__c
       WHERE Member__c != NULL AND Member__r.Member_Type__c = 'Production'
+      WITH SYSTEM_MODE
     ];
     result.orphanReservations = [
       SELECT COUNT()
       FROM Reservation__c
       WHERE Member__c = NULL
+      WITH SYSTEM_MODE
     ];
     result.nonProductionFines = [
       SELECT COUNT()
       FROM Fine__c
       WHERE Member__c != NULL AND Member__r.Member_Type__c != 'Production'
+      WITH SYSTEM_MODE
     ];
     result.productionFines = [
       SELECT COUNT()
       FROM Fine__c
       WHERE Member__c != NULL AND Member__r.Member_Type__c = 'Production'
+      WITH SYSTEM_MODE
     ];
     result.orphanFines = [
       SELECT COUNT()
       FROM Fine__c
       WHERE Member__c = NULL
+      WITH SYSTEM_MODE
     ];
     if (result.productionMembers == 0)
       result.blockers.add('No Production members are available for ingestion.');

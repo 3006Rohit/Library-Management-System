@@ -29,6 +29,7 @@ public without sharing class LibraryScanService {
       SELECT Id, Barcode__c, Status__c, Book__r.Name
       FROM Book_Copy__c
       WHERE Barcode__c = :normalizedBarcode
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (copies.isEmpty())
@@ -89,6 +90,7 @@ public without sharing class LibraryScanService {
         SELECT Id, Due_Date__c
         FROM Borrow_Record__c
         WHERE Id = :loanId
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       scan.Borrow_Record__c = loan.Id;
@@ -148,6 +150,7 @@ public without sharing class LibraryScanService {
           Member__c = :member.Id
           AND Return_Date__c = NULL
           AND Book_Copy__r.Barcode__c = :normalizedBarcode
+        WITH SYSTEM_MODE
         ORDER BY Borrow_Date__c DESC
         LIMIT 1
       ];
@@ -186,6 +189,7 @@ public without sharing class LibraryScanService {
       SELECT Id, Barcode__c, Status__c, Book__r.Name
       FROM Book_Copy__c
       WHERE Barcode__c = :barcode
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     return copies.isEmpty() ? null : copies[0];
@@ -229,6 +233,7 @@ public without sharing class LibraryScanService {
         Borrow_Record__c
       FROM Library_Scan_Transaction__c
       WHERE Idempotency_Key__c = :key AND Member__c = :memberId
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     return rows.isEmpty() ? null : rows[0];

@@ -63,7 +63,7 @@ start_agent agent_router:
 
     reasoning:
         instructions: ->
-            | Select the best tool or subagent based on the user's intent and conversation history. Preserve topic continuity across turns. Treat short replies such as yes, no, those, them, and how many as follow-ups to the previous library question. For any library-related question, choose the closest library subagent; only use off-topic handling when the request is clearly unrelated to library services. Do not route a library question to the ambiguous topic merely because it is short.
+            | Select the best tool or subagent based on the user's intent and conversation history. Preserve topic continuity across turns. Treat short replies such as yes, no, those, them, and how many as follow-ups to the previous library question. For any library-related question, choose the closest library subagent; only use off-topic handling when the request is clearly unrelated to library services. Do not route a library question to the ambiguous topic merely because it is short. Questions asking how many, a count, a total, overdue loans, active loans, reservation queues, or fines must go to Library_Analytics or Circulation_Information, never answered from memory.
 
         actions:
             go_to_Library_Analytics: @utils.transition to @subagent.Library_Analytics
@@ -84,6 +84,7 @@ subagent Library_Analytics:
             | Provide live aggregate analytics related to library copies, loans, reservations, fines, popularity, and demand. Invoke LibraryAgentAnalyticsAction immediately for every current-value question, including follow-ups and short confirmations. Pass the current question or preserved prior question as requestContext. Do not ask for a time period unless the user explicitly requests one. You cannot modify data or provide member-specific details.
               Additional instructions follow:
               If the query is about library-wide metrics or analytics, use LibraryAgentAnalyticsAction.
+              totalCopies counts physical copies, not titles. When asked how many books, say how many copies the library holds and that titles can be found through catalog search. Report figures exactly as the action returned them. Current counts, popularity, and demand come from the live fields. Mention Data Cloud trends (dataCloudTrendsJson) only when they contain data, and always say they are a snapshot using dataCloudRefreshNote; if they are empty, say no Data Cloud trend data is available and do not infer any. Never present a Data Cloud figure as a live count.
               
               Ensure the request does not pertain to individual member data or require write operations.
               
@@ -232,6 +233,16 @@ subagent Library_Analytics:
                 "reservationDemandJson": string
                     description: "JSON array of books with the highest reservation demand."
                     label: "Reservation Demand JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                "dataCloudTrendsJson": string
+                    description: "JSON of Data Cloud trend snapshots (top borrowed books and reservation demand). May lag live counts and may be empty."
+                    label: "Data Cloud Trends JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                "dataCloudRefreshNote": string
+                    description: "Refresh time and reliability note for the Data Cloud trend snapshot."
+                    label: "Data Cloud Refresh Note"
                     is_displayable: False
                     filter_from_agent: False
 
@@ -547,17 +558,20 @@ subagent Circulation_Information:
 
     reasoning:
         instructions: ->
-            | Provide live aggregate circulation information, including loans, overdue items, reservations, and fines. Invoke LibraryAgentAnalyticsAction immediately for every current-value question, including follow-ups and short confirmations. Pass the current conversation context as requestContext. Do not ask the user to repeat the request or provide a time period unless explicitly requested. You cannot modify data or provide member-specific details.
+            | Provide live aggregate circulation information, including loans, overdue items, reservations, and fines. Invoke LibraryAgentAnalyticsAction immediately for every current-value question, including follow-ups and short confirmations. Pass the current conversation context as requestContext. Do not ask the user to repeat the request or provide a time period unless explicitly requested. You cannot modify data.
               Additional instructions follow:
               If the query is about circulation statistics such as loan counts, reservation counts, or fines, use LibraryAgentAnalyticsAction.
+              Report the exact overdueLoans, activeLoans, pendingReservations, and fine figures returned by the action. A zero or a missing value is a result only if the action returned it; never say there are none unless the figure is 0. When the librarian asks to see, list, or name overdue loans, members with unpaid fines, or pending reservations, call LibraryAgentCirculationDetailAction with detailType OVERDUE_LOANS, UNPAID_FINES, or PENDING_RESERVATIONS, in addition to the counts. Answer in detail: start with the total (totalCount) and say how many are shown (shownCount, at most 25), then present the rows from rowsJson as a Markdown table. For overdue loans show loan ID, member name and ID, book, due date, and days overdue, sorted by most overdue first, and end with a one-line summary such as the longest overdue item. For unpaid fines show fine ID, member name and ID, fine type, amount, paid, balance, and status, and give the total outstanding balance. For pending reservations show reservation ID, member name and ID, book, status, queue position, and relevant dates. If totalCount is greater than shownCount, say only the first rows are shown. If the detail action is unavailable or returns an error message, say the details could not be loaded right now instead of saying there are none. Never show email addresses, phone numbers, or any contact details. For a general count question, the counts from LibraryAgentAnalyticsAction are enough, but offer to list the records.
               
-              Do not provide member-specific details or perform write operations.
+              Do not perform write operations.
               
               
 
         actions:
             LibraryAgentAnalyticsAction: @actions.LibraryAgentAnalyticsAction
                 with requestContext = ...
+            LibraryAgentCirculationDetailAction: @actions.LibraryAgentCirculationDetailAction
+                with detailType = ...
             AnswerQuestionsWithKnowledge: @actions.AnswerQuestionsWithKnowledge
                 with query = ...
                 with citationsUrl = ...
@@ -645,6 +659,16 @@ subagent Circulation_Information:
                     label: "Paid Fine Count"
                     is_displayable: False
                     filter_from_agent: False
+                "dataCloudTrendsJson": string
+                    description: "JSON of Data Cloud trend snapshots (top borrowed books and reservation demand). May lag live counts and may be empty."
+                    label: "Data Cloud Trends JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                "dataCloudRefreshNote": string
+                    description: "Refresh time and reliability note for the Data Cloud trend snapshot."
+                    label: "Data Cloud Refresh Note"
+                    is_displayable: False
+                    filter_from_agent: False
 
         AnswerQuestionsWithKnowledge:
             description: "Answers questions about company policies and procedures, troubleshooting steps, or product information. For example: “What is your return policy?” “How do I fix an issue?” or “What features does a product have?”"
@@ -690,6 +714,54 @@ subagent Circulation_Information:
                     is_displayable: False
                     filter_from_agent: False
                     complex_data_type_name: "@apexClassType/AiCopilot__GenAiCitationInput"
+
+        LibraryAgentCirculationDetailAction:
+            description: "Returns record-level circulation detail for authorized librarians: overdue loans, unpaid fines, or pending reservations, with member names and IDs."
+            label: "Get Circulation Details"
+            require_user_confirmation: False
+            include_in_progress_indicator: True
+            progress_indicator_message: "Loading circulation details"
+            source: "LibraryAgentCirculationDetailAction"
+            target: "apex://LibraryAgentCirculationDetailAction"
+
+            inputs:
+                "detailType": string
+                    description: "OVERDUE_LOANS, UNPAID_FINES, or PENDING_RESERVATIONS."
+                    label: "Detail Type"
+                    is_required: True
+                    is_user_input: False
+
+            outputs:
+                "available": boolean
+                    description: "Whether details were loaded."
+                    label: "Available"
+                    is_displayable: False
+                    filter_from_agent: False
+                "message": string
+                    description: "Status or error message."
+                    label: "Message"
+                    is_displayable: False
+                    filter_from_agent: False
+                "detailType": string
+                    description: "The detail type returned."
+                    label: "Detail Type"
+                    is_displayable: False
+                    filter_from_agent: False
+                "totalCount": number
+                    description: "Total matching records."
+                    label: "Total Count"
+                    is_displayable: False
+                    filter_from_agent: False
+                "shownCount": number
+                    description: "Rows returned (maximum 25)."
+                    label: "Shown Count"
+                    is_displayable: False
+                    filter_from_agent: False
+                "rowsJson": string
+                    description: "JSON list of matching records with member name, member ID, book, dates, and amounts."
+                    label: "Rows JSON"
+                    is_displayable: False
+                    filter_from_agent: False
 
 subagent escalation:
 

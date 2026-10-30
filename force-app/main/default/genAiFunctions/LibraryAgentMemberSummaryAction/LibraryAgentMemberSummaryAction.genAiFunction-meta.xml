@@ -8,6 +8,5 @@
     <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
     <localDeveloperName>LibraryAgentMemberSummaryAction</localDeveloperName>
     <masterLabel>Get Member Summary</masterLabel>
-    <language>en_US</language>
     <progressIndicatorMessage>Loading the member summary</progressIndicatorMessage>
 </GenAiFunction>

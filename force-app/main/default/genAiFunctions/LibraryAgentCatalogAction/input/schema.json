@@ -1,11 +1,35 @@
 {
-  "unevaluatedProperties": false,
-  "required": [],
-  "properties": {
-    "author": { "title": "Author", "description": "Optional author search text.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isUserInput": false },
-    "availableOnly": { "title": "Available Only", "description": "Return only books with available copies.", "lightning:type": "lightning__booleanType", "lightning:isPII": false, "copilotAction:isUserInput": false },
-    "category": { "title": "Category", "description": "Optional category search text.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isUserInput": false },
-    "title": { "title": "Title", "description": "Optional title search text.", "lightning:type": "lightning__textType", "lightning:isPII": false, "copilotAction:isUserInput": false }
+  "required" : [ ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "author" : {
+      "title" : "Author",
+      "description" : "Optional author search text.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "availableOnly" : {
+      "title" : "Available Only",
+      "description" : "Return only books with available copies.",
+      "lightning:type" : "lightning__booleanType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "category" : {
+      "title" : "Category",
+      "description" : "Optional category search text.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "title" : {
+      "title" : "Title",
+      "description" : "Optional title search text.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
   },
-  "lightning:type": "lightning__objectType"
+  "lightning:type" : "lightning__objectType"
 }

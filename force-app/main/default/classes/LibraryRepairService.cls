@@ -34,6 +34,7 @@ public without sharing class LibraryRepairService {
       SELECT Id, Name, Barcode__c, Status__c, Condition__c
       FROM Book_Copy__c
       WHERE Id = :copyId
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -52,6 +53,7 @@ public without sharing class LibraryRepairService {
       SELECT Id, Member__c, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION AND Status__c = 'Open'
+      WITH SYSTEM_MODE
       LIMIT 500
     ];
     for (Library_Scan_Transaction__c row : existing)
@@ -99,6 +101,7 @@ public without sharing class LibraryRepairService {
       SELECT Id
       FROM Book_Copy__c
       WHERE Barcode__c = :barcode.trim()
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
     if (copies.isEmpty()) {
@@ -126,6 +129,7 @@ public without sharing class LibraryRepairService {
       SELECT Id, Status__c, Result_Message__c
       FROM Library_Scan_Transaction__c
       WHERE Id = :repairId AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -137,6 +141,7 @@ public without sharing class LibraryRepairService {
       SELECT Id, Name, Barcode__c, Status__c
       FROM Book_Copy__c
       WHERE Id = :copyId
+      WITH SYSTEM_MODE
       LIMIT 1
       FOR UPDATE
     ];
@@ -171,6 +176,7 @@ public without sharing class LibraryRepairService {
       SELECT Id, Status__c, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
       WHERE Operation__c = :OPERATION
+      WITH SYSTEM_MODE
       ORDER BY Created_At__c DESC
       LIMIT 500
     ]) {
@@ -182,6 +188,7 @@ public without sharing class LibraryRepairService {
         SELECT Id, Name, Barcode__c, Status__c
         FROM Book_Copy__c
         WHERE Id = :copyId
+        WITH SYSTEM_MODE
         LIMIT 1
       ];
       if (!copies.isEmpty())
