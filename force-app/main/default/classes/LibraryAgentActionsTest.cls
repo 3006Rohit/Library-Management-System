@@ -198,8 +198,11 @@ private class LibraryAgentActionsTest {
     )[0];
     System.assertEquals(true, success.available);
     System.assertEquals(2, success.totalCopies);
-    System.assertEquals(1, success.activeLoans);
+    // Current counts are read live from library records (two active loans in
+    // the fixture); the Data Cloud rows only feed the separate trend snapshot.
+    System.assertEquals(2, success.activeLoans);
     System.assert(success.topBorrowedBooksJson != null);
+    System.assert(success.dataCloudTrendsJson != null);
 
     LibraryDataCloudService.forceFailure = true;
     LibraryAgentAnalyticsAction.Response unavailable = LibraryAgentAnalyticsAction.execute(
@@ -207,10 +210,12 @@ private class LibraryAgentActionsTest {
         new LibraryAgentAnalyticsAction.Request()
       }
     )[0];
-    System.assertEquals(false, unavailable.available);
+    // Live counts stay available when only the Data Cloud trend fails.
+    System.assertEquals(true, unavailable.available);
+    System.assert(unavailable.dataCloudRefreshNote.contains('unavailable'));
     System.assertEquals(
       false,
-      unavailable.message.contains('TEST_DATA_CLOUD_FAILURE')
+      unavailable.dataCloudRefreshNote.contains('TEST_DATA_CLOUD_FAILURE')
     );
   }
 
@@ -291,7 +296,8 @@ private class LibraryAgentActionsTest {
       new List<LibraryAgentMemberSummaryAction.Request>{ summaryRequest }
     )[0];
     System.assertEquals(true, summary.found);
-    System.assertEquals(3, summary.totalLoans);
+    // Member counts come live from Borrow_Record__c, not from Data Cloud.
+    System.assertEquals(1, summary.totalLoans);
     System.assertEquals(data.memberA.Email__c, summary.memberEmail);
 
     summaryRequest.memberLookup = 'missing@example.invalid';

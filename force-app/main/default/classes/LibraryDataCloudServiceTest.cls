@@ -1,7 +1,20 @@
 @IsTest
 private class LibraryDataCloudServiceTest {
+  private static String createBookId() {
+    Book__c book = new Book__c(
+      Name = 'Data Cloud Demand Book',
+      ISBN__c = 'DC-DEMAND-1',
+      Status__c = 'Active',
+      Total_Copies__c = 1,
+      Available_Copies__c = 1
+    );
+    insert book;
+    return String.valueOf(book.Id);
+  }
+
   @IsTest
   static void mapsLibrarianInsightsAndMissingRowsSafely() {
+    String bookId = createBookId();
     LibraryDataCloudService.testRows = new Map<String, List<Map<String, Object>>>{
       'Library_Copy_Availability__cio' => new List<Map<String, Object>>{
         new Map<String, Object>{
@@ -39,7 +52,7 @@ private class LibraryDataCloudServiceTest {
       },
       'Library_Book_Popularity__cio' => new List<Map<String, Object>>{
         new Map<String, Object>{
-          'book_id__c' => 'a05gK00008TH2ILQA1',
+          'book_id__c' => bookId,
           'total_borrow_count__c' => 3,
           'active_borrow_count__c' => 1,
           'returned_borrow_count__c' => 2
@@ -47,7 +60,7 @@ private class LibraryDataCloudServiceTest {
       },
       'Library_Reservation_Demand__cio' => new List<Map<String, Object>>{
         new Map<String, Object>{
-          'book_id__c' => 'a05gK00008TH2ILQA1',
+          'book_id__c' => bookId,
           'total_reservation_count__c' => 2,
           'fulfilled_reservation_count__c' => 1,
           'cancelled_reservation_count__c' => 1,
@@ -163,12 +176,13 @@ private class LibraryDataCloudServiceTest {
 
   @IsTest
   static void sortsAndTrimsTopListsAfterLoadingAllRows() {
+    String bookId = createBookId();
     List<Map<String, Object>> popularity = new List<Map<String, Object>>();
     List<Map<String, Object>> demand = new List<Map<String, Object>>();
     for (Integer index = 0; index < 11; index++) {
       popularity.add(
         new Map<String, Object>{
-          'book_id__c' => 'a05gK00008TH2ILQA1',
+          'book_id__c' => bookId,
           'total_borrow_count__c' => index,
           'active_borrow_count__c' => 0,
           'returned_borrow_count__c' => index
@@ -176,7 +190,7 @@ private class LibraryDataCloudServiceTest {
       );
       demand.add(
         new Map<String, Object>{
-          'book_id__c' => 'a05gK00008TH2ILQA1',
+          'book_id__c' => bookId,
           'total_reservation_count__c' => index,
           'fulfilled_reservation_count__c' => 0,
           'cancelled_reservation_count__c' => index,
