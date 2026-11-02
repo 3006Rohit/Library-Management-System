@@ -12,7 +12,12 @@ public without sharing class LibraryReservationWorkflowService {
         'Only a waiting reservation can be prepared.'
       );
     promoteAvailableReservations(reservations[0].Book__c);
-    return [SELECT Status__c FROM Reservation__c WHERE Id = :reservationId WITH SYSTEM_MODE]
+    return [
+        SELECT Status__c
+        FROM Reservation__c
+        WHERE Id = :reservationId
+        WITH SYSTEM_MODE
+      ]
       .Status__c == 'Ready';
   }
 
@@ -47,7 +52,10 @@ public without sharing class LibraryReservationWorkflowService {
       FROM Reservation__c
       WHERE Book__c = :bookId AND Status__c = 'Pending'
       WITH SYSTEM_MODE
-      ORDER BY Reservation_Date__c ASC, Id ASC
+      ORDER BY
+        Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST,
+        Reservation_Date__c ASC,
+        Id ASC
       LIMIT 50
     ];
     Integer count = Math.min(copies.size(), pending.size());

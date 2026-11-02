@@ -65,7 +65,11 @@ public without sharing class LibraryReservationEtaService {
       FROM Reservation__c
       WHERE Book__c IN :bookIds AND Status__c IN ('Pending', 'Ready')
       WITH SYSTEM_MODE
-      ORDER BY Book__c, Reservation_Date__c ASC, Id ASC
+      ORDER BY
+        Book__c,
+        Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST,
+        Reservation_Date__c ASC,
+        Id ASC
     ]) {
       if (!activeByBook.containsKey(reservation.Book__c))
         activeByBook.put(reservation.Book__c, new List<Reservation__c>());

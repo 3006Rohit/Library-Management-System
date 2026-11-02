@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Queue_Priority__c</fullName>
+  <label>Queue Priority</label>
+  <description
+  >Reservation queue rank for members on this plan. Lower numbers are served first; blank ranks last. Ties are broken by reservation time.</description>
+  <inlineHelpText
+  >1 = highest priority. Blank plans rank after all numbered plans.</inlineHelpText>
+  <precision>3</precision>
+  <scale>0</scale>
+  <required>false</required>
+  <type>Number</type>
+</CustomField>

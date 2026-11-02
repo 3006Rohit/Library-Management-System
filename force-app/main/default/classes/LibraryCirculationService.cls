@@ -29,9 +29,15 @@ public without sharing class LibraryCirculationService {
       throw new AuraHandledException(
         'The requested copy is no longer available.'
       );
-    Database.update(new Book_Copy__c(Id = copy.Id, Status__c = 'Available'), AccessLevel.SYSTEM_MODE);
+    Database.update(
+      new Book_Copy__c(Id = copy.Id, Status__c = 'Available'),
+      AccessLevel.SYSTEM_MODE
+    );
     checkout(loan.Member__c, copy.Id);
-    Database.delete(new Borrow_Record__c(Id = loan.Id), AccessLevel.SYSTEM_MODE);
+    Database.delete(
+      new Borrow_Record__c(Id = loan.Id),
+      AccessLevel.SYSTEM_MODE
+    );
     LibraryMemberNotificationService.create(
       loan.Member__c,
       'Borrowing Approved',
@@ -62,7 +68,10 @@ public without sharing class LibraryCirculationService {
     loan.Notes__c = String.isBlank(reason) ? 'Rejected by librarian.' : reason;
     Database.update(loan, AccessLevel.SYSTEM_MODE);
     if (loan.Book_Copy__c != null)
-      Database.update(new Book_Copy__c(Id = loan.Book_Copy__c, Status__c = 'Available'), AccessLevel.SYSTEM_MODE);
+      Database.update(
+        new Book_Copy__c(Id = loan.Book_Copy__c, Status__c = 'Available'),
+        AccessLevel.SYSTEM_MODE
+      );
   }
 
   public static Id checkout(Id memberId, Id copyId) {
@@ -113,7 +122,10 @@ public without sharing class LibraryCirculationService {
       FROM Reservation__c
       WHERE Book__c = :copy.Book__c AND Status__c IN ('Pending', 'Ready')
       WITH SYSTEM_MODE
-      ORDER BY Reservation_Date__c ASC, Id ASC
+      ORDER BY
+        Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST,
+        Reservation_Date__c ASC,
+        Id ASC
       LIMIT 1
     ];
     if (!reservations.isEmpty())
@@ -153,7 +165,10 @@ public without sharing class LibraryCirculationService {
       Renewal_Count__c = 0
     );
     Database.insert(loan, AccessLevel.SYSTEM_MODE);
-    Database.update(new Book_Copy__c(Id = copy.Id, Status__c = 'Borrowed'), AccessLevel.SYSTEM_MODE);
+    Database.update(
+      new Book_Copy__c(Id = copy.Id, Status__c = 'Borrowed'),
+      AccessLevel.SYSTEM_MODE
+    );
     if (
       blocking != null &&
       blocking.Status__c == 'Ready' &&
@@ -195,7 +210,9 @@ public without sharing class LibraryCirculationService {
         Status__c,
         Member__r.Membership_Plan__r.Fine_Per_Day__c
       FROM Borrow_Record__c
-      WHERE Id = :loanId WITH SYSTEM_MODE FOR UPDATE
+      WHERE Id = :loanId
+      WITH SYSTEM_MODE
+      FOR UPDATE
     ];
     if (expectedMemberId != null && loan.Member__c != expectedMemberId)
       throw new AuraHandledException(
@@ -206,16 +223,21 @@ public without sharing class LibraryCirculationService {
     Book_Copy__c copy = [
       SELECT Id, Book__c, Status__c
       FROM Book_Copy__c
-      WHERE Id = :loan.Book_Copy__c WITH SYSTEM_MODE FOR UPDATE
+      WHERE Id = :loan.Book_Copy__c
+      WITH SYSTEM_MODE
+      FOR UPDATE
     ];
     Datetime now = System.now();
     loan.Return_Date__c = now;
     loan.Status__c = 'Returned';
-    Database.update(new Borrow_Record__c(
-      Id = loan.Id,
-      Return_Date__c = now,
-      Status__c = 'Returned'
-    ), AccessLevel.SYSTEM_MODE);
+    Database.update(
+      new Borrow_Record__c(
+        Id = loan.Id,
+        Return_Date__c = now,
+        Status__c = 'Returned'
+      ),
+      AccessLevel.SYSTEM_MODE
+    );
     if (
       loan.Due_Date__c != null &&
       now > loan.Due_Date__c &&
@@ -226,18 +248,24 @@ public without sharing class LibraryCirculationService {
         [
           SELECT COUNT()
           FROM Fine__c
-          WHERE Borrow_Record__c = :loan.Id AND Fine_Type__c = 'Overdue' WITH SYSTEM_MODE ] == 0
+          WHERE Borrow_Record__c = :loan.Id AND Fine_Type__c = 'Overdue'
+          WITH SYSTEM_MODE
+        ] == 0
       )
-        Database.insert(new Fine__c(
-          Member__c = loan.Member__c,
-          Borrow_Record__c = loan.Id,
-          Contact__c = loan.Contact__c,
-          Fine_Type__c = 'Overdue',
-          Amount__c = days * loan.Member__r.Membership_Plan__r.Fine_Per_Day__c,
-          Paid_Amount__c = 0,
-          Status__c = 'Unpaid',
-          Generated_Date__c = Date.today()
-        ), AccessLevel.SYSTEM_MODE);
+        Database.insert(
+          new Fine__c(
+            Member__c = loan.Member__c,
+            Borrow_Record__c = loan.Id,
+            Contact__c = loan.Contact__c,
+            Fine_Type__c = 'Overdue',
+            Amount__c = days *
+              loan.Member__r.Membership_Plan__r.Fine_Per_Day__c,
+            Paid_Amount__c = 0,
+            Status__c = 'Unpaid',
+            Generated_Date__c = Date.today()
+          ),
+          AccessLevel.SYSTEM_MODE
+        );
     }
     List<Reservation__c> pending = [
       SELECT
@@ -248,11 +276,19 @@ public without sharing class LibraryCirculationService {
         Member__r.Email__c,
         Queue_Position__c
       FROM Reservation__c
-      WHERE Book__c = :copy.Book__c AND Status__c = 'Pending' WITH SYSTEM_MODE ORDER BY Reservation_Date__c ASC, Id ASC
+      WHERE Book__c = :copy.Book__c AND Status__c = 'Pending'
+      WITH SYSTEM_MODE
+      ORDER BY
+        Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST,
+        Reservation_Date__c ASC,
+        Id ASC
       LIMIT 1
     ];
     if (pending.isEmpty()) {
-      Database.update(new Book_Copy__c(Id = copy.Id, Status__c = 'Available'), AccessLevel.SYSTEM_MODE);
+      Database.update(
+        new Book_Copy__c(Id = copy.Id, Status__c = 'Available'),
+        AccessLevel.SYSTEM_MODE
+      );
       notifyReplacementMembers(copy.Book__c);
     } else {
       Reservation__c next = pending[0];
@@ -273,7 +309,10 @@ public without sharing class LibraryCirculationService {
         'A returned copy became available.'
       );
       notifyReady(next);
-      Database.update(new Book_Copy__c(Id = copy.Id, Status__c = 'Reserved'), AccessLevel.SYSTEM_MODE);
+      Database.update(
+        new Book_Copy__c(Id = copy.Id, Status__c = 'Reserved'),
+        AccessLevel.SYSTEM_MODE
+      );
       resequenceQueue(copy.Book__c);
     }
     LibraryReservationEtaService.recalculateForBook(copy.Book__c);
@@ -337,13 +376,16 @@ public without sharing class LibraryCirculationService {
       : loan.Renewal_Count__c + 1);
     loan.Last_Renewed_Date__c = System.now();
     loan.Status__c = 'Active';
-    Database.update(new Borrow_Record__c(
-      Id = loan.Id,
-      Due_Date__c = loan.Due_Date__c,
-      Renewal_Count__c = loan.Renewal_Count__c,
-      Last_Renewed_Date__c = loan.Last_Renewed_Date__c,
-      Status__c = 'Active'
-    ), AccessLevel.SYSTEM_MODE);
+    Database.update(
+      new Borrow_Record__c(
+        Id = loan.Id,
+        Due_Date__c = loan.Due_Date__c,
+        Renewal_Count__c = loan.Renewal_Count__c,
+        Last_Renewed_Date__c = loan.Last_Renewed_Date__c,
+        Status__c = 'Active'
+      ),
+      AccessLevel.SYSTEM_MODE
+    );
   }
 
   public static void recordFinePayment(Id fineId, Decimal amount) {
@@ -558,7 +600,10 @@ public without sharing class LibraryCirculationService {
       FROM Reservation__c
       WHERE Book__c IN :bookIds AND Status__c = 'Pending'
       WITH SYSTEM_MODE
-      ORDER BY Reservation_Date__c ASC, Id ASC
+      ORDER BY
+        Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST,
+        Reservation_Date__c ASC,
+        Id ASC
     ]) {
       if (!pendingByBook.containsKey(row.Book__c))
         pendingByBook.put(row.Book__c, new List<Reservation__c>());
@@ -629,7 +674,11 @@ public without sharing class LibraryCirculationService {
       FROM Reservation__c
       WHERE Book__c IN :bookIds AND Status__c IN ('Pending', 'Ready')
       WITH SYSTEM_MODE
-      ORDER BY Book__c, Reservation_Date__c ASC, Id ASC
+      ORDER BY
+        Book__c,
+        Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST,
+        Reservation_Date__c ASC,
+        Id ASC
     ];
     List<Reservation__c> resequenced = new List<Reservation__c>();
     Id currentBook;
@@ -736,7 +785,9 @@ public without sharing class LibraryCirculationService {
         Membership_Plan__r.Active__c,
         Membership_Plan__r.Reservation_Limit__c
       FROM Member__c
-      WHERE Id = :memberId WITH SYSTEM_MODE LIMIT 1
+      WHERE Id = :memberId
+      WITH SYSTEM_MODE
+      LIMIT 1
     ];
     if (members.isEmpty())
       throw new AuraHandledException(
@@ -883,7 +934,12 @@ public without sharing class LibraryCirculationService {
         Member__r.Email__c,
         Queue_Position__c
       FROM Reservation__c
-      WHERE Book__c = :bookId AND Status__c = 'Pending' WITH SYSTEM_MODE ORDER BY Reservation_Date__c ASC, Id ASC
+      WHERE Book__c = :bookId AND Status__c = 'Pending'
+      WITH SYSTEM_MODE
+      ORDER BY
+        Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST,
+        Reservation_Date__c ASC,
+        Id ASC
       LIMIT 1
     ];
     if (next.isEmpty()) {
@@ -922,7 +978,7 @@ public without sharing class LibraryCirculationService {
     List<Reservation__c> rows = (List<Reservation__c>) Database.queryWithBinds(
       'SELECT Id, Status__c, Queue_Position__c FROM Reservation__c ' +
         'WHERE Book__c = :bookId AND Status__c IN (\'Pending\', \'Ready\') ' +
-        'ORDER BY Reservation_Date__c ASC, Id ASC',
+        'ORDER BY Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST, Reservation_Date__c ASC, Id ASC',
       new Map<String, Object>{ 'bookId' => bookId },
       AccessLevel.SYSTEM_MODE
     );
@@ -1032,11 +1088,14 @@ public without sharing class LibraryCirculationService {
     loan.Notes__c = String.isBlank(loan.Notes__c)
       ? entry
       : loan.Notes__c + '\n' + entry;
-    Database.update(new Book_Copy__c(
-      Id = copy.Id,
-      Status__c = 'Damaged',
-      Condition__c = 'Poor'
-    ), AccessLevel.SYSTEM_MODE);
+    Database.update(
+      new Book_Copy__c(
+        Id = copy.Id,
+        Status__c = 'Damaged',
+        Condition__c = 'Poor'
+      ),
+      AccessLevel.SYSTEM_MODE
+    );
     Database.update(loan, AccessLevel.SYSTEM_MODE);
     notifyReplacementMembers(copy.Book__c);
   }
@@ -1051,7 +1110,9 @@ public without sharing class LibraryCirculationService {
     Borrow_Record__c loan = [
       SELECT Id, Member__c
       FROM Borrow_Record__c
-      WHERE Id = :loanId AND Member__c = :memberId WITH SYSTEM_MODE LIMIT 1
+      WHERE Id = :loanId AND Member__c = :memberId
+      WITH SYSTEM_MODE
+      LIMIT 1
     ];
     reportDefectiveCopyWithoutPermission(loan.Id, notes);
   }
@@ -1168,7 +1229,10 @@ public without sharing class LibraryCirculationService {
       '. Due date extended by ' +
       String.valueOf(delayDays) +
       ' day(s).';
-    Database.update(new Book_Copy__c(Id = replacement.Id, Status__c = 'Borrowed'), AccessLevel.SYSTEM_MODE);
+    Database.update(
+      new Book_Copy__c(Id = replacement.Id, Status__c = 'Borrowed'),
+      AccessLevel.SYSTEM_MODE
+    );
     Database.update(loan, AccessLevel.SYSTEM_MODE);
   }
 }

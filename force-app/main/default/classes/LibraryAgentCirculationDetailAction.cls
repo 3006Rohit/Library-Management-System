@@ -69,12 +69,13 @@ global with sharing class LibraryAgentCirculationDetailAction {
       if (m == null)
         return null;
       String full = String.join(
-        new List<String>{
-          m.First_Name__c == null ? '' : m.First_Name__c,
-          m.Last_Name__c == null ? '' : m.Last_Name__c
-        },
-        ' '
-      ).trim();
+          new List<String>{
+            m.First_Name__c == null ? '' : m.First_Name__c,
+            m.Last_Name__c == null ? '' : m.Last_Name__c
+          },
+          ' '
+        )
+        .trim();
       return String.isBlank(full) ? m.Name : full;
     }
 
@@ -83,7 +84,10 @@ global with sharing class LibraryAgentCirculationDetailAction {
       output.totalCount = [
         SELECT COUNT()
         FROM Borrow_Record__c
-        WHERE Return_Date__c = NULL AND Due_Date__c < :now AND Status__c != 'Lost'
+        WHERE
+          Return_Date__c = NULL
+          AND Due_Date__c < :now
+          AND Status__c != 'Lost'
         WITH SYSTEM_MODE
       ];
       List<Map<String, Object>> rows = new List<Map<String, Object>>();
@@ -98,7 +102,10 @@ global with sharing class LibraryAgentCirculationDetailAction {
           Member__r.Last_Name__c,
           Book_Copy__r.Book__r.Name
         FROM Borrow_Record__c
-        WHERE Return_Date__c = NULL AND Due_Date__c < :now AND Status__c != 'Lost'
+        WHERE
+          Return_Date__c = NULL
+          AND Due_Date__c < :now
+          AND Status__c != 'Lost'
         WITH SYSTEM_MODE
         ORDER BY Due_Date__c ASC
         LIMIT 25
@@ -187,7 +194,10 @@ global with sharing class LibraryAgentCirculationDetailAction {
         FROM Reservation__c
         WHERE Status__c IN ('Pending', 'Ready')
         WITH SYSTEM_MODE
-        ORDER BY Reservation_Date__c ASC
+        ORDER BY
+          Book__c,
+          Member__r.Membership_Plan__r.Queue_Priority__c ASC NULLS LAST,
+          Reservation_Date__c ASC
         LIMIT 25
       ]) {
         rows.add(

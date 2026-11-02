@@ -23,13 +23,22 @@
         <apexClass>LibrarySettingsController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <classAccesses><apexClass>LibraryAgentAnalyticsAction</apexClass><enabled>true</enabled></classAccesses>
-    <classAccesses><apexClass>LibraryAgentCatalogAction</apexClass><enabled>true</enabled></classAccesses>
-    <classAccesses><apexClass>LibraryAgentMemberSummaryAction</apexClass><enabled>true</enabled></classAccesses>
-    <classAccesses><apexClass>LibraryAgentMyActivityAction</apexClass><enabled>true</enabled></classAccesses>
-    <classAccesses><apexClass>LibraryAgentMyLoansAction</apexClass><enabled>true</enabled></classAccesses>
-    <classAccesses><apexClass>LibraryAgentMyReservationsAction</apexClass><enabled>true</enabled></classAccesses>
-    <classAccesses><apexClass>LibraryAgentApiController</apexClass><enabled>true</enabled></classAccesses>
+    <classAccesses><apexClass>LibraryAgentAnalyticsAction</apexClass><enabled
+    >true</enabled></classAccesses>
+    <classAccesses><apexClass>LibraryAgentCatalogAction</apexClass><enabled
+    >true</enabled></classAccesses>
+    <classAccesses><apexClass
+    >LibraryAgentMemberSummaryAction</apexClass><enabled
+    >true</enabled></classAccesses>
+    <classAccesses><apexClass>LibraryAgentMyActivityAction</apexClass><enabled
+    >true</enabled></classAccesses>
+    <classAccesses><apexClass>LibraryAgentMyLoansAction</apexClass><enabled
+    >true</enabled></classAccesses>
+    <classAccesses><apexClass
+    >LibraryAgentMyReservationsAction</apexClass><enabled
+    >true</enabled></classAccesses>
+    <classAccesses><apexClass>LibraryAgentApiController</apexClass><enabled
+    >true</enabled></classAccesses>
     <tabSettings>
         <tab>Library_Librarian_Workspace</tab>
         <visibility>Visible</visibility>
@@ -333,6 +342,9 @@
     <fieldPermissions><field>Reservation__c.Fulfilled_Date__c</field><editable
     >true</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field>Fine__c.Paid_Amount__c</field><editable
+    >true</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Membership_Plan__c.Queue_Priority__c</field><editable
     >true</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field>Membership_Plan__c.Active__c</field><editable
     >true</editable><readable>true</readable></fieldPermissions>
