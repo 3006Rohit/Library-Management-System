@@ -2,6 +2,7 @@ import { LightningElement } from "lwc";
 import getAllRoomBookings from "@salesforce/apex/LibraryLibrarianSessionController.getAllRoomBookings";
 import cancelRoomBookingAsLibrarian from "@salesforce/apex/LibraryLibrarianSessionController.cancelRoomBookingAsLibrarian";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import LightningConfirm from "lightning/confirm";
 
 export default class LibraryLibrarianRoomBookings extends LightningElement {
   bookings = [];
@@ -57,7 +58,12 @@ export default class LibraryLibrarianRoomBookings extends LightningElement {
 
   async handleCancel(event) {
     const bookingId = event.currentTarget.dataset.id;
-    if (!confirm("Are you sure you want to cancel this booking?")) {
+    const confirmed = await LightningConfirm.open({
+      message: "Are you sure you want to cancel this booking?",
+      label: "Cancel booking",
+      theme: "warning"
+    });
+    if (!confirmed) {
       return;
     }
     try {

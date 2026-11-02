@@ -39,7 +39,8 @@ export default class LibraryAcquisitionDashboard extends LightningElement {
 
   decorate(row) {
     const scoreValue = Math.round(row.score || 0);
-    const priority = scoreValue >= 70 ? "High" : scoreValue >= 40 ? "Medium" : "Low";
+    const priority =
+      scoreValue >= 70 ? "High" : scoreValue >= 40 ? "Medium" : "Low";
     const isBuy = row.recommendationType === "Purchase";
     const quantity = row.recommendedQuantity || 1;
     return {

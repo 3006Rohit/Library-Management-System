@@ -62,9 +62,9 @@ export default class LibraryPaymentOperations extends LightningElement {
 
   captureReason(event) {
     const id = event.currentTarget.dataset.id;
-    this.rows = this.rows.map((row) =>
-      row.id === id ? { ...row, reason: event.target.value } : row
-    );
+    this.rows = this.rows.map((row) => {
+      return row.id === id ? { ...row, reason: event.target.value } : row;
+    });
   }
 
   async reconcile(event) {

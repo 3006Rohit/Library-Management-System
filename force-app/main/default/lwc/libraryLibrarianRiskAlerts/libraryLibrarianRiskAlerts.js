@@ -59,9 +59,9 @@ export default class LibraryLibrarianRiskAlerts extends LightningElement {
 
   captureNote(event) {
     const id = event.currentTarget.dataset.id;
-    this.rows = this.rows.map((row) =>
-      row.id === id ? { ...row, reviewerNote: event.target.value } : row
-    );
+    this.rows = this.rows.map((row) => {
+      return row.id === id ? { ...row, reviewerNote: event.target.value } : row;
+    });
   }
 
   async scan() {
