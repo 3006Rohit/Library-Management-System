@@ -28,6 +28,10 @@ import updateMyNotificationPreferences from "@salesforce/apex/LibraryMemberSessi
 import reportDefectiveLoan from "@salesforce/apex/LibraryMemberSessionController.reportDefectiveLoan";
 import saveMyEngagement from "@salesforce/apex/LibraryMemberSessionController.saveMyEngagement";
 import followAuthor from "@salesforce/apex/LibraryMemberSessionController.followAuthor";
+import unfollowAuthor from "@salesforce/apex/LibraryMemberSessionController.unfollowAuthor";
+import getMyAuthorFollows from "@salesforce/apex/LibraryMemberSessionController.getMyAuthorFollows";
+import getMyEngagements from "@salesforce/apex/LibraryMemberSessionController.getMyEngagements";
+import removeMyEngagement from "@salesforce/apex/LibraryMemberSessionController.removeMyEngagement";
 import submitBookReview from "@salesforce/apex/LibraryMemberSessionController.submitBookReview";
 
 const NAVIGATION = [
@@ -89,6 +93,8 @@ export default class LibraryMemberShell extends LightningElement {
   reviewText = "";
   reviewStatus;
   borrowings = [];
+  readingList = [];
+  followedAuthors = [];
   reservations = [];
   fines = [];
   membership;
@@ -324,11 +330,28 @@ export default class LibraryMemberShell extends LightningElement {
   get hasSelectedLoans() {
     return this.selectedLoans.length > 0;
   }
+  get isLoanListTab() {
+    return !["Reading List", "Followed Authors"].includes(this.loanTab);
+  }
+  get isReadingListTab() {
+    return this.loanTab === "Reading List";
+  }
+  get isFollowedAuthorsTab() {
+    return this.loanTab === "Followed Authors";
+  }
+  get hasReadingList() {
+    return this.readingList.length > 0;
+  }
+  get hasFollowedAuthors() {
+    return this.followedAuthors.length > 0;
+  }
   get loanTabs() {
     return [
       ["Active", this.onTimeLoans.length],
       ["Overdue", this.overdueLoans.length],
-      ["Returned", this.returnedLoans.length]
+      ["Returned", this.returnedLoans.length],
+      ["Reading List", this.readingList.length],
+      ["Followed Authors", this.followedAuthors.length]
     ].map(([label, count]) => ({
       label: `${label} (${count})`,
       value: label,
@@ -786,7 +809,7 @@ export default class LibraryMemberShell extends LightningElement {
       Dashboard: () => this.loadDashboardData(),
       "Explore Books": () =>
         Promise.all([this.loadCategories(), this.loadCatalog()]),
-      "My Books": () => this.loadBorrowings(),
+      "My Books": () => this.loadMyBooks(),
       Reservations: () => this.loadReservations(),
       Membership: () => this.loadMembership(),
       "Fines & Payments": () => this.loadFinesAndPayments(),
@@ -816,7 +839,7 @@ export default class LibraryMemberShell extends LightningElement {
       );
     } else if (this.section === "Dashboard")
       refresh = this.loadDashboardData(false);
-    else if (this.section === "My Books") refresh = this.loadBorrowings();
+    else if (this.section === "My Books") refresh = this.loadMyBooks();
     else if (this.section === "Reservations") refresh = this.loadReservations();
     else if (this.section === "Fines & Payments")
       refresh = this.loadFinesAndPayments();
@@ -884,6 +907,45 @@ export default class LibraryMemberShell extends LightningElement {
   loadBorrowings() {
     return this.call(getMyBorrowings, {}, (data) => {
       this.borrowings = (data || []).map((row) => this.decorateLoan(row));
+    });
+  }
+
+  loadMyBooks() {
+    return Promise.all([
+      this.loadBorrowings(),
+      this.call(getMyEngagements, {}, (data) => {
+        this.readingList = (data || []).map((row) => ({
+          ...row,
+          updatedLabel: this.formatDate(row.lastUpdated)
+        }));
+      }),
+      this.call(getMyAuthorFollows, {}, (data) => {
+        this.followedAuthors = (data || []).map((row) => ({
+          ...row,
+          followedLabel: this.formatDate(row.followedAt)
+        }));
+      })
+    ]);
+  }
+
+  removeFromReadingList(event) {
+    return this.call(
+      removeMyEngagement,
+      { engagementId: event.currentTarget.dataset.id },
+      () => {
+        this.readingList = this.readingList.filter(
+          (row) => row.id !== event.currentTarget.dataset.id
+        );
+      }
+    );
+  }
+
+  unfollowBookAuthor(event) {
+    const followId = event.currentTarget.dataset.id;
+    return this.call(unfollowAuthor, { followId }, () => {
+      this.followedAuthors = this.followedAuthors.filter(
+        (row) => row.id !== followId
+      );
     });
   }
 

@@ -316,7 +316,93 @@
                   </button></template
                 >
               </div>
-              <section class="table-card">
+              <section class="table-card" if:true={isReadingListTab}>
+                <template if:true={hasReadingList}
+                  ><div class="responsive-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Book</th>
+                          <th>Status</th>
+                          <th>Updated</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template for:each={readingList} for:item="item"
+                          ><tr key={item.id}>
+                            <td><strong>{item.bookTitle}</strong></td>
+                            <td>{item.state}</td>
+                            <td>{item.updatedLabel}</td>
+                            <td>
+                              <div class="loan-actions">
+                                <button
+                                  class="button primary compact"
+                                  data-id={item.bookId}
+                                  onclick={openBook}
+                                >
+                                  View
+                                </button>
+                                <button
+                                  class="button outline compact"
+                                  data-id={item.id}
+                                  onclick={removeFromReadingList}
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </td>
+                          </tr></template
+                        >
+                      </tbody>
+                    </table>
+                  </div></template
+                >
+                <template if:false={hasReadingList}
+                  ><div class="empty-state">
+                    Your reading list is empty. Open a book and choose Save to
+                    Reading List.
+                  </div></template
+                >
+              </section>
+              <section class="table-card" if:true={isFollowedAuthorsTab}>
+                <template if:true={hasFollowedAuthors}
+                  ><div class="responsive-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Author</th>
+                          <th>Followed On</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template for:each={followedAuthors} for:item="author"
+                          ><tr key={author.id}>
+                            <td><strong>{author.authorName}</strong></td>
+                            <td>{author.followedLabel}</td>
+                            <td>
+                              <button
+                                class="button outline compact"
+                                data-id={author.id}
+                                onclick={unfollowBookAuthor}
+                              >
+                                Unfollow
+                              </button>
+                            </td>
+                          </tr></template
+                        >
+                      </tbody>
+                    </table>
+                  </div></template
+                >
+                <template if:false={hasFollowedAuthors}
+                  ><div class="empty-state">
+                    You are not following any authors yet.
+                  </div></template
+                >
+              </section>
+              <section class="table-card" if:true={isLoanListTab}>
                 <template if:true={hasSelectedLoans}
                   ><div class="responsive-table">
                     <table>
