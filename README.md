@@ -25,7 +25,10 @@ Your DX project follows this structure:
 
 - **`force-app/main/default/`** - Your metadata source files live in this default package directory. You can configure additional package directories in the `sfdx-project.json` file.
 - **`config/`** - Scratch org definitions and project settings
-- **`scripts/`** - Automation scripts for common tasks
+- **`manifest/`** - Deployment manifests (`core-package.xml`, `agentforce-package.xml`, ...)
+- **`scripts/`** - PowerShell automation; ad-hoc Apex lives in `scripts/apex/`
+- **`data/`** - Demo data workbook used by `scripts/import-library-workbook.ps1`
+- **`docs/`** - Documentation: `SETUP.md`, `DATA_MODEL.md`, `WORKFLOWS.md`, `SECURITY_MODEL.md`, `OPERATIONS.md`, `DEMO_SCRIPT.md`; `testing/` (test plans and guides), `reports/` (audits and UAT results), `presentation/` (overview deck)
 - **`sfdx-project.json`** - Project manifest that defines package directories, namespace, API version, and other project-level settings
 
 See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm).

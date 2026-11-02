@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $org = 'library-org'
-$workbookPath = Join-Path $PSScriptRoot '..\Salesforce_Library_Demo_Data_100_Books.xlsx'
+$workbookPath = Join-Path $PSScriptRoot '..\data\Salesforce_Library_Demo_Data_100_Books.xlsx'
 $outDir = Join-Path $PSScriptRoot '..\.tmp-library-import'
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 

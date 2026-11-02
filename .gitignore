@@ -54,3 +54,11 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+# Local tooling output
+.agentforce-*/
+.agentforce-*.json
+graphify-out/cache/
+hs_err_pid*.log
+deploy*.log
+*.zip
