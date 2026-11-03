@@ -74,6 +74,14 @@ const NAV = [
   ["Reports", "utility:chart"],
   ["Settings", "utility:settings"]
 ];
+const NAV_GROUPS = [
+  ["Dashboard", ["Dashboard"]],
+  ["Catalog", ["Books", "Book Copies", "Acquisitions"]],
+  ["Circulation", ["Borrowing", "Reservations", "Fines", "Rooms"]],
+  ["People", ["Members", "Registrations", "Memberships", "Payments"]],
+  ["Insights", ["Reports", "Librarian Assistant"]],
+  ["Settings", ["Settings"]]
+];
 const PAGE_COPY = {
   Dashboard: ["Dashboard", "A clear view of today’s library operations"],
   "Librarian Assistant": [
@@ -182,6 +190,7 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   loading = false;
   error;
   sidebarOpen = false;
+  openGroup = "";
   notificationsOpen = false;
   userName = "Librarian";
   userEmail = "";
@@ -231,6 +240,7 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   reservationBookId;
   globalSearch = "";
   showBookModal = false;
+  scrollToBookPage = false;
   showBookDetail = false;
   showCopyModal = false;
   editingBook = false;
@@ -280,14 +290,47 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
     }
   }
 
-  get navItems() {
-    return NAV.map(([label, icon]) => ({
-      label,
-      icon,
-      value: label,
-      active: label === this.section,
-      className: label === this.section ? "nav-item active" : "nav-item"
-    }));
+  get navGroups() {
+    const icons = new Map(NAV);
+    return NAV_GROUPS.map(([label, sections]) => {
+      const groupActive = sections.includes(this.section);
+      const expanded = this.openGroup === label;
+      return {
+        label,
+        single: sections.length === 1,
+        firstSection: sections[0],
+        active: groupActive,
+        expanded,
+        directClass: groupActive
+          ? "nav-link nav-item active"
+          : "nav-link nav-item",
+        linkClass: groupActive ? "nav-link active" : "nav-link",
+        menuClass: expanded ? "menu open" : "menu",
+        items: sections.map((value) => ({
+          value,
+          label: value,
+          icon: icons.get(value),
+          active: value === this.section,
+          className:
+            value === this.section
+              ? "menu-item nav-item active"
+              : "menu-item nav-item"
+        }))
+      };
+    });
+  }
+  get linksClass() {
+    return this.sidebarOpen ? "links mobile-open" : "links";
+  }
+  get pageHeadline() {
+    if (this.showMemberDetails) return "Member Details";
+    if (this.section === "Dashboard") {
+      const first = String(this.userName || "").split(" ")[0];
+      return first && first !== "Librarian"
+        ? `Welcome back, ${first}`
+        : "Welcome back";
+    }
+    return PAGE_COPY[this.section][0];
   }
   get pageTitle() {
     if (this.showMemberDetails) return "Member Details";
@@ -309,7 +352,15 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
       .toUpperCase();
   }
   get shellClass() {
-    return this.sidebarOpen ? "app-shell sidebar-open" : "app-shell";
+    // While the add/edit book page is open it replaces the workspace in place,
+    // so it can never be hidden behind the Lightning Experience header.
+    return [
+      "app-shell",
+      this.sidebarOpen ? "sidebar-open" : "",
+      this.showBookModal ? "book-open" : ""
+    ]
+      .filter(Boolean)
+      .join(" ");
   }
   get librarianNotifications() {
     const d = this.dashboard || {};
@@ -1116,6 +1167,8 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
     this.section = event.currentTarget.dataset.section;
     if (this.section === "Members") this.memberDetail = undefined;
     this.sidebarOpen = false;
+    this.openGroup = "";
+    this.notificationsOpen = false;
     const loaders = {
       Dashboard: () => this.loadDashboard(),
       "Librarian Assistant": () => undefined,
@@ -1259,6 +1312,21 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
   }
   toggleNotifications() {
     this.notificationsOpen = !this.notificationsOpen;
+    this.openGroup = "";
+  }
+  toggleGroup(event) {
+    const label = event.currentTarget.dataset.group;
+    this.openGroup = this.openGroup === label ? "" : label;
+    this.notificationsOpen = false;
+  }
+  handleGroupFocusOut(event) {
+    const label = event.currentTarget.dataset.group;
+    if (
+      this.openGroup === label &&
+      !event.currentTarget.contains(event.relatedTarget)
+    ) {
+      this.openGroup = "";
+    }
   }
   openNotification(event) {
     this.notificationsOpen = false;
@@ -1467,9 +1535,13 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
         memberName: r.Member__r?.Name || "—",
         bookName: r.Book_Copy__r?.Book__r?.Name || "—",
         copyName: r.Book_Copy__r?.Name || "—",
+        borrowDateLabel: this.formatDay(r.Borrow_Date__c),
+        dueDateLabel: this.formatDay(r.Due_Date__c),
         statusClass: this.badge(r.Status__c),
         replacementRequired: Boolean(r.Replacement_Required__c),
-        defectReportedDate: r.Defect_Reported_Date__c || "—",
+        defectReportedDate: r.Defect_Reported_Date__c
+          ? this.formatDay(r.Defect_Reported_Date__c)
+          : "—",
         defectNotes: r.Notes__c || "No defect notes provided.",
         canAct: ["Active", "Overdue"].includes(r.Status__c),
         canApprove: r.Status__c === "Pending",
@@ -1483,6 +1555,7 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
         ...r,
         memberName: r.Member__r?.Name || "—",
         bookName: r.Book__r?.Name || "—",
+        reservedOnLabel: this.formatDay(r.Reservation_Date__c),
         displayStatus: r.Status__c === "Pending" ? "Waiting" : r.Status__c,
         statusClass: this.badge(
           r.Status__c === "Pending" ? "Waiting" : r.Status__c
@@ -1729,6 +1802,15 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
     this.selectedCategoryIds = [];
     this.loadReferenceData();
     this.showBookModal = true;
+    this.scrollToBookPage = true;
+  }
+  renderedCallback() {
+    if (this.scrollToBookPage && this.showBookModal) {
+      this.scrollToBookPage = false;
+      this.template
+        .querySelector(".book-page-modal")
+        ?.scrollIntoView?.({ block: "start" });
+    }
   }
   openEditBook(event) {
     const id = event?.currentTarget?.dataset?.id || this.bookDetail?.Id;
@@ -1756,6 +1838,7 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
       this.loadReferenceData();
       this.showBookDetail = false;
       this.showBookModal = true;
+      this.scrollToBookPage = true;
     });
   }
   viewBook(event) {
@@ -2532,6 +2615,16 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
       return `${months} ${months === 1 ? "Month" : "Months"}`;
     }
     return `${days} ${days === 1 ? "Day" : "Days"}`;
+  }
+  formatDay(value) {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }).format(date);
   }
   formatDate(value) {
     if (!value) return "—";

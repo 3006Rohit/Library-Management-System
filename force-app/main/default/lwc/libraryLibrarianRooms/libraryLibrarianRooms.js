@@ -9,6 +9,7 @@ export default class LibraryLibrarianRooms extends LightningElement {
   name = "";
   location = "";
   seats = 6;
+  roomType = "Shared";
   equipment = "";
   loading = false;
   saving = false;
@@ -26,8 +27,31 @@ export default class LibraryLibrarianRooms extends LightningElement {
     return this.rooms.reduce((sum, room) => sum + (room.capacity || 0), 0);
   }
 
+  get privateCount() {
+    return this.rooms.filter((room) => room.isPrivate).length;
+  }
+
   get summary() {
-    return `${this.rooms.length} rooms · ${this.totalSeats} seats`;
+    const privateText = this.privateCount
+      ? ` · ${this.privateCount} private`
+      : "";
+    return `${this.rooms.length} rooms · ${this.totalSeats} seats${privateText}`;
+  }
+
+  get isPrivateType() {
+    return this.roomType === "Private";
+  }
+
+  get isSharedType() {
+    return !this.isPrivateType;
+  }
+
+  get sharedTypeClass() {
+    return this.isSharedType ? "type active" : "type";
+  }
+
+  get privateTypeClass() {
+    return this.isPrivateType ? "type active" : "type";
   }
 
   get saveDisabled() {
@@ -37,8 +61,13 @@ export default class LibraryLibrarianRooms extends LightningElement {
   get roomRows() {
     return this.rooms.map((room) => ({
       ...room,
+      typeLabel: room.isPrivate ? "Private · 1 seat" : `${room.capacity} seats`,
       details: [room.location, room.equipment].filter(Boolean).join(" · ")
     }));
+  }
+
+  chooseType(event) {
+    this.roomType = event.currentTarget.dataset.type;
   }
 
   handleInput(event) {
@@ -60,7 +89,7 @@ export default class LibraryLibrarianRooms extends LightningElement {
 
   async addRoom(event) {
     event.preventDefault();
-    const seats = Number(this.seats);
+    const seats = this.isPrivateType ? 1 : Number(this.seats);
     if (!this.name.trim() || !Number.isInteger(seats) || seats < 1) {
       this.toast(
         "Check the form",
@@ -75,12 +104,19 @@ export default class LibraryLibrarianRooms extends LightningElement {
         name: this.name,
         location: this.location,
         capacity: seats,
-        equipment: this.equipment
+        equipment: this.equipment,
+        roomType: this.roomType
       });
       this.name = "";
       this.location = "";
       this.equipment = "";
-      this.toast("Room added", `${seats} seats are now bookable.`, "success");
+      this.toast(
+        "Room added",
+        this.isPrivateType
+          ? "The private room is now bookable."
+          : `${seats} seats are now bookable.`,
+        "success"
+      );
       await this.refresh();
     } catch (error) {
       this.toast(

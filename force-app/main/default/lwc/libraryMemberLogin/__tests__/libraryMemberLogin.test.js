@@ -23,7 +23,7 @@ describe("c-library-member-login", () => {
       is: LibraryMemberLogin
     });
     document.body.appendChild(element);
-    element.shadowRoot.querySelector("lightning-button").click();
+    element.shadowRoot.querySelector("button.primary").click();
     await Promise.resolve()
       .then(() => Promise.resolve())
       .then(() => Promise.resolve());
@@ -39,7 +39,7 @@ describe("c-library-member-login", () => {
       is: LibraryMemberLogin
     });
     document.body.appendChild(element);
-    element.shadowRoot.querySelector("lightning-button").click();
+    element.shadowRoot.querySelector("button.primary").click();
     await Promise.resolve()
       .then(() => Promise.resolve())
       .then(() => Promise.resolve());

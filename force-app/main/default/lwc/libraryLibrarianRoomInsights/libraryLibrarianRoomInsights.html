@@ -1,0 +1,135 @@
+<template>
+  <section class="insights" aria-label="Room demand insights">
+    <div class="head">
+      <div class="title">
+        <span class="icon" aria-hidden="true">✦</span>
+        <div>
+          <h2>Room insights</h2>
+          <p>Peak times, busiest rooms and suggestions from real bookings</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="refresh"
+        onclick={refresh}
+        disabled={loading}
+      >
+        Refresh
+      </button>
+    </div>
+
+    <template if:true={loading}>
+      <div class="notice">Analysing bookings…</div>
+    </template>
+    <template if:true={error}>
+      <div class="notice error" role="alert">{error}</div>
+    </template>
+    <template if:true={showEmpty}>
+      <div class="notice">
+        <template for:each={tipRows} for:item="tip">
+          <span key={tip.key}>{tip.text}</span>
+        </template>
+      </div>
+    </template>
+
+    <template if:true={hasData}>
+      <div class="cards">
+        <template for:each={summaryCards} for:item="card">
+          <article class="card" key={card.label}>
+            <span class="card-icon" aria-hidden="true">{card.icon}</span>
+            <span class="card-copy">
+              <strong>{card.value}</strong>
+              <small>{card.label}</small>
+            </span>
+          </article>
+        </template>
+      </div>
+
+      <div class="charts">
+        <article class="panel">
+          <h3>When rooms are busiest</h3>
+          <p class="sub">Seat-hours booked at each hour of the day</p>
+          <div class="chart" role="img" aria-label="Bookings by hour">
+            <template for:each={hourBars} for:item="bar">
+              <div class="col" key={bar.key} title={bar.title}>
+                <div class="track">
+                  <div class={bar.className} style={bar.barStyle}></div>
+                </div>
+                <span class="tick">{bar.label}</span>
+              </div>
+            </template>
+          </div>
+          <template if:true={quietText}>
+            <p class="quiet">Quietest: {quietText}</p>
+          </template>
+        </article>
+
+        <article class="panel">
+          <h3>Busiest days</h3>
+          <p class="sub">Bookings by day of the week</p>
+          <div class="chart days" role="img" aria-label="Bookings by day">
+            <template for:each={dayBars} for:item="bar">
+              <div class="col" key={bar.key} title={bar.title}>
+                <div class="track">
+                  <div class={bar.className} style={bar.barStyle}></div>
+                </div>
+                <span class="tick">{bar.label}</span>
+              </div>
+            </template>
+          </div>
+        </article>
+      </div>
+
+      <div class="charts">
+        <article class="panel">
+          <h3>Most in-demand rooms</h3>
+          <template if:true={hasRooms}>
+            <template for:each={roomRows} for:item="room">
+              <div class="room" key={room.key}>
+                <div class="room-top">
+                  <strong>{room.name}</strong>
+                  <span class="tag">{room.typeLabel}</span>
+                  <span class="share">{room.share}</span>
+                </div>
+                <div class="meter">
+                  <div class={room.levelClass} style={room.barStyle}></div>
+                </div>
+                <small>{room.detail}</small>
+              </div>
+            </template>
+          </template>
+          <template if:false={hasRooms}>
+            <p class="sub">No rooms yet.</p>
+          </template>
+        </article>
+
+        <article class="panel">
+          <h3>Most requested seats</h3>
+          <template if:true={hasSeats}>
+            <template for:each={seatRows} for:item="seat">
+              <div class="seat-row" key={seat.key}>
+                <span class="rank">{seat.rank}</span>
+                <strong>{seat.title}</strong>
+                <span class="count">{seat.count}</span>
+              </div>
+            </template>
+          </template>
+          <template if:false={hasSeats}>
+            <p class="sub">No seat history yet.</p>
+          </template>
+        </article>
+      </div>
+
+      <article class="panel tips">
+        <h3>Suggestions</h3>
+        <template for:each={tipRows} for:item="tip">
+          <div class="tip" key={tip.key}>
+            <span class="num">{tip.number}</span>
+            <p>{tip.text}</p>
+          </div>
+        </template>
+        <small class="updated">Updated {updatedText}</small>
+      </article>
+    </template>
+  </section>
+</template>

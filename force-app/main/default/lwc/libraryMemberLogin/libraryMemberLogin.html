@@ -1,35 +1,96 @@
-<template
-  ><article class="login-card">
-    <h1>Member sign in</h1>
-    <p>Sign in with your library email and password.</p>
-    <template lwc:if={error}
-      ><div class="error" role="alert">{error}</div></template
-    ><lightning-input
-      name="email"
-      type="email"
-      label="Email"
-      value={email}
-      onchange={handleInput}
-      required
-    ></lightning-input
-    ><lightning-input
-      name="password"
-      type="password"
-      label="Password"
-      value={password}
-      onchange={handleInput}
-      required
-    ></lightning-input
-    ><lightning-button
-      variant="brand"
-      label="Sign In"
-      onclick={submit}
-      disabled={busy}
-    ></lightning-button>
-    <div class="links">
-      <button type="button" onclick={forgot}>Forgot Password</button
-      ><button type="button" onclick={activate}>Activate Account</button
-      ><button type="button" onclick={signup}>Create Account</button>
+<template>
+  <div class="page">
+    <div class="frame">
+      <c-library-auth-nav></c-library-auth-nav>
+
+      <div class="split">
+        <section class="form-side">
+          <span class="badge">▥ Log In</span>
+          <h1>Welcome back</h1>
+          <p class="sub">Enter your account details below to continue</p>
+
+          <template lwc:if={error}>
+            <div class="error" role="alert">{error}</div>
+          </template>
+
+          <form onsubmit={submit} novalidate>
+            <label for="email">Email</label>
+            <input
+              id="email"
+              class="field"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="Enter your email"
+              value={email}
+              oninput={handleInput}
+            />
+
+            <label for="password">Password</label>
+            <div class="password-wrap">
+              <input
+                id="password"
+                class="field"
+                name="password"
+                type={passwordType}
+                autocomplete="current-password"
+                placeholder="Enter your password"
+                value={password}
+                oninput={handleInput}
+              />
+              <button
+                type="button"
+                class="eye"
+                aria-label={passwordToggleLabel}
+                onclick={togglePassword}
+              >
+                {passwordToggleIcon}
+              </button>
+            </div>
+
+            <div class="row">
+              <button type="button" class="link" onclick={activate}>
+                Activate account
+              </button>
+              <button type="button" class="link" onclick={forgot}>
+                Forgot password?
+              </button>
+            </div>
+
+            <button type="submit" class="primary" disabled={busy}>
+              {submitLabel}
+            </button>
+          </form>
+
+          <p class="foot">
+            Don't have an account?
+            <button type="button" class="link strong" onclick={signup}>
+              Sign up
+            </button>
+          </p>
+        </section>
+
+        <aside class="panel">
+          <div class="panel-logo">Library Portal</div>
+          <h2>Your Library, Online</h2>
+          <p>
+            Borrow, reserve and track every book from one simple, smart place.
+          </p>
+          <div class="shelf" aria-hidden="true">
+            <div class="spine s1"><span>The Silent Sea</span></div>
+            <div class="spine s2"><span>Ember Road</span></div>
+            <div class="spine s3"><span>Field Notes</span></div>
+            <div class="spine s4"><span>Atlas of Rain</span></div>
+          </div>
+          <div class="due" aria-hidden="true">
+            <span class="dot"></span>
+            <div>
+              <strong>Due in 5 days</strong>
+              <small>Renew online in one tap</small>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
-  </article></template
->
+  </div>
+</template>

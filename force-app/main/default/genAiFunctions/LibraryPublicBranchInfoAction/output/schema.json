@@ -1,0 +1,46 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "name": {
+      "title": "Name",
+      "description": "Branch name.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "code": {
+      "title": "Code",
+      "description": "Branch code.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "address": {
+      "title": "Address",
+      "description": "Branch address.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "openingHours": {
+      "title": "Opening Hours",
+      "description": "Published opening hours, empty when not published.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "message": {
+      "title": "Message",
+      "description": "Status note, for example when hours are not published or no branch matched.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

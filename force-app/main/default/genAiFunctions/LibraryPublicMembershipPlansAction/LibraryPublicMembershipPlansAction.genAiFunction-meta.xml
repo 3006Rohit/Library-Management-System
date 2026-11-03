@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Returns active membership plans with fee, duration, borrow limit, loan period and how to join.</description>
+    <developerName>LibraryPublicMembershipPlansAction</developerName>
+    <invocationTarget>LibraryPublicMembershipPlansAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryPublicMembershipPlansAction</localDeveloperName>
+    <masterLabel>Get Membership Plans</masterLabel>
+    <progressIndicatorMessage
+  >Looking up membership plans</progressIndicatorMessage>
+</GenAiFunction>

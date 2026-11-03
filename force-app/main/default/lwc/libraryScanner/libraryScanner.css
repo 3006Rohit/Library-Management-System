@@ -1,11 +1,10 @@
 :host {
-  --primary-blue: #0b66e4;
-  --text-primary: #122033;
-  --text-secondary: #69788d;
-  --border-color: #dfe5ec;
-  --bg-light: #f5f7fa;
-  --bg-white: #ffffff;
+  --text-primary: #111;
+  --text-secondary: #666;
+  --border-color: #e6e6e6;
+  --bg-light: #f4f4f4;
   display: block;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
 }
 
 .scanner-card {
@@ -15,9 +14,8 @@
   max-width: 100%;
   padding: 2rem;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background: var(--bg-white);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 32px;
+  background: #fff;
 }
 
 .scanner-heading,
@@ -33,15 +31,16 @@
 .scan-preview h3 {
   margin: 0 0 8px 0;
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 .scanner-heading h2 {
-  font-size: 24px;
+  font-size: 30px;
 }
 
 .scan-preview h3 {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .scanner-heading p,
@@ -49,72 +48,95 @@
 .camera-panel p {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .eyebrow {
-  color: var(--text-secondary);
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  color: #333;
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .scanner-icon {
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   place-items: center;
-  border-radius: 8px;
-  background: #e3f2fd;
-  color: var(--primary-blue);
-  font-size: 28px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  font-size: 26px;
   flex-shrink: 0;
 }
 
 .scanner-entry {
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
 }
 
 .scanner-mode {
   display: flex;
   gap: 4px;
-  padding: 4px;
-  border-radius: 6px;
+  padding: 5px;
+  border-radius: 999px;
   background: var(--bg-light);
-  border: 1px solid var(--border-color);
 }
 
 .mode-button {
-  padding: 8px 12px;
+  padding: 10px 20px;
   border: 0;
-  border-radius: 4px;
+  border-radius: 999px;
   background: transparent;
   color: var(--text-secondary);
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
 .mode-button:hover {
-  background: #f0f2f5;
   color: var(--text-primary);
 }
 
 .mode-button.active {
-  background: var(--bg-white);
-  color: var(--primary-blue);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  background: #111;
+  color: #fff;
 }
 
-.scanner-entry lightning-input {
+.barcode-field {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   min-width: 200px;
+}
+
+.barcode-label {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.barcode-input {
+  height: 48px;
+  padding: 0 20px;
+  border: 1px solid #e3e3e3;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text-primary);
+  background: #fff;
+  outline: 0;
+}
+
+.barcode-input:focus {
+  border-color: #111;
 }
 
 .scanner-actions {
@@ -124,35 +146,34 @@
 }
 
 .button {
-  padding: 10px 16px;
+  height: 48px;
+  padding: 0 26px;
   border: 0;
-  border-radius: 4px;
+  border-radius: 999px;
   font: inherit;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 500;
+  font-size: 15px;
   cursor: pointer;
-  transition: all 0.2s;
   white-space: nowrap;
 }
 
 .button.primary {
-  background: var(--primary-blue);
-  color: white;
+  background: #111;
+  color: #fff;
 }
 
 .button.primary:hover:not(:disabled) {
-  background: #0955d8;
+  background: #333;
 }
 
 .button.outline {
-  border: 1px solid var(--border-color);
-  background: var(--bg-white);
+  border: 1px solid #111;
+  background: #fff;
   color: var(--text-primary);
 }
 
 .button.outline:hover:not(:disabled) {
   background: var(--bg-light);
-  border-color: #b3d9ff;
 }
 
 .button:disabled {
@@ -165,47 +186,42 @@
   gap: 1rem;
   justify-items: start;
   padding: 1rem;
-  border-radius: 6px;
-  background: #0f1419;
-  border: 1px solid #1a2332;
+  border-radius: 24px;
+  background: #111;
 }
 
 .camera-video {
   width: 100%;
   max-height: 300px;
-  border-radius: 4px;
+  border-radius: 16px;
   object-fit: cover;
 }
 
 .camera-panel p {
-  color: #e0e7ff;
-  font-size: 14px;
+  color: #e6e6e6;
 }
 
 .scan-preview {
-  padding: 1rem;
-  border: 1px solid #b3e5b3;
-  border-radius: 6px;
-  background: #f1f8f1;
+  padding: 1.25rem 1.5rem;
+  border-radius: 24px;
+  background: #f4f4f4;
 }
 
 .scan-message {
-  padding: 12px 16px;
-  border-radius: 4px;
-  font-weight: 600;
+  padding: 14px 20px;
+  border-radius: 18px;
+  font-weight: 500;
   font-size: 14px;
 }
 
 .scan-message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background: #e5f3ea;
+  color: #1f6b3a;
 }
 
 .scan-message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: #fbe5e5;
+  color: #9b1c1c;
 }
 
 @media (max-width: 1024px) {
@@ -229,7 +245,7 @@
 
 @media (max-width: 640px) {
   .scanner-card {
-    padding: 1rem;
+    padding: 1.25rem;
     gap: 1rem;
   }
 
@@ -242,17 +258,5 @@
   .scan-preview {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .scanner-mode {
-    width: 100%;
-  }
-
-  .scanner-actions {
-    width: 100%;
-  }
-
-  .scanner-actions .button {
-    flex: 1;
   }
 }

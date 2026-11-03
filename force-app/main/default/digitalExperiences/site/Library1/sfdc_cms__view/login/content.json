@@ -17,49 +17,23 @@
                 "layoutDirectionTablet": "column",
                 "maxContentWidth": "",
                 "sectionColumnGutterWidth": "0",
-                "sectionConfig": "{\"UUID\":\"921248c4-48bb-4661-ba47-3a822d2acc27\",\"columns\":[{\"UUID\":\"7708470c-0eb1-4c97-8200-fa2189ffb875\",\"columnName\":\"Hero\",\"columnKey\":\"col1\",\"columnWidth\":\"5\",\"seedComponents\":null},{\"UUID\":\"87364b98-0d93-4ca0-9fd8-190a41713236\",\"columnName\":\"Login Form\",\"columnKey\":\"col2\",\"columnWidth\":\"7\",\"seedComponents\":null}]}",
-                "sectionMinHeight": "100vh",
-                "sectionVerticalAlign": "center"
+                "sectionConfig": "{\"UUID\":\"921248c4-48bb-4661-ba47-3a822d2acc27\",\"columns\":[{\"UUID\":\"87364b98-0d93-4ca0-9fd8-190a41713236\",\"columnName\":\"Login Page\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "",
+                "sectionVerticalAlign": "flex-start"
               },
               "children": [
                 {
                   "children": [
                     {
-                      "attributes": {},
-                      "definition": "c:libraryAuthHero",
-                      "id": "591a9393-e632-4002-a735-07e75bbe9187",
-                      "type": "component"
-                    }
-                  ],
-                  "id": "7708470c-0eb1-4c97-8200-fa2189ffb875",
-                  "name": "col1",
-                  "title": "Hero",
-                  "type": "region"
-                },
-                {
-                  "children": [
-                    {
-                      "attributes": {},
-                      "definition": "c:libraryLoginHeading",
-                      "id": "37ca360b-429a-4bbb-987e-5889bb870a1a",
-                      "type": "component"
-                    },
-                    {
-                      "attributes": {},
+                      "attributes": { "dxpStyle": {} },
                       "definition": "c:libraryMemberLogin",
                       "id": "49b31927-d602-4f42-86b6-5ea6c0284ea6",
-                      "type": "component"
-                    },
-                    {
-                      "attributes": {},
-                      "definition": "c:librarySignupLink",
-                      "id": "c3e52f50-1a1d-4a29-a604-c4204fe93a73",
                       "type": "component"
                     }
                   ],
                   "id": "87364b98-0d93-4ca0-9fd8-190a41713236",
-                  "name": "col2",
-                  "title": "Login Form",
+                  "name": "col1",
+                  "title": "Login Page",
                   "type": "region"
                 }
               ],

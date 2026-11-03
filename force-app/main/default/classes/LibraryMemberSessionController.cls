@@ -498,7 +498,9 @@ public without sharing class LibraryMemberSessionController {
     if (!c.isEmpty())
       q += ' WHERE ' + String.join(c, ' AND ');
     q += ' ORDER BY Name LIMIT :size OFFSET :off';
-    List<Book__c> results = readableBooks((List<Book__c>) Database.query(q, AccessLevel.SYSTEM_MODE));
+    List<Book__c> results = readableBooks(
+      (List<Book__c>) Database.query(q, AccessLevel.SYSTEM_MODE)
+    );
     if (!String.isBlank(searchTerm))
       LibraryAcquisitionInsightService.recordSearchTelemetry(
         searchTerm,
@@ -609,6 +611,13 @@ public without sharing class LibraryMemberSessionController {
   ) {
     Member__c m = member(sessionToken);
     return LibraryMembershipPaymentService.getUpgradePlans(m.Id);
+  }
+  @AuraEnabled
+  public static List<LibraryMembershipPaymentService.UpgradePlan> getMembershipPlanCatalog(
+    String sessionToken
+  ) {
+    Member__c m = member(sessionToken);
+    return LibraryMembershipPaymentService.getPlanCatalog(m.Id);
   }
   @AuraEnabled
   public static void updateMyProfile(
@@ -754,6 +763,12 @@ public without sharing class LibraryMemberSessionController {
       endAt,
       minimumCapacity
     );
+  }
+  @AuraEnabled
+  public static LibraryRoomInsightService.InsightsDTO getRoomDemandForecast(
+    String sessionToken
+  ) {
+    return LibraryRoomInsightService.getForecast(sessionToken);
   }
   @AuraEnabled
   public static List<LibraryRoomBookingService.SeatDTO> getLibraryRoomSeats(

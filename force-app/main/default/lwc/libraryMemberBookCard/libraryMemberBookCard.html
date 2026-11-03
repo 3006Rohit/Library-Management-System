@@ -1,12 +1,11 @@
 <template>
   <article class="book-card">
     <div class="cover-wrap">
-      <template if:true={hasCover}
-        ><img src={book.coverUrl} alt={book.Name} class="cover"
-      /></template>
-      <template if:false={hasCover}
-        ><div class="cover placeholder" aria-hidden="true">▥</div></template
-      >
+      <c-library-book-cover
+        title={book.Name}
+        author={book.authors}
+        cover-url={book.coverUrl}
+      ></c-library-book-cover>
     </div>
     <div class="book-content">
       <h3 title={book.Name}>{book.Name}</h3>

@@ -63,13 +63,14 @@ start_agent agent_router:
 
     reasoning:
         instructions: ->
-            | Select the best tool or subagent based on the user's intent and conversation history. Preserve topic continuity across turns. Treat short replies such as yes, no, those, them, and how many as follow-ups to the previous library question. For any library-related question, choose the closest library subagent; only use off-topic handling when the request is clearly unrelated to library services. Do not route a library question to the ambiguous topic merely because it is short. Questions asking how many, a count, a total, overdue loans, active loans, reservation queues, or fines must go to Library_Analytics or Circulation_Information, never answered from memory.
+            | Select the best tool or subagent based on the user's intent and conversation history. Preserve topic continuity across turns. Treat short replies such as yes, no, those, them, and how many as follow-ups to the previous library question. For any library-related question, choose the closest library subagent; only use off-topic handling when the request is clearly unrelated to library services. Do not route a library question to the ambiguous topic merely because it is short. Questions asking how many, a count, a total, overdue loans, active loans, reservation queues, or fines must go to Library_Analytics or Circulation_Information, never answered from memory. Questions about study rooms or seats, such as peak or busy times, the most in-demand rooms or seats, private rooms, room cancellations, or suggestions to improve room usage, go to Room_Insights.
 
         actions:
             go_to_Library_Analytics: @utils.transition to @subagent.Library_Analytics
             go_to_Catalog_Search: @utils.transition to @subagent.Catalog_Search
             go_to_Member_Lookup: @utils.transition to @subagent.Member_Lookup
             go_to_Circulation_Information: @utils.transition to @subagent.Circulation_Information
+            go_to_Room_Insights: @utils.transition to @subagent.Room_Insights
             go_to_escalation: @utils.transition to @subagent.escalation
             go_to_ambiguous_question: @utils.transition to @subagent.ambiguous_question
             go_to_off_topic: @utils.transition to @subagent.off_topic
@@ -760,6 +761,107 @@ subagent Circulation_Information:
                 "rowsJson": string
                     description: "JSON list of matching records with member name, member ID, book, dates, and amounts."
                     label: "Rows JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+
+subagent Room_Insights:
+
+    label: "Room Insights"
+    description: "Use this topic when librarians ask about study room demand: peak hours or days, the most in-demand rooms and seats, private room usage, room cancellations, or suggestions to improve room usage."
+
+    reasoning:
+        instructions: ->
+            | Answer room and seat demand questions for librarians. Invoke LibraryAgentRoomInsightsAction immediately for every room demand question, including follow-ups and short confirmations. Report only values the action returned; never invent bookings, hours, rooms or seats. When asked for peak time, give peakHourLabel and peakDayLabel and mention the busiest hours from busyHoursJson. For the most in-demand rooms, rank busiestRoomsJson by bookings and give each room's share. For seats, use topSeatsJson. Always finish with the suggestions the action returned, as short bullet points, and add one practical recommendation of your own only if it follows directly from the returned numbers. If available is false, state the message and do not guess. Booking times carry no time zone, so say the hours reflect the library's local booking times. This topic is read-only and never exposes member names.
+
+        actions:
+            LibraryAgentRoomInsightsAction: @actions.LibraryAgentRoomInsightsAction
+                with requestContext = ...
+
+    actions:
+        LibraryAgentRoomInsightsAction:
+            description: "Returns read-only study room demand insights for authorized librarians: peak hours and days, most in-demand rooms and seats, cancellations and suggestions."
+            label: "Get Room Demand Insights"
+            require_user_confirmation: False
+            include_in_progress_indicator: True
+            progress_indicator_message: "Analysing room bookings"
+            target: "apex://LibraryAgentRoomInsightsAction"
+
+            inputs:
+                "requestContext": string
+                    description: "Optional context describing the room question."
+                    label: "Request Context"
+                    is_required: False
+                    is_user_input: False
+
+            outputs:
+                "available": boolean
+                    description: "Whether room insight data is available."
+                    label: "Available"
+                    is_displayable: False
+                    filter_from_agent: False
+                "message": string
+                    description: "Status or error message from the room insight service."
+                    label: "Message"
+                    is_displayable: False
+                    filter_from_agent: False
+                "totalBookings": number
+                    description: "Total room bookings analysed, including cancellations."
+                    label: "Total Bookings"
+                    is_displayable: False
+                    filter_from_agent: False
+                "activeBookings": number
+                    description: "Bookings that were not cancelled."
+                    label: "Active Bookings"
+                    is_displayable: False
+                    filter_from_agent: False
+                "canceledBookings": number
+                    description: "Cancelled bookings."
+                    label: "Canceled Bookings"
+                    is_displayable: False
+                    filter_from_agent: False
+                "cancellationPercent": number
+                    description: "Percentage of bookings cancelled."
+                    label: "Cancellation Percent"
+                    is_displayable: False
+                    filter_from_agent: False
+                "peakHourLabel": string
+                    description: "Busiest hour of the day, for example 5 PM - 6 PM."
+                    label: "Peak Hour"
+                    is_displayable: False
+                    filter_from_agent: False
+                "peakDayLabel": string
+                    description: "Busiest day of the week."
+                    label: "Peak Day"
+                    is_displayable: False
+                    filter_from_agent: False
+                "quietTimes": string
+                    description: "Comma separated quietest hours."
+                    label: "Quiet Times"
+                    is_displayable: False
+                    filter_from_agent: False
+                "busyHoursJson": string
+                    description: "JSON array of hour, bookings and demand level for each hour."
+                    label: "Busy Hours JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                "busyDaysJson": string
+                    description: "JSON array of day, bookings and demand level for each weekday."
+                    label: "Busy Days JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                "busiestRoomsJson": string
+                    description: "JSON array of rooms with type, capacity, bookings, booked hours, share percent and demand level."
+                    label: "Busiest Rooms JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                "topSeatsJson": string
+                    description: "JSON array of the most requested seats by room."
+                    label: "Top Seats JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                "suggestions": string
+                    description: "Rule-based suggestions, one per line."
+                    label: "Suggestions"
                     is_displayable: False
                     filter_from_agent: False
 

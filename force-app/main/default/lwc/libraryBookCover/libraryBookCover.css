@@ -1,0 +1,143 @@
+:host {
+  display: block;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+.cover {
+  --w: 132px;
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 2 / 3;
+  margin: 0 auto;
+  border-radius: 6px 14px 14px 6px;
+  box-shadow:
+    0 14px 26px rgba(0, 0, 0, 0.18),
+    0 3px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 160ms ease;
+}
+
+.cover.large {
+  --w: min(100%, 240px);
+}
+
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 9px;
+  border-radius: 6px 0 0 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.28),
+    rgba(255, 255, 255, 0.12) 70%,
+    rgba(0, 0, 0, 0)
+  );
+  pointer-events: none;
+}
+
+:host(:hover) .cover {
+  transform: translateY(-3px);
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.placeholder {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 14px 12px 20px;
+  color: #fff;
+  text-align: center;
+  overflow: hidden;
+}
+
+.rule {
+  width: 34px;
+  height: 2px;
+  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.book-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+.cover.large .book-title {
+  font-size: 22px;
+}
+
+.book-author {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.cover.large .book-author {
+  font-size: 12px;
+}
+
+.mark {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.initial {
+  display: none;
+}
+
+/* Small cover for table rows: a coloured spine with the title's first letter. */
+.cover.thumb {
+  --w: 44px;
+  margin: 0;
+  border-radius: 4px 8px 8px 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+}
+
+.cover.thumb::after {
+  width: 5px;
+}
+
+.cover.thumb .placeholder {
+  justify-content: center;
+  padding: 0 0 0 5px;
+}
+
+.cover.thumb .initial {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cover.thumb .rule,
+.cover.thumb .book-title,
+.cover.thumb .book-author,
+.cover.thumb .mark {
+  display: none;
+}
+
+:host(:hover) .cover.thumb {
+  transform: none;
+}

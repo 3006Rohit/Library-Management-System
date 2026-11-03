@@ -1,57 +1,89 @@
 <template>
   <div class={shellClass}>
-    <aside class="sidebar">
-      <div class="brand">
-        <span class="brand-mark"
-          ><lightning-icon
-            icon-name="utility:knowledge_base"
-            size="x-small"
-          ></lightning-icon></span
-        ><span>Library Management</span>
-      </div>
-      <nav aria-label="Librarian navigation">
-        <template for:each={navItems} for:item="item">
-          <button
-            key={item.value}
-            class={item.className}
-            data-section={item.value}
-            onclick={selectSection}
-            aria-current={item.active}
-          >
-            <lightning-icon
-              icon-name={item.icon}
-              size="xx-small"
-            ></lightning-icon
-            ><span>{item.label}</span>
-          </button>
-        </template>
-      </nav>
-    </aside>
-
-    <div class="main-frame">
-      <header class="topbar">
+    <div class="frame">
+      <header class="nav">
         <button
-          class="menu-button"
+          type="button"
+          class="logo"
+          data-section="Dashboard"
+          onclick={selectSection}
+        >
+          Library Portal
+        </button>
+        <button
+          type="button"
+          class="menu-button mobile-menu-button"
           onclick={toggleSidebar}
           aria-label="Toggle navigation"
+          aria-expanded={sidebarOpen}
         >
-          <lightning-icon
-            icon-name="utility:rows"
-            size="small"
-          ></lightning-icon>
+          ☰
         </button>
-        <label class="global-search"
-          ><lightning-icon
-            icon-name="utility:search"
-            size="xx-small"
-          ></lightning-icon
-          ><input
-            type="search"
-            placeholder="Search..."
-            value={globalSearch}
-            oninput={handleGlobalSearch}
-        /></label>
+        <nav class={linksClass} aria-label="Librarian navigation">
+          <template for:each={navGroups} for:item="group">
+            <div
+              class="nav-group"
+              key={group.label}
+              data-group={group.label}
+              onfocusout={handleGroupFocusOut}
+            >
+              <template lwc:if={group.single}>
+                <button
+                  type="button"
+                  class={group.directClass}
+                  data-section={group.firstSection}
+                  aria-current={group.active}
+                  onclick={selectSection}
+                >
+                  {group.label}
+                </button>
+              </template>
+              <template lwc:else>
+                <button
+                  type="button"
+                  class={group.linkClass}
+                  aria-haspopup="true"
+                  aria-expanded={group.expanded}
+                  data-group={group.label}
+                  onclick={toggleGroup}
+                >
+                  {group.label}<span class="caret" aria-hidden="true">▾</span>
+                </button>
+                <div class={group.menuClass}>
+                  <template for:each={group.items} for:item="item">
+                    <button
+                      type="button"
+                      key={item.value}
+                      class={item.className}
+                      data-section={item.value}
+                      aria-current={item.active}
+                      onclick={selectSection}
+                    >
+                      <lightning-icon
+                        icon-name={item.icon}
+                        size="xx-small"
+                      ></lightning-icon
+                      ><span>{item.label}</span>
+                    </button>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </template>
+        </nav>
         <div class="top-actions">
+          <label class="global-search"
+            ><lightning-icon
+              icon-name="utility:search"
+              size="xx-small"
+            ></lightning-icon
+            ><input
+              class="bare"
+              type="search"
+              placeholder="Search..."
+              value={globalSearch}
+              oninput={handleGlobalSearch}
+          /></label>
           <button
             class="icon-button"
             title="Notifications"
@@ -107,14 +139,12 @@
               </div>
             </section>
           </template>
-          <div class="avatar">{userInitials}</div>
-          <div class="profile">
-            <strong>{userName}</strong><span>Librarian</span>
+          <div class="account-chip">
+            <span class="avatar">{userInitials}</span>
+            <span class="profile"
+              ><strong>{userName}</strong><span>Librarian</span></span
+            >
           </div>
-          <lightning-icon
-            icon-name="utility:down"
-            size="xx-small"
-          ></lightning-icon>
         </div>
       </header>
       <main class="content">
@@ -134,31 +164,34 @@
             >{error}
           </div></template
         >
-        <template if:false={isLibrarianAssistant}>
-          <div class="page-heading">
-            <div>
-              <h1>{pageTitle}</h1>
-              <p>{pageSubtitle}</p>
+        <div class="page-heading hero">
+          <span class="hero-badge">▥ {section}</span>
+          <h1>{pageHeadline}</h1>
+          <p>{pageSubtitle}</p>
+          <template if:true={isDashboard}>
+            <div class="cta">
+              <button
+                type="button"
+                class="button primary large"
+                data-section="Borrowing"
+                onclick={selectSection}
+              >
+                Issue or return a book
+              </button>
+              <button
+                type="button"
+                class="button soft large"
+                data-section="Registrations"
+                onclick={selectSection}
+              >
+                Review registrations
+              </button>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
 
         <template if:true={isLibrarianAssistant}>
           <section class="lib-assistant-page" aria-label="Librarian Assistant">
-            <section class="lib-assistant-hero">
-              <div class="lib-assistant-hero-art" aria-hidden="true">🤖</div>
-              <div>
-                <h1>Librarian Assistant</h1>
-                <p>Your AI assistant for library management</p>
-                <span
-                  >Contextual AI over governed Salesforce operational data and
-                  Data Cloud insights for safe, read-only decisions.</span
-                >
-              </div>
-              <div class="lib-assistant-hero-books" aria-hidden="true">
-                ▥ ✦ ▥
-              </div>
-            </section>
             <div class="lib-assistant-workspace">
               <section class="lib-assistant-help-card">
                 <h2>What can I help you with?</h2>
@@ -271,6 +304,7 @@
                 >
                   <span aria-hidden="true">⌕</span
                   ><input
+                    class="bare"
                     value={assistantInput}
                     oninput={handleAssistantInput}
                     placeholder="Type your question here..."
@@ -305,16 +339,6 @@
                   <h2>Data Cloud Analytics</h2>
                 </div>
               </div>
-              <template if:true={analyticsAvailable}>
-                <span class="analytics-status connected"
-                  ><span aria-hidden="true"></span>Connected</span
-                >
-              </template>
-              <template if:false={analyticsAvailable}>
-                <span class="analytics-status unavailable"
-                  ><span aria-hidden="true"></span>Unavailable</span
-                >
-              </template>
             </div>
             <template if:true={analyticsAvailable}>
               <div class="analytics-summary-grid">
@@ -399,8 +423,6 @@
               <div class="empty">{analyticsMessage}</div>
             </template>
           </section>
-          <c-library-librarian-closures></c-library-librarian-closures>
-          <c-library-repair-cases></c-library-repair-cases>
         </template>
 
         <template if:true={isBooks}>
@@ -452,12 +474,10 @@
               <table>
                 <thead>
                   <tr>
-                    <th>Title</th>
-                    <th>Author</th>
+                    <th>Book</th>
                     <th>Category</th>
                     <th>ISBN</th>
-                    <th>Total Copies</th>
-                    <th>Available</th>
+                    <th>Copies</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -466,25 +486,41 @@
                   <template for:each={books} for:item="book"
                     ><tr key={book.Id}>
                       <td>
-                        <button
-                          class="text-link"
-                          data-id={book.Id}
-                          onclick={viewBook}
-                        >
-                          {book.Name}
-                        </button>
+                        <div class="book-cell">
+                          <c-library-book-cover
+                            size="thumb"
+                            title={book.Name}
+                            author={book.authorNames}
+                            cover-url={book.Cover_Image_URL__c}
+                          ></c-library-book-cover>
+                          <div class="book-cell-copy">
+                            <button
+                              class="text-link"
+                              data-id={book.Id}
+                              onclick={viewBook}
+                            >
+                              {book.Name}
+                            </button>
+                            <small>{book.authorNames}</small>
+                          </div>
+                        </div>
                       </td>
-                      <td>{book.authorNames}</td>
-                      <td>{book.categoryNames}</td>
+                      <td>
+                        <span class="chip-tag">{book.categoryNames}</span>
+                      </td>
                       <td>{book.ISBN__c}</td>
-                      <td>{book.Total_Copies__c}</td>
-                      <td>{book.Available_Copies__c}</td>
+                      <td>
+                        <span class="copies-count"
+                          ><strong>{book.Available_Copies__c}</strong> of
+                          {book.Total_Copies__c} available</span
+                        >
+                      </td>
                       <td>
                         <span class={book.statusClass}>{book.Status__c}</span>
                       </td>
                       <td>
                         <button
-                          class="action-link"
+                          class="button secondary compact"
                           data-id={book.Id}
                           onclick={openEditBook}
                         >
@@ -513,6 +549,7 @@
               </div>
             </div>
           </div>
+          <c-library-librarian-review-moderation></c-library-librarian-review-moderation>
         </template>
 
         <template if:true={isBookCopies}>
@@ -555,29 +592,42 @@
               <table>
                 <thead>
                   <tr>
-                    <th>Copy ID</th>
-                    <th>Book Title</th>
+                    <th>Book copy</th>
                     <th>Barcode</th>
                     <th>Location</th>
-                    <th>Status</th>
                     <th>Condition</th>
+                    <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <template for:each={copies} for:item="copy"
                     ><tr key={copy.Id}>
-                      <td><span class="text-link">{copy.Name}</span></td>
-                      <td>{copy.bookName}</td>
-                      <td>{copy.Barcode__c}</td>
-                      <td>{copy.Shelf_Location__c}</td>
                       <td>
-                        <span class={copy.statusClass}>{copy.Status__c}</span>
+                        <div class="book-cell">
+                          <c-library-book-cover
+                            size="thumb"
+                            title={copy.bookName}
+                          ></c-library-book-cover>
+                          <div class="book-cell-copy">
+                            <strong class="cell-title">{copy.bookName}</strong>
+                            <small>Copy {copy.Name}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="chip-tag mono">{copy.Barcode__c}</span>
+                      </td>
+                      <td>
+                        <span class="chip-tag">{copy.Shelf_Location__c}</span>
                       </td>
                       <td>{copy.Condition__c}</td>
                       <td>
+                        <span class={copy.statusClass}>{copy.Status__c}</span>
+                      </td>
+                      <td>
                         <button
-                          class="action-link"
+                          class="button secondary compact"
                           data-id={copy.Id}
                           onclick={openEditCopy}
                         >
@@ -1094,11 +1144,19 @@
                 <tbody>
                   <template for:each={loans} for:item="loan"
                     ><tr key={loan.Id}>
-                      <td><span class="text-link">{loan.Name}</span></td>
+                      <td><span class="chip-tag mono">{loan.Name}</span></td>
                       <td>{loan.memberName}</td>
-                      <td>{loan.bookName}</td>
-                      <td>{loan.Borrow_Date__c}</td>
-                      <td>{loan.Due_Date__c}</td>
+                      <td>
+                        <div class="book-cell">
+                          <c-library-book-cover
+                            size="thumb"
+                            title={loan.bookName}
+                          ></c-library-book-cover>
+                          <strong class="cell-title">{loan.bookName}</strong>
+                        </div>
+                      </td>
+                      <td>{loan.borrowDateLabel}</td>
+                      <td>{loan.dueDateLabel}</td>
                       <td>
                         <span class={loan.statusClass}>{loan.Status__c}</span>
                       </td>
@@ -1182,6 +1240,7 @@
               size="xx-small"
             ></lightning-icon>
             <input
+              class="bare"
               type="search"
               placeholder="Search by member or book..."
               value={reservationSearch}
@@ -1206,16 +1265,32 @@
                 <tbody>
                   <template for:each={reservations} for:item="reservation"
                     ><tr key={reservation.Id}>
-                      <td><span class="text-link">{reservation.Name}</span></td>
+                      <td>
+                        <span class="chip-tag mono">{reservation.Name}</span>
+                      </td>
                       <td>{reservation.memberName}</td>
-                      <td>{reservation.bookName}</td>
-                      <td>{reservation.Reservation_Date__c}</td>
+                      <td>
+                        <div class="book-cell">
+                          <c-library-book-cover
+                            size="thumb"
+                            title={reservation.bookName}
+                          ></c-library-book-cover>
+                          <strong class="cell-title"
+                            >{reservation.bookName}</strong
+                          >
+                        </div>
+                      </td>
+                      <td>{reservation.reservedOnLabel}</td>
                       <td>
                         <span class={reservation.statusClass}
                           >{reservation.displayStatus}</span
                         >
                       </td>
-                      <td>{reservation.queuePosition}</td>
+                      <td>
+                        <span class="queue-pill"
+                          >#{reservation.queuePosition}</span
+                        >
+                      </td>
                       <td title={reservation.etaReason}>
                         <strong>{reservation.etaDateLabel}</strong>
                         <small>{reservation.etaConfidence} confidence</small>
@@ -1260,6 +1335,7 @@
                 size="xx-small"
               ></lightning-icon>
               <input
+                class="bare"
                 type="search"
                 placeholder="Search by member or transaction..."
                 value={fineSearch}
@@ -1284,10 +1360,14 @@
                 <tbody>
                   <template for:each={fines} for:item="fine"
                     ><tr key={fine.Id}>
-                      <td>{fine.Name}</td>
+                      <td><span class="chip-tag mono">{fine.Name}</span></td>
                       <td>{fine.memberName}</td>
-                      <td><span class="text-link">{fine.loanName}</span></td>
-                      <td>{fine.amountLabel}</td>
+                      <td>
+                        <span class="chip-tag mono">{fine.loanName}</span>
+                      </td>
+                      <td>
+                        <strong class="amount">{fine.amountLabel}</strong>
+                      </td>
                       <td>{fine.reasonLabel}</td>
                       <td>
                         <span class={fine.statusClass}>{fine.Status__c}</span>
@@ -1585,6 +1665,7 @@
         </template>
 
         <template if:true={isRooms}>
+          <c-library-librarian-room-insights></c-library-librarian-room-insights>
           <c-library-librarian-rooms></c-library-librarian-rooms>
           <c-library-librarian-room-bookings></c-library-librarian-room-bookings>
         </template>
@@ -1804,6 +1885,8 @@
               </button>
             </div>
           </section>
+          <c-library-librarian-closures></c-library-librarian-closures>
+          <c-library-repair-cases></c-library-repair-cases>
         </template>
       </main>
     </div>
@@ -1819,10 +1902,13 @@
       <div class="modal-card book-modal book-page-card">
         <header>
           <div>
+            <span class="hero-badge small">▥ Books</span>
             <h2>{modalTitle}</h2>
             <p>Enter book details and save to the library</p>
           </div>
-          <button class="modal-close" onclick={closeModals}>×</button>
+          <button class="modal-close" aria-label="Close" onclick={closeModals}>
+            ×
+          </button>
         </header>
         <div class="modal-body book-form">
           <div class="form-fields">
@@ -1901,17 +1987,11 @@
           <aside class="cover-preview">
             <span>Book Cover</span>
             <div class="cover-art">
-              <template if:true={hasBookCover}
-                ><img
-                  src={bookForm.coverUrl}
-                  alt="Book cover preview" /></template
-              ><template if:false={hasBookCover}
-                ><lightning-icon
-                  icon-name="utility:knowledge_base"
-                  size="large"
-                ></lightning-icon
-                ><strong>{bookForm.title}</strong></template
-              >
+              <c-library-book-cover
+                size="large"
+                title={bookForm.title}
+                cover-url={bookForm.coverUrl}
+              ></c-library-book-cover>
             </div>
             <button
               class="button secondary change-cover"

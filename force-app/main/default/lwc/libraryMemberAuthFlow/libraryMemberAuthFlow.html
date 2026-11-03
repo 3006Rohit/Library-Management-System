@@ -1,78 +1,117 @@
-<template
-  ><article class="flow-card">
-    <h1>{title}</h1>
-    <p>{description}</p>
-    <template lwc:if={error}
-      ><div class="error" role="alert">{error}</div></template
-    ><template lwc:if={message}
-      ><div class="success" role="status">{message}</div></template
-    ><template lwc:if={isForgot}
-      ><lightning-input
-        name="email"
-        type="email"
-        label="Email"
-        value={email}
-        onchange={handleInput}
-        required
-      ></lightning-input></template
-    ><template lwc:if={isActivate}
-      ><lightning-input
-        name="token"
-        label="Activation token"
-        value={token}
-        onchange={handleInput}
-        required
-      ></lightning-input></template
-    ><template lwc:if={isReset}
-      ><lightning-input
-        name="token"
-        label="Reset token"
-        value={token}
-        onchange={handleInput}
-        required
-      ></lightning-input></template
-    ><template lwc:if={isActivate}
-      ><lightning-input
-        name="password"
-        type="password"
-        label="New password"
-        value={password}
-        onchange={handleInput}
-        required
-      ></lightning-input
-      ><lightning-input
-        name="confirmation"
-        type="password"
-        label="Confirm password"
-        value={confirmation}
-        onchange={handleInput}
-        required
-      ></lightning-input></template
-    ><template lwc:if={isReset}
-      ><lightning-input
-        name="password"
-        type="password"
-        label="New password"
-        value={password}
-        onchange={handleInput}
-        required
-      ></lightning-input
-      ><lightning-input
-        name="confirmation"
-        type="password"
-        label="Confirm password"
-        value={confirmation}
-        onchange={handleInput}
-        required
-      ></lightning-input></template
-    ><lightning-button
-      variant="brand"
-      label="Continue"
-      onclick={submit}
-      disabled={busy}
-    ></lightning-button
-    ><button class="back" type="button" onclick={backToLogin}>
-      Back to login
-    </button>
-  </article></template
->
+<template>
+  <div class="page">
+    <div class="frame">
+      <c-library-auth-nav></c-library-auth-nav>
+
+      <div class="split">
+        <section class="form-side">
+          <span class="badge">▥ {badge}</span>
+          <h1>{title}</h1>
+          <p class="sub">{description}</p>
+
+          <template lwc:if={error}>
+            <div class="error" role="alert">{error}</div>
+          </template>
+          <template lwc:if={message}>
+            <div class="success" role="status">{message}</div>
+          </template>
+
+          <form onsubmit={handleSubmit} novalidate>
+            <template lwc:if={isForgot}>
+              <label for="email">Email</label>
+              <input
+                id="email"
+                class="field"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="Enter your email"
+                value={email}
+                oninput={handleInput}
+              />
+            </template>
+
+            <template lwc:if={needsToken}>
+              <label for="token">{tokenLabel}</label>
+              <input
+                id="token"
+                class="field"
+                name="token"
+                type="text"
+                autocomplete="one-time-code"
+                placeholder="Paste the token from your email"
+                value={token}
+                oninput={handleInput}
+              />
+            </template>
+
+            <template lwc:if={needsPassword}>
+              <label for="password">New password</label>
+              <div class="password-wrap">
+                <input
+                  id="password"
+                  class="field"
+                  name="password"
+                  type={passwordType}
+                  autocomplete="new-password"
+                  placeholder="Enter a new password"
+                  value={password}
+                  oninput={handleInput}
+                />
+                <button
+                  type="button"
+                  class="eye"
+                  aria-label={passwordToggleLabel}
+                  onclick={togglePassword}
+                >
+                  {passwordToggleIcon}
+                </button>
+              </div>
+
+              <label for="confirmation">Confirm password</label>
+              <input
+                id="confirmation"
+                class="field"
+                name="confirmation"
+                type={passwordType}
+                autocomplete="new-password"
+                placeholder="Re-enter your password"
+                value={confirmation}
+                oninput={handleInput}
+              />
+            </template>
+
+            <button type="submit" class="primary" disabled={busy}>
+              {submitLabel}
+            </button>
+          </form>
+
+          <p class="foot">
+            <button type="button" class="link strong" onclick={backToLogin}>
+              ← Back to login
+            </button>
+          </p>
+        </section>
+
+        <aside class="panel">
+          <div class="panel-logo">Library Portal</div>
+          <h2>{panelTitle}</h2>
+          <p>{panelText}</p>
+          <div class="shelf" aria-hidden="true">
+            <div class="spine s1"><span>The Silent Sea</span></div>
+            <div class="spine s2"><span>Ember Road</span></div>
+            <div class="spine s3"><span>Field Notes</span></div>
+            <div class="spine s4"><span>Atlas of Rain</span></div>
+          </div>
+          <div class="due" aria-hidden="true">
+            <span class="dot"></span>
+            <div>
+              <strong>{panelNoteTitle}</strong>
+              <small>{panelNoteText}</small>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</template>

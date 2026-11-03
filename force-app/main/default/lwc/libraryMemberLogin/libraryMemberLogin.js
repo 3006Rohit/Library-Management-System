@@ -5,10 +5,27 @@ export default class LibraryMemberLogin extends LightningElement {
   password = "";
   error;
   busy = false;
+  showPassword = false;
+  get passwordType() {
+    return this.showPassword ? "text" : "password";
+  }
+  get passwordToggleLabel() {
+    return this.showPassword ? "Hide password" : "Show password";
+  }
+  get passwordToggleIcon() {
+    return this.showPassword ? "Hide" : "Show";
+  }
+  get submitLabel() {
+    return this.busy ? "Signing in…" : "Sign in";
+  }
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
   handleInput(event) {
     this[event.target.name] = event.target.value;
   }
-  submit() {
+  submit(event) {
+    event?.preventDefault();
     this.error = undefined;
     this.busy = true;
     return login({ email: this.email, password: this.password })

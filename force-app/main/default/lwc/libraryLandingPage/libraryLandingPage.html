@@ -1,0 +1,236 @@
+<template>
+  <div class="page">
+    <div class="frame">
+      <nav class="nav" aria-label="Main">
+        <a class="logo" href="/library/">Library Portal</a>
+        <div class="links">
+          <a class="current" href="/library/">Home</a>
+          <a href="/library/explore-books">Books</a>
+          <a href="#plans">Plans</a>
+          <a href="/library/contact">Contact</a>
+        </div>
+        <div class="actions">
+          <a
+            class="icon-btn"
+            href="/library/explore-books"
+            aria-label="Search books"
+            >⌕</a
+          >
+          <a class="btn soft" href="/library/register">Sign up</a>
+          <a class="btn dark" href="/library/login">Log in</a>
+        </div>
+      </nav>
+
+      <header class="hero">
+        <span class="badge">▥ Your neighbourhood library, online</span>
+        <h1>Your Trusted Gateway To Every Great Read</h1>
+        <p>
+          Browse the catalog, check branch details and ask our assistant
+          anything. Join free to borrow, reserve and track your books.
+        </p>
+        <div class="cta">
+          <a class="btn dark large" href="/library/register">Join free</a>
+          <a class="btn soft large" href="/library/explore-books"
+            >Browse books</a
+          >
+        </div>
+      </header>
+
+      <section class="grid two">
+        <article class="card">
+          <h2>Browse without an account</h2>
+          <p class="muted">
+            Search the full catalog and see availability, no login needed.
+          </p>
+          <div class="books">
+            <template for:each={books} for:item="book">
+              <a
+                class="book"
+                key={book.id}
+                style={book.style}
+                href="/library/explore-books"
+              >
+                <template if:true={book.coverUrl}>
+                  <img src={book.coverUrl} alt={book.title} />
+                </template>
+                <template if:false={book.coverUrl}>
+                  <span>{book.title}</span>
+                </template>
+              </a>
+            </template>
+            <template if:false={hasBooks}>
+              <p class="muted">Books will appear here.</p>
+            </template>
+          </div>
+          <div class="chips">
+            <template for:each={filterItems} for:item="filter">
+              <button
+                key={filter.key}
+                type="button"
+                class={filter.className}
+                data-term={filter.term}
+                onclick={handleFilter}
+              >
+                {filter.label}
+              </button>
+            </template>
+          </div>
+        </article>
+
+        <article class="card chat" id="ask">
+          <div class="chat-head">
+            <span class="avatar">✦</span>
+            <div>
+              <h2>Ask the Library Assistant</h2>
+              <p class="muted">Public assistant, no sign-in needed</p>
+            </div>
+          </div>
+          <div class="thread" aria-live="polite">
+            <template for:each={messages} for:item="message">
+              <div key={message.id} class={message.className}>
+                {message.text}
+              </div>
+            </template>
+          </div>
+          <div class="chips">
+            <template for:each={suggestions} for:item="suggestion">
+              <button
+                key={suggestion}
+                type="button"
+                class="chip"
+                data-question={suggestion}
+                onclick={handleSuggestion}
+              >
+                {suggestion}
+              </button>
+            </template>
+          </div>
+          <form class="composer" onsubmit={send}>
+            <input
+              type="text"
+              placeholder="Type your question..."
+              aria-label="Ask the library assistant"
+              value={input}
+              oninput={handleInput}
+            />
+            <button type="submit" aria-label="Send" disabled={busy}>
+              {sendLabel}
+            </button>
+          </form>
+        </article>
+      </section>
+
+      <section class="grid two second">
+        <article class="card">
+          <h2>Members only</h2>
+          <ul class="locked">
+            <template for:each={members} for:item="item">
+              <li key={item}><span aria-hidden="true">🔒</span>{item}</li>
+            </template>
+          </ul>
+          <a class="btn dark" href="/library/login">Log in to unlock</a>
+        </article>
+
+        <article class="card stats-card">
+          <div>
+            <h2>Our library in numbers</h2>
+            <p class="muted">Open to everyone in the community.</p>
+          </div>
+          <div class="stats">
+            <template for:each={stats} for:item="stat">
+              <div key={stat.label}>
+                <strong>{stat.value}</strong>
+                <span>{stat.label}</span>
+              </div>
+            </template>
+          </div>
+        </article>
+      </section>
+
+      <template if:true={showPlansSection}>
+        <section class="plans" id="plans">
+          <div class="plans-head">
+            <span class="badge">▥ Membership plans</span>
+            <h2 class="plans-title">
+              Simple, Transparent Membership For Every Reader
+            </h2>
+            <p>
+              Pick the plan that fits how you read. Join free online and start
+              borrowing right away.
+            </p>
+            <div class="toggle" role="group" aria-label="Billing period">
+              <button
+                type="button"
+                class={monthlyTabClass}
+                data-billing="monthly"
+                aria-pressed={isMonthly}
+                onclick={handleBilling}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                class={annualTabClass}
+                data-billing="annual"
+                aria-pressed={isAnnual}
+                onclick={handleBilling}
+              >
+                Annually
+              </button>
+            </div>
+          </div>
+          <div class="plan-grid">
+            <template for:each={plans} for:item="plan">
+              <article key={plan.id} class={plan.className}>
+                <template if:true={plan.featured}>
+                  <span class="popular">Most popular</span>
+                </template>
+                <p class="plan-name">{plan.name}</p>
+                <div class="plan-price">
+                  <strong>{plan.price}</strong>
+                  <span>{plan.unit}</span>
+                </div>
+                <p class="plan-note">{plan.billedNote}</p>
+                <p class="plan-desc">{plan.description}</p>
+                <a class={plan.buttonClass} href="/library/register"
+                  >Get Started</a
+                >
+                <p class="plan-includes">Includes:</p>
+                <ul>
+                  <template for:each={plan.includes} for:item="item">
+                    <li key={item.key}>
+                      <span aria-hidden="true">✓</span>{item.text}
+                    </li>
+                  </template>
+                </ul>
+              </article>
+            </template>
+            <article class="plan">
+              <p class="plan-name">Institutions</p>
+              <div class="plan-price"><strong>Custom</strong></div>
+              <p class="plan-note">Tailored to your organisation</p>
+              <p class="plan-desc">
+                For schools, colleges and community groups that need memberships
+                at scale.
+              </p>
+              <a class="btn outline wide" href="#contact">Contact Us</a>
+              <p class="plan-includes">Includes:</p>
+              <ul>
+                <template for:each={customPlan.includes} for:item="item">
+                  <li key={item.key}>
+                    <span aria-hidden="true">✓</span>{item.text}
+                  </li>
+                </template>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </template>
+
+      <footer class="footer" id="contact">
+        <span>Branch hours | Policies | FAQ</span>
+        <span>2026 Library Portal</span>
+      </footer>
+    </div>
+  </div>
+</template>

@@ -46,6 +46,7 @@ start_agent agent_router:
               Questions about holds or reservations go to my_reservations.
               Questions about overall activity, counts, or fines go to my_library_activity.
               Questions about finding or searching for books go to catalog_discovery.
+              Questions about when study rooms are busiest, peak times, or the best time to book a room go to room_busy_times.
         actions:
             go_to_escalation: @utils.transition to @subagent.escalation
             go_to_off_topic: @utils.transition to @subagent.off_topic
@@ -54,6 +55,7 @@ start_agent agent_router:
             go_to_my_loans: @utils.transition to @subagent.my_loans
             go_to_my_reservations: @utils.transition to @subagent.my_reservations
             go_to_catalog_discovery: @utils.transition to @subagent.catalog_discovery
+            go_to_room_busy_times: @utils.transition to @subagent.room_busy_times
 
 subagent escalation:
     label: "Escalation"
@@ -387,3 +389,70 @@ subagent catalog_discovery:
                 with author=...
                 with category=...
                 with availableOnly=...
+
+subagent room_busy_times:
+    label: "Room Busy Times"
+    description: "Tell the authenticated member when study rooms are busiest and the best times to book. Uses LibraryAgentRoomForecastAction."
+
+    actions:
+        get_room_busy_times:
+            description: "Retrieve anonymous, read-only study room busy-time guidance: peak hour, peak day, quiet times and tips."
+            label: "Get Room Busy Times"
+            require_user_confirmation: False
+            include_in_progress_indicator: True
+            progress_indicator_message: "Checking room busy times"
+            target: "apex://LibraryAgentRoomForecastAction"
+            inputs:
+                sessionToken: string
+                    description: "Member session token for authentication."
+                    label: "Session Token"
+                    is_required: True
+                    is_user_input: False
+            outputs:
+                available: boolean
+                    description: "Whether busy-time data is available."
+                    label: "Available"
+                    is_displayable: False
+                    filter_from_agent: False
+                message: string
+                    description: "Status message from the forecast service."
+                    label: "Message"
+                    is_displayable: True
+                    filter_from_agent: False
+                peakHourLabel: string
+                    description: "Busiest hour of the day, for example 5 PM - 6 PM."
+                    label: "Peak Hour"
+                    is_displayable: True
+                    filter_from_agent: False
+                peakDayLabel: string
+                    description: "Busiest day of the week."
+                    label: "Peak Day"
+                    is_displayable: True
+                    filter_from_agent: False
+                quietTimes: string
+                    description: "Comma separated quiet hours that are best to book."
+                    label: "Quiet Times"
+                    is_displayable: True
+                    filter_from_agent: False
+                busyHoursJson: string
+                    description: "JSON array of hour and demand level."
+                    label: "Busy Hours JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                busyDaysJson: string
+                    description: "JSON array of day and demand level."
+                    label: "Busy Days JSON"
+                    is_displayable: False
+                    filter_from_agent: False
+                tips: string
+                    description: "Friendly booking tips, one per line."
+                    label: "Tips"
+                    is_displayable: True
+                    filter_from_agent: False
+
+    reasoning:
+        instructions: ->
+            | Use {!@actions.get_room_busy_times} immediately for every question about when study rooms are busy, peak times, or the best time to book, including follow-ups. Report only returned values: the peak hour, the peak day, the quiet times to book, and the tips. If available is false, say there is not enough booking history yet and do not guess. You only describe general busy times; you cannot show other members or who booked a seat, and you cannot book a room. Tell the member they can book on the Rooms page. Never disclose authentication tokens.
+        actions:
+            get_room_busy_times: @actions.get_room_busy_times
+                with sessionToken=@variables.SessionToken

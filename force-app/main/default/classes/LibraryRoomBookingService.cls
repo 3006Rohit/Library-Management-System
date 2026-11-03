@@ -2,6 +2,8 @@ public without sharing class LibraryRoomBookingService {
   private static final String ROOM_OPERATION = 'Library Room';
   private static final String BOOKING_OPERATION = 'Room Booking';
   private static final Integer MAX_SEATS = 200;
+  public static final String ROOM_TYPE_SHARED = 'Shared';
+  public static final String ROOM_TYPE_PRIVATE = 'Private';
 
   public class RoomDTO {
     @AuraEnabled
@@ -18,6 +20,12 @@ public without sharing class LibraryRoomBookingService {
     public Boolean available;
     @AuraEnabled
     public Integer availableSeats;
+    // 'Shared' (study room with a seat map) or 'Private' (one-person room that
+    // is booked whole).
+    @AuraEnabled
+    public String roomType;
+    @AuraEnabled
+    public Boolean isPrivate;
   }
 
   public class SeatDTO {
@@ -52,12 +60,25 @@ public without sharing class LibraryRoomBookingService {
     Integer capacity,
     String equipment
   ) {
+    return createRoom(name, location, capacity, equipment, ROOM_TYPE_SHARED);
+  }
+
+  public static Id createRoom(
+    String name,
+    String location,
+    Integer capacity,
+    String equipment,
+    String roomType
+  ) {
     LibraryPolicyService.require('Manage_Library_Catalog');
+    String type = normalizeRoomType(roomType);
+    // A private room is a single-person room, so it always has exactly one seat.
+    Integer seatCount = type == ROOM_TYPE_PRIVATE ? 1 : capacity;
     if (
       String.isBlank(name) ||
-      capacity == null ||
-      capacity < 1 ||
-      capacity > MAX_SEATS
+      seatCount == null ||
+      seatCount < 1 ||
+      seatCount > MAX_SEATS
     )
       throw new AuraHandledException(
         'Room name and a seat count between 1 and ' +
@@ -74,8 +95,9 @@ public without sharing class LibraryRoomBookingService {
           new Map<String, Object>{
             'n' => name.trim().left(80),
             'l' => String.isBlank(location) ? null : location.trim().left(80),
-            'c' => capacity,
-            'e' => String.isBlank(equipment) ? null : equipment.trim().left(80)
+            'c' => seatCount,
+            'e' => String.isBlank(equipment) ? null : equipment.trim().left(80),
+            't' => type
           }
         )
         .left(255)
@@ -221,7 +243,9 @@ public without sharing class LibraryRoomBookingService {
     }
     Library_Scan_Transaction__c booking = new Library_Scan_Transaction__c(
       Idempotency_Key__c = key +
-        (existing.isEmpty() ? '' : ':' + String.valueOf(Crypto.getRandomLong())),
+        (existing.isEmpty()
+          ? ''
+          : ':' + String.valueOf(Crypto.getRandomLong())),
       Operation__c = BOOKING_OPERATION,
       Member__c = member.Id,
       Status__c = 'Booked',
@@ -431,7 +455,15 @@ public without sharing class LibraryRoomBookingService {
     dto.location = stringValue(payload.get('l'));
     dto.capacity = integerValue(payload.get('c'));
     dto.equipment = stringValue(payload.get('e'));
+    dto.roomType = normalizeRoomType(stringValue(payload.get('t')));
+    dto.isPrivate = dto.roomType == ROOM_TYPE_PRIVATE;
     return dto;
+  }
+  public static String normalizeRoomType(String value) {
+    return String.isNotBlank(value) &&
+      value.trim().equalsIgnoreCase(ROOM_TYPE_PRIVATE)
+      ? ROOM_TYPE_PRIVATE
+      : ROOM_TYPE_SHARED;
   }
   private static Map<String, Object> parse(String raw) {
     if (String.isBlank(raw))

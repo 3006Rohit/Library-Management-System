@@ -1,5 +1,6 @@
 :host {
   display: block;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
 }
 .card-panel {
   padding: 4px 0 12px;
@@ -9,117 +10,125 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 .eyebrow {
-  margin: 0 0 5px;
-  color: #0877eb;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  color: #333;
+  font-size: 13px;
 }
 h3 {
   margin: 0;
-  color: #09213d;
-  font-size: 20px;
+  color: #111;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
 }
 .intro {
-  margin: 7px 0 0;
-  color: #64748b;
+  margin: 8px 0 0;
+  color: #666;
   max-width: 680px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 .member-card {
-  max-width: 650px;
+  max-width: 680px;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 32px;
   color: #fff;
-  background: linear-gradient(135deg, #062f50, #0877eb);
-  box-shadow: 0 16px 32px rgba(6, 47, 80, 0.22);
+  background: #111;
 }
 .card-topline,
 .card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 20px;
-  font-size: 11px;
-  font-weight: 700;
+  padding: 18px 26px;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0.12em;
 }
 .card-footer {
-  color: rgba(255, 255, 255, 0.78);
-  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  color: #bbb;
+  border-top: 1px solid #2b2b2b;
   letter-spacing: 0;
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 13px;
 }
 .shield {
   font-size: 18px;
 }
 .card-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 190px;
-  gap: 20px;
-  padding: 25px 20px;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 24px;
+  padding: 26px;
 }
 .token-block {
   display: grid;
   align-content: center;
-  gap: 10px;
+  gap: 12px;
 }
 .token-caption {
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 12px;
+  color: #bbb;
+  font-size: 13px;
 }
 code {
   display: block;
   overflow-wrap: anywhere;
-  color: #062f50;
+  color: #111;
   background: #fff;
-  border-radius: 8px;
-  padding: 13px;
-  font-size: 13px;
+  border-radius: 18px;
+  padding: 16px 18px;
+  font-size: 14px;
   line-height: 1.4;
 }
 .copy-button {
   width: max-content;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 7px;
-  padding: 7px 10px;
+  border: 1px solid #555;
+  border-radius: 999px;
+  padding: 9px 20px;
   color: #fff;
   background: transparent;
+  font-family: inherit;
   cursor: pointer;
 }
 .member-details {
   display: grid;
   align-content: center;
-  gap: 7px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  gap: 8px;
+  font-size: 13px;
+  color: #bbb;
 }
 .member-details strong {
   color: #fff;
-  font-size: 20px;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 .status-pill {
   width: max-content;
   border-radius: 999px;
-  padding: 4px 9px;
-  color: #062f50;
-  background: #c8f7dc;
-  font-weight: 700;
+  padding: 5px 14px;
+  color: #1f6b3a;
+  background: #e5f3ea;
+  font-weight: 500;
 }
 .button {
   border: 0;
-  border-radius: 8px;
-  padding: 10px 15px;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-family: inherit;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 500;
 }
 .button.secondary {
-  color: #062f50;
-  background: #eaf3ff;
+  color: #111;
+  background: #fff;
+  border: 1px solid #111;
 }
 .button:disabled {
   opacity: 0.6;
@@ -128,10 +137,10 @@ code {
 .status,
 .error {
   margin: 14px 0 0;
-  font-size: 13px;
+  font-size: 14px;
 }
 .error {
-  color: #b42318;
+  color: #9b1c1c;
 }
 @media (max-width: 680px) {
   .panel-header,

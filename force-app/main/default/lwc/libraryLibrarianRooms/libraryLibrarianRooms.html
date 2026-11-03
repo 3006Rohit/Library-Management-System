@@ -9,6 +9,26 @@
     </div>
 
     <form class="room-form" onsubmit={addRoom}>
+      <div class="type-toggle" role="group" aria-label="Room type">
+        <button
+          type="button"
+          class={sharedTypeClass}
+          data-type="Shared"
+          aria-pressed={isSharedType}
+          onclick={chooseType}
+        >
+          Shared study room
+        </button>
+        <button
+          type="button"
+          class={privateTypeClass}
+          data-type="Private"
+          aria-pressed={isPrivateType}
+          onclick={chooseType}
+        >
+          Private single room
+        </button>
+      </div>
       <div class="field">
         <label for="roomName">Room name</label>
         <input
@@ -22,20 +42,22 @@
           onchange={handleInput}
         />
       </div>
-      <div class="field">
-        <label for="roomSeats">Number of seats</label>
-        <input
-          id="roomSeats"
-          type="number"
-          name="seats"
-          value={seats}
-          min="1"
-          max="200"
-          step="1"
-          required
-          onchange={handleInput}
-        />
-      </div>
+      <template if:true={isSharedType}>
+        <div class="field">
+          <label for="roomSeats">Number of seats</label>
+          <input
+            id="roomSeats"
+            type="number"
+            name="seats"
+            value={seats}
+            min="1"
+            max="200"
+            step="1"
+            required
+            onchange={handleInput}
+          />
+        </div>
+      </template>
       <div class="field">
         <label for="roomLocation">Location</label>
         <input
@@ -77,7 +99,7 @@
         <article class="room-row" key={room.id}>
           <div>
             <strong>{room.name}</strong>
-            <span>{room.capacity} seats</span>
+            <span>{room.typeLabel}</span>
             <span>{room.details}</span>
           </div>
           <button

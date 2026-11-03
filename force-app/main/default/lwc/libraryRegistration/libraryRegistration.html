@@ -10,152 +10,263 @@
     ></c-library-auth-state>
   </template>
   <template if:false={submitted}>
-    <div class="registration-page">
-      <aside class="portal-nav">
-        <div class="brand">▥ <span>Library</span></div>
-        <a href="/library/">⌂ <span>Home</span></a>
-        <a href="/library/explore-books">▣ <span>Explore Books</span></a>
-        <a href="/library/login">♙ <span>Login</span></a>
-      </aside>
-      <main class="registration-main">
-        <header>
-          <div class="header-search">
-            ⌕ <span>Search books, authors, or categories...</span>
-          </div>
-          <a href="/library/login">Sign in</a>
-        </header>
-        <section class="registration-content">
-          <div class="heading">
-            <h1>New Registration</h1>
-            <p>Create your library account</p>
-          </div>
-          <div class="steps">
-            <div class="step active">
-              <span>1</span><strong>Basic Details</strong>
+    <div class="page">
+      <div class="frame">
+        <c-library-auth-nav></c-library-auth-nav>
+
+        <div class="split">
+          <section class="intro">
+            <span class="badge">▥ Sign Up</span>
+            <h1>Join Your Library Today</h1>
+            <p class="sub">
+              Fill out the form and a librarian will review your application.
+              You will get an email once a decision is made.
+            </p>
+            <div class="benefits">
+              <div class="benefit">
+                <span class="icon">▣</span>
+                <strong>Thousands of books</strong>
+                <small>Browse a growing physical catalog</small>
+              </div>
+              <div class="benefit">
+                <span class="icon">▤</span>
+                <strong>Manage loans online</strong>
+                <small>Track due dates and renewals</small>
+              </div>
+              <div class="benefit">
+                <span class="icon">♡</span>
+                <strong>Reserve favorites</strong>
+                <small>Join live reservation queues</small>
+              </div>
+              <div class="benefit">
+                <span class="icon">✓</span>
+                <strong>Personal access</strong>
+                <small>Your activity stays tied to your account</small>
+              </div>
             </div>
-            <div class="step"><span>2</span><strong>Verify Email</strong></div>
-            <div class="step"><span>3</span><strong>Complete</strong></div>
-          </div>
-          <div class="form-layout">
-            <form class="registration-form" onsubmit={handleSubmit} novalidate>
-              <div class="field-grid">
-                <lightning-input
-                  name="firstName"
-                  data-field="firstName"
-                  label="First Name"
-                  required
-                  onchange={handleChange}
-                ></lightning-input>
-                <lightning-input
-                  name="lastName"
-                  data-field="lastName"
-                  label="Last Name"
-                  required
-                  onchange={handleChange}
-                ></lightning-input>
-                <lightning-input
-                  name="email"
-                  data-field="email"
-                  type="email"
-                  label="Email"
-                  required
-                  onchange={handleChange}
-                ></lightning-input>
-                <lightning-input
-                  name="phone"
-                  data-field="phone"
-                  type="tel"
-                  label="Phone Number"
-                  pattern="[+0-9() .-]{7,25}"
-                  message-when-pattern-mismatch="Enter a valid phone number."
-                  onchange={handleChange}
-                ></lightning-input>
-                <lightning-input
-                  name="dateOfBirth"
-                  data-field="dateOfBirth"
-                  type="date"
-                  label="Date of Birth"
-                  max={today}
-                  onchange={handleChange}
-                ></lightning-input>
-                <lightning-combobox
-                  name="requestedPlanId"
-                  data-field="requestedPlanId"
-                  label="Membership Plan"
-                  options={planOptions}
-                  required
-                  onchange={handleChange}
-                ></lightning-combobox>
-                <lightning-textarea
-                  class="full"
-                  name="interests"
-                  data-field="interests"
-                  label="Book Interests"
-                  placeholder="e.g. Technology, Fiction, History"
-                  maxlength="255"
-                  message-when-too-long="Please keep your interests under 255 characters."
-                  onchange={handleChange}
-                ></lightning-textarea>
-                <lightning-textarea
-                  class="full"
-                  name="address"
-                  data-field="address"
-                  label="Address"
-                  onchange={handleChange}
-                ></lightning-textarea>
-              </div>
-              <template if:true={errorMessage}
-                ><div class="form-error" role="alert">
-                  {errorMessage}
-                </div></template
+            <p class="login-prompt">
+              Already have an account? <a href="/library/login">Log in</a>
+            </p>
+          </section>
+
+          <form class="card" onsubmit={handleSubmit} novalidate>
+            <div class="two">
+              <lightning-input
+                name="firstName"
+                data-field="firstName"
+                label="First Name"
+                placeholder="Jane"
+                required
+                onchange={handleChange}
+              ></lightning-input>
+              <lightning-input
+                name="lastName"
+                data-field="lastName"
+                label="Last Name"
+                placeholder="Doe"
+                required
+                onchange={handleChange}
+              ></lightning-input>
+            </div>
+            <lightning-input
+              name="email"
+              data-field="email"
+              type="email"
+              label="Email"
+              placeholder="jane@company.com"
+              required
+              onchange={handleChange}
+            ></lightning-input>
+            <div class="two">
+              <lightning-input
+                name="phone"
+                data-field="phone"
+                type="tel"
+                label="Phone Number"
+                placeholder="000-000-0000"
+                pattern="[+0-9() .-]{7,25}"
+                message-when-pattern-mismatch="Enter a valid phone number."
+                onchange={handleChange}
+              ></lightning-input>
+              <lightning-input
+                name="dateOfBirth"
+                data-field="dateOfBirth"
+                type="date"
+                label="Date of Birth"
+                max={today}
+                onchange={handleChange}
+              ></lightning-input>
+            </div>
+            <lightning-combobox
+              name="requestedPlanId"
+              data-field="requestedPlanId"
+              label="Membership Plan"
+              placeholder="Choose a plan"
+              options={planOptions}
+              required
+              onchange={handleChange}
+            ></lightning-combobox>
+            <div class="ms" onfocusout={handleInterestsFocusOut}>
+              <span class="ms-label" id="interests-label">Book Interests</span>
+              <button
+                type="button"
+                class="ms-trigger"
+                aria-haspopup="listbox"
+                aria-expanded={interestsOpen}
+                aria-labelledby="interests-label"
+                onclick={toggleInterests}
               >
-              <button class="submit-button" type="submit" disabled={loading}>
-                Submit Registration
+                <span>{interestsPlaceholder}</span>
+                <span class="ms-caret" aria-hidden="true">▾</span>
               </button>
-              <template if:true={loading}
-                ><lightning-spinner
-                  alternative-text="Submitting application"
-                  size="small"
-                ></lightning-spinner
-              ></template>
-            </form>
-            <aside class="benefits">
-              <h2>Why join our library?</h2>
-              <div>
-                <span>▣</span>
-                <p>
-                  <strong>Access thousands of books</strong
-                  ><small>Browse a growing physical catalog</small>
-                </p>
+              <template lwc:if={hasSelectedInterests}>
+                <div class="ms-chips">
+                  <template for:each={interestChips} for:item="chip">
+                    <span class="ms-chip" key={chip.name}>
+                      {chip.name}
+                      <button
+                        type="button"
+                        aria-label="Remove interest"
+                        data-name={chip.name}
+                        onclick={handleRemoveInterest}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </template>
+                </div>
+              </template>
+              <div
+                class={interestsListClass}
+                role="group"
+                aria-label="Book interests"
+              >
+                <template for:each={interestItems} for:item="item">
+                  <label class={item.className} key={item.name}>
+                    <input
+                      type="checkbox"
+                      data-name={item.name}
+                      checked={item.checked}
+                      disabled={item.disabled}
+                      onchange={handleInterestChange}
+                    />
+                    {item.name}
+                  </label>
+                </template>
+                <template lwc:if={interestsLimitReached}>
+                  <p class="ms-note">Selection limit reached.</p>
+                </template>
               </div>
-              <div>
-                <span>▤</span>
-                <p>
-                  <strong>Manage your loans online</strong
-                  ><small>Track due dates and renewals</small>
-                </p>
+            </div>
+            <lightning-textarea
+              name="address"
+              data-field="address"
+              label="Address"
+              placeholder="Street, city, postal code"
+              onchange={handleChange}
+            ></lightning-textarea>
+            <template if:true={errorMessage}>
+              <div class="form-error" role="alert">{errorMessage}</div>
+            </template>
+            <button class="submit-button" type="submit" disabled={loading}>
+              {submitLabel}
+            </button>
+            <template if:true={loading}>
+              <lightning-spinner
+                alternative-text="Submitting application"
+                size="small"
+              ></lightning-spinner>
+            </template>
+          </form>
+        </div>
+      </div>
+
+      <template lwc:if={showPayment}>
+        <div class="overlay" onkeydown={handleDialogKeydown}>
+          <div
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pay-title"
+          >
+            <div class="modal-head">
+              <span class="badge">▥ Demo payment</span>
+              <button
+                type="button"
+                class="modal-close"
+                aria-label="Close payment"
+                onclick={closePayment}
+              >
+                ×
+              </button>
+            </div>
+            <h2 id="pay-title">Complete your payment</h2>
+            <p class="modal-sub">
+              Pay your membership fee to finish registering.
+            </p>
+
+            <div class="summary">
+              <div class="summary-row">
+                <span>Plan</span>
+                <strong>{quote.planName}</strong>
               </div>
-              <div>
-                <span>♡</span>
-                <p>
-                  <strong>Reserve your favorite books</strong
-                  ><small>Join live reservation queues</small>
-                </p>
+              <div class="summary-row">
+                <span>Duration</span>
+                <strong>{termLabel}</strong>
               </div>
-              <div>
-                <span>✓</span>
-                <p>
-                  <strong>Get personalized access</strong
-                  ><small>Your activity stays tied to your account</small>
-                </p>
+              <div class="summary-row total">
+                <span>Total</span>
+                <strong>{amountLabel}</strong>
               </div>
-            </aside>
+            </div>
+
+            <p class="pay-label" id="pay-with">Pay with</p>
+            <div class="methods" role="radiogroup" aria-labelledby="pay-with">
+              <template for:each={paymentMethods} for:item="method">
+                <button
+                  key={method.name}
+                  type="button"
+                  role="radio"
+                  aria-checked={method.selected}
+                  class={method.className}
+                  data-method={method.name}
+                  onclick={handleSelectMethod}
+                >
+                  <span class="method-icon" aria-hidden="true"
+                    >{method.icon}</span
+                  >
+                  <span class="method-text">
+                    <strong>{method.name}</strong>
+                    <small>{method.hint}</small>
+                  </span>
+                </button>
+              </template>
+            </div>
+            <p class="demo-note">{selectedMethodHint}</p>
+
+            <template lwc:if={paymentError}>
+              <div class="form-error" role="alert">{paymentError}</div>
+            </template>
+
+            <button
+              type="button"
+              class="submit-button"
+              disabled={paying}
+              onclick={handlePay}
+            >
+              {payLabel}
+            </button>
+            <button
+              type="button"
+              class="cancel"
+              disabled={paying}
+              onclick={closePayment}
+            >
+              Cancel
+            </button>
           </div>
-          <p class="login-prompt">
-            Already have an account? <a href="/library/login">Sign in</a>
-          </p>
-        </section>
-      </main>
+        </div>
+      </template>
     </div>
   </template>
 </template>

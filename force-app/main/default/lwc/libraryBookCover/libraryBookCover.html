@@ -1,0 +1,23 @@
+<template>
+  <div class={wrapperClass}>
+    <template lwc:if={hasCover}>
+      <img class="art" src={coverUrl} alt={title} />
+    </template>
+    <template lwc:else>
+      <div
+        class="art placeholder"
+        style={placeholderStyle}
+        role="img"
+        aria-label={title}
+      >
+        <span class="initial" aria-hidden="true">{initial}</span>
+        <span class="rule" aria-hidden="true"></span>
+        <span class="book-title">{displayTitle}</span>
+        <template lwc:if={showAuthor}>
+          <span class="book-author">{author}</span>
+        </template>
+        <span class="mark" aria-hidden="true">▥</span>
+      </div>
+    </template>
+  </div>
+</template>

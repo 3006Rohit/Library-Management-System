@@ -46,11 +46,9 @@ describe("c-library-scanner", () => {
       is: LibraryScanner
     });
     document.body.appendChild(element);
-    const input = element.shadowRoot.querySelector("lightning-input");
+    const input = element.shadowRoot.querySelector('input[data-id="barcode"]');
     input.value = "BAR-1";
-    input.dispatchEvent(
-      new CustomEvent("change", { detail: { value: "BAR-1" } })
-    );
+    input.dispatchEvent(new CustomEvent("change"));
     element.shadowRoot.querySelector(".button.primary").click();
     await flush();
     expect(lookupScannedCopy).toHaveBeenCalledWith({

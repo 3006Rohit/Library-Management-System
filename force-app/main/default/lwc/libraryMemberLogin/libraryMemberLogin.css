@@ -1,30 +1,281 @@
-.login-card {
-  max-width: 30rem;
-  margin: 3rem auto;
-  padding: 2rem;
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 1rem 3rem #102a4320;
-}
-.login-card lightning-input {
+:host {
   display: block;
-  margin: 1rem 0;
+  background: #fafaf8;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  color: #111;
 }
-.links {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
+
+.page {
+  padding: 32px;
 }
-.links button {
+
+.frame {
+  max-width: 1340px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 40px;
+  padding: 36px 46px 46px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 56px;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.form-side {
+  max-width: 460px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.badge {
+  display: inline-block;
+  background: #f1f1f1;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: 15px;
+}
+
+h1 {
+  font-size: 48px;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin: 24px 0 10px;
+}
+
+.sub {
+  margin: 0 0 30px;
+  color: #666;
+  font-size: 17px;
+}
+
+label {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 18px 0 8px;
+}
+
+.field {
+  width: 100%;
+  box-sizing: border-box;
+  height: 56px;
+  border: 1px solid #e3e3e3;
+  border-radius: 999px;
+  padding: 0 24px;
+  font-size: 16px;
+  font-family: inherit;
+  color: #111;
+  background: #fff;
+  outline: 0;
+}
+
+.field:focus {
+  border-color: #111;
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap .field {
+  padding-right: 80px;
+}
+
+.eye {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
   border: 0;
   background: none;
-  color: #1264a3;
+  font-size: 14px;
+  color: #666;
   cursor: pointer;
 }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 18px 0 24px;
+}
+
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 14px;
+  color: #111;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link.strong {
+  font-weight: 500;
+}
+
+.primary {
+  width: 100%;
+  height: 58px;
+  border: 0;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.foot {
+  text-align: center;
+  margin: 26px 0 0;
+  font-size: 14px;
+  color: #666;
+}
+
 .error {
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  background: #fee2e2;
-  color: #991b1b;
-  border-radius: 0.5rem;
+  background: #fdecec;
+  color: #9b1c1c;
+  border-radius: 16px;
+  padding: 12px 18px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.panel {
+  background: #f4f4f4;
+  border-radius: 32px;
+  padding: 44px 40px 36px;
+  text-align: center;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.panel-logo {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.panel h2 {
+  font-size: 40px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  margin: 26px 0 12px;
+}
+
+.panel p {
+  max-width: 420px;
+  margin: 0;
+  color: #666;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.shelf {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-top: 44px;
+}
+
+.spine {
+  width: 92px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px;
+  display: flex;
+  align-items: flex-end;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.s1 {
+  height: 200px;
+  background: #2f4b7c;
+}
+
+.s2 {
+  height: 240px;
+  background: #a4483a;
+}
+
+.s3 {
+  height: 180px;
+  background: #3d6b57;
+}
+
+.s4 {
+  height: 220px;
+  background: #6d5a8a;
+}
+
+.due {
+  margin-top: -34px;
+  align-self: flex-start;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #fff;
+  border-radius: 20px;
+  padding: 14px 20px;
+  text-align: left;
+  box-shadow: 0 0 0 1px #e8e8e8;
+}
+
+.due strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.due small {
+  color: #777;
+  font-size: 13px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #111;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 12px;
+  }
+
+  .frame {
+    padding: 22px 18px 28px;
+    border-radius: 28px;
+  }
+
+  .split {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .panel {
+    min-height: 0;
+  }
+
+  h1 {
+    font-size: 38px;
+  }
 }

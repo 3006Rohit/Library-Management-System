@@ -1,0 +1,62 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "planName": {
+      "title": "Plan Name",
+      "description": "Membership plan the policy applies to.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "loanDurationDays": {
+      "title": "Loan Duration Days",
+      "description": "Loan period in days.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "borrowLimit": {
+      "title": "Borrow Limit",
+      "description": "Maximum items that can be borrowed at once.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "renewalLimit": {
+      "title": "Renewal Limit",
+      "description": "Maximum number of renewals per loan.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "reservationLimit": {
+      "title": "Reservation Limit",
+      "description": "Maximum active reservations.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "finePerDay": {
+      "title": "Fine Per Day",
+      "description": "Fine charged per overdue day.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "message": {
+      "title": "Message",
+      "description": "Status note when policies are unavailable.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

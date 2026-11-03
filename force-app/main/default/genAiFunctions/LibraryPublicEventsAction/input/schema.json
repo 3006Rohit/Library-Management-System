@@ -1,0 +1,21 @@
+{
+  "required": [],
+  "unevaluatedProperties": false,
+  "properties": {
+    "topic": {
+      "title": "Topic",
+      "description": "Optional keyword to match against the event title or description.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": false
+    },
+    "branch": {
+      "title": "Branch",
+      "description": "Optional branch or location to match.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": false
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

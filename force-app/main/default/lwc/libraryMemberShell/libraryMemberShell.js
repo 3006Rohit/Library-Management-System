@@ -18,7 +18,7 @@ import getMyMembership from "@salesforce/apex/LibraryMemberSessionController.get
 import getMyPayments from "@salesforce/apex/LibraryMemberSessionController.getMyPayments";
 import getMyProfile from "@salesforce/apex/LibraryMemberSessionController.getMyProfile";
 import updateMyProfile from "@salesforce/apex/LibraryMemberSessionController.updateMyProfile";
-import getUpgradePlans from "@salesforce/apex/LibraryMemberSessionController.getUpgradePlans";
+import getMembershipPlanCatalog from "@salesforce/apex/LibraryMemberSessionController.getMembershipPlanCatalog";
 import payForMembershipUpgrade from "@salesforce/apex/LibraryMemberSessionController.payForMembershipUpgrade";
 import renewMyMembership from "@salesforce/apex/LibraryMemberSessionController.renewMyMembership";
 import getMyNotifications from "@salesforce/apex/LibraryMemberSessionController.getMyNotifications";
@@ -33,6 +33,8 @@ import getMyAuthorFollows from "@salesforce/apex/LibraryMemberSessionController.
 import getMyEngagements from "@salesforce/apex/LibraryMemberSessionController.getMyEngagements";
 import removeMyEngagement from "@salesforce/apex/LibraryMemberSessionController.removeMyEngagement";
 import submitBookReview from "@salesforce/apex/LibraryMemberSessionController.submitBookReview";
+import getPublishedBookReviews from "@salesforce/apex/LibraryMemberSessionController.getPublishedBookReviews";
+import getMyBookReviews from "@salesforce/apex/LibraryMemberSessionController.getMyBookReviews";
 
 const NAVIGATION = [
   ["Dashboard", "utility:home"],
@@ -45,6 +47,12 @@ const NAVIGATION = [
   ["Membership", "utility:groups"],
   ["Fines & Payments", "utility:money"],
   ["Profile", "utility:user"]
+];
+const NAV_GROUPS = [
+  ["Dashboard", ["Dashboard"]],
+  ["Books", ["Explore Books", "Scan & Borrow", "My Books", "Reservations"]],
+  ["Services", ["Study Rooms", "Member Assistant"]],
+  ["Account", ["Membership", "Fines & Payments", "Profile"]]
 ];
 const PAGE_COPY = {
   Dashboard: ["Member Dashboard", "Here’s your library overview"],
@@ -92,6 +100,8 @@ export default class LibraryMemberShell extends LightningElement {
   reviewRating;
   reviewText = "";
   reviewStatus;
+  publishedReviews = [];
+  myBookReview;
   borrowings = [];
   readingList = [];
   followedAuthors = [];
@@ -102,7 +112,8 @@ export default class LibraryMemberShell extends LightningElement {
   notifications = [];
   notificationPreferences = [];
   notificationPreferenceSaving = false;
-  upgradePlans = [];
+  planCatalog = [];
+  billing = "annual";
   profile;
   loading = false;
   error;
@@ -115,6 +126,7 @@ export default class LibraryMemberShell extends LightningElement {
   catalogPage = 1;
   catalogPageSize = 8;
   mobileNavOpen = false;
+  openGroup = "";
   accountMenuOpen = false;
   notificationsOpen = false;
   loanTab = "Active";
@@ -159,17 +171,30 @@ export default class LibraryMemberShell extends LightningElement {
     }
   }
 
-  get navItems() {
-    return NAVIGATION.map(([label, icon]) => ({
-      label,
-      icon,
-      value: label,
-      className: label === this.section ? "nav-item active" : "nav-item"
-    }));
+  get navGroups() {
+    const meta = new Map(NAVIGATION.map(([label, icon]) => [label, icon]));
+    return NAV_GROUPS.map(([label, sections]) => {
+      const active = sections.includes(this.section);
+      const expanded = this.openGroup === label;
+      return {
+        label,
+        single: sections.length === 1,
+        firstSection: sections[0],
+        expanded,
+        linkClass: active ? "nav-link active" : "nav-link",
+        menuClass: expanded ? "menu open" : "menu",
+        items: sections.map((value) => ({
+          value,
+          label: value,
+          icon: meta.get(value),
+          className: value === this.section ? "menu-item active" : "menu-item"
+        }))
+      };
+    });
   }
 
-  get mobileNavClass() {
-    return this.mobileNavOpen ? "side-nav mobile-open" : "side-nav";
+  get linksClass() {
+    return this.mobileNavOpen ? "links mobile-open" : "links";
   }
   get accountMenuClass() {
     return this.accountMenuOpen ? "account-menu open" : "account-menu";
@@ -181,6 +206,11 @@ export default class LibraryMemberShell extends LightningElement {
   }
   get pageTitle() {
     return PAGE_COPY[this.section]?.[0] || this.section;
+  }
+  get pageHeadline() {
+    return this.isDashboard
+      ? `Welcome back, ${this.firstNameLabel}`
+      : this.pageTitle;
   }
   get pageSubtitle() {
     return PAGE_COPY[this.section]?.[1] || "";
@@ -601,6 +631,44 @@ export default class LibraryMemberShell extends LightningElement {
       ? "availability available"
       : "availability unavailable";
   }
+  get hasPublishedReviews() {
+    return this.publishedReviews.length > 0;
+  }
+  get otherReviews() {
+    return this.publishedReviews.filter(
+      (row) => row.id !== this.myBookReview?.id
+    );
+  }
+  get hasOtherReviews() {
+    return this.otherReviews.length > 0;
+  }
+  get hasMyReview() {
+    return Boolean(this.myBookReview);
+  }
+  get showNoReviews() {
+    return !this.hasMyReview && !this.hasOtherReviews;
+  }
+  get averageRating() {
+    const rows = this.publishedReviews;
+    if (!rows.length) return "";
+    const total = rows.reduce((sum, row) => sum + row.rating, 0);
+    return (total / rows.length).toFixed(1);
+  }
+  get averageStars() {
+    const rounded = Math.round(Number(this.averageRating || 0));
+    return "★".repeat(rounded) + "☆".repeat(5 - rounded);
+  }
+  get reviewCountLabel() {
+    const count = this.publishedReviews.length;
+    return `${count} review${count === 1 ? "" : "s"}`;
+  }
+  get myReviewNote() {
+    const status = this.myBookReview?.status;
+    if (status === "Published") return "Visible to other members";
+    if (status === "Rejected")
+      return "Not published. You can edit it and submit again.";
+    return "Waiting for librarian approval";
+  }
   get borrowedCopyCount() {
     return Math.max(
       0,
@@ -614,12 +682,95 @@ export default class LibraryMemberShell extends LightningElement {
   get hasUnreadNotifications() {
     return this.unreadNotifications.length > 0;
   }
-  get availableUpgradePlans() {
-    return this.upgradePlans.map((plan) => ({
-      ...plan,
-      priceLabel: this.currency(plan.fee),
-      current: plan.name === this.planName
-    }));
+  get isAnnualBilling() {
+    return this.billing === "annual";
+  }
+  get isMonthlyBilling() {
+    return !this.isAnnualBilling;
+  }
+  get monthlyTabClass() {
+    return this.isAnnualBilling ? "tab" : "tab active";
+  }
+  get annualTabClass() {
+    return this.isAnnualBilling ? "tab active" : "tab";
+  }
+  handleBilling(event) {
+    this.billing = event.currentTarget.dataset.billing;
+  }
+  get planCards() {
+    const plans = this.planCatalog;
+    const topLimit = Math.max(
+      0,
+      ...plans.map((plan) => Number(plan.borrowLimit || 0))
+    );
+    const featuredId =
+      plans.length > 1
+        ? plans.find((plan) => Number(plan.borrowLimit || 0) === topLimit)?.id
+        : undefined;
+    return plans.map((plan) => {
+      const fee = Number(plan.fee || 0);
+      const days = Number(plan.durationDays || 0);
+      const term = this.durationText(days);
+      const featured = plan.id === featuredId;
+      let price = "Free";
+      let unit = "";
+      if (fee > 0 && days > 0) {
+        // Whole months in the term (365 days = 12), matching the public site.
+        const perMonth = fee / Math.max(1, Math.round(days / 30.4375));
+        price = this.planMoney(this.isAnnualBilling ? perMonth * 12 : perMonth);
+        unit = this.isAnnualBilling ? "/year" : "/month";
+      } else if (fee > 0) {
+        price = this.currency(fee);
+        unit = `/${term}`;
+      }
+      const limit = Number(plan.borrowLimit || 0);
+      const includes = [
+        limit
+          ? `Borrow up to ${limit} books at a time`
+          : "No fixed borrow limit",
+        plan.loanDurationDays
+          ? `${plan.loanDurationDays}-day loan period`
+          : null,
+        plan.reservationLimit
+          ? `Up to ${plan.reservationLimit} reservations`
+          : null,
+        plan.renewalLimit ? `${plan.renewalLimit} renewals per loan` : null,
+        `${term} membership`
+      ].filter(Boolean);
+      let buttonLabel = "Upgrade";
+      if (plan.current) buttonLabel = "Current plan";
+      else if (!plan.upgradeAllowed) buttonLabel = "Lower tier";
+      return {
+        id: plan.id,
+        name: plan.name,
+        price,
+        unit,
+        billedNote:
+          fee > 0
+            ? `${this.currency(fee)} billed for ${term}`
+            : `${term} membership`,
+        featured,
+        current: plan.current,
+        className: featured ? "plan featured" : "plan",
+        buttonLabel,
+        buttonClass: featured ? "button white wide" : "button outline wide",
+        disabled: !plan.upgradeAllowed,
+        includes: includes.map((text) => ({ text, key: `${plan.id}-${text}` }))
+      };
+    });
+  }
+  durationText(days) {
+    const value = Number(days || 0);
+    if (!value) return "Flexible term";
+    if (value % 365 === 0) {
+      const years = value / 365;
+      return `${years} year${years === 1 ? "" : "s"}`;
+    }
+    if (value % 30 === 0) {
+      const months = value / 30;
+      return `${months} month${months === 1 ? "" : "s"}`;
+    }
+    return `${value} days`;
   }
   get joinedDate() {
     return this.formatDate(
@@ -804,7 +955,9 @@ export default class LibraryMemberShell extends LightningElement {
   selectSection(event) {
     this.section = event.currentTarget.dataset.section;
     this.mobileNavOpen = false;
+    this.openGroup = "";
     this.accountMenuOpen = false;
+    this.notificationsOpen = false;
     const loaders = {
       Dashboard: () => this.loadDashboardData(),
       "Explore Books": () =>
@@ -983,8 +1136,8 @@ export default class LibraryMemberShell extends LightningElement {
       this.call(getMyMembership, {}, (data) => {
         this.membership = data;
       }),
-      this.call(getUpgradePlans, {}, (data) => {
-        this.upgradePlans = data || [];
+      this.call(getMembershipPlanCatalog, {}, (data) => {
+        this.planCatalog = data || [];
       }),
       this.call(getMyPayments, {}, (data) => {
         this.payments = (data || []).map((row) => this.decoratePayment(row));
@@ -1143,7 +1296,45 @@ export default class LibraryMemberShell extends LightningElement {
       this.reviewRating = undefined;
       this.reviewText = "";
       this.reviewStatus = undefined;
+      this.publishedReviews = [];
+      this.myBookReview = undefined;
+      return this.loadBookReviews(bookId);
     });
+  }
+
+  loadBookReviews(bookId) {
+    return Promise.all([
+      getPublishedBookReviews({ sessionToken: this.sessionToken, bookId }),
+      getMyBookReviews({ sessionToken: this.sessionToken })
+    ])
+      .then(([published, mine]) => {
+        if (this.bookDetail?.Id !== bookId) return;
+        this.publishedReviews = (published || []).map((row) =>
+          this.decorateReview(row)
+        );
+        const own = (mine || []).find((row) => row.bookId === bookId);
+        this.myBookReview = own ? this.decorateReview(own) : undefined;
+        if (own) {
+          this.reviewRating = String(own.rating || "");
+          this.reviewText = own.reviewText || "";
+        }
+      })
+      .catch(() => {
+        // Reviews are supplementary; the book details must still open.
+        this.publishedReviews = [];
+        this.myBookReview = undefined;
+      });
+  }
+
+  decorateReview(row) {
+    const rating = Math.max(0, Math.min(5, Number(row.rating || 0)));
+    return {
+      ...row,
+      rating,
+      stars: "★".repeat(rating) + "☆".repeat(5 - rating),
+      dateLabel: this.formatDate(row.submittedAt),
+      statusClass: this.badge(row.status === "Pending" ? "Waiting" : row.status)
+    };
   }
 
   closeBookDetails() {
@@ -1236,6 +1427,7 @@ export default class LibraryMemberShell extends LightningElement {
       },
       (review) => {
         this.reviewStatus = review.status;
+        this.myBookReview = this.decorateReview(review);
         this.toast(
           "Review submitted",
           "Your review is pending librarian moderation.",
@@ -1273,7 +1465,7 @@ export default class LibraryMemberShell extends LightningElement {
 
   requestUpgrade(event) {
     this.confirmAction = "upgrade";
-    this.confirmRecord = this.upgradePlans.find(
+    this.confirmRecord = this.planCatalog.find(
       (row) => row.id === event.currentTarget.dataset.id
     );
   }
@@ -1417,14 +1609,33 @@ export default class LibraryMemberShell extends LightningElement {
     this.mobileNavOpen = !this.mobileNavOpen;
   }
 
+  toggleGroup(event) {
+    const label = event.currentTarget.dataset.group;
+    this.openGroup = this.openGroup === label ? "" : label;
+    this.accountMenuOpen = false;
+    this.notificationsOpen = false;
+  }
+
+  handleGroupFocusOut(event) {
+    const label = event.currentTarget.dataset.group;
+    if (
+      this.openGroup === label &&
+      !event.currentTarget.contains(event.relatedTarget)
+    ) {
+      this.openGroup = "";
+    }
+  }
+
   toggleAccountMenu() {
     this.accountMenuOpen = !this.accountMenuOpen;
     this.notificationsOpen = false;
+    this.openGroup = "";
   }
 
   toggleNotifications() {
     this.notificationsOpen = !this.notificationsOpen;
     this.accountMenuOpen = false;
+    this.openGroup = "";
   }
 
   readNotification(event) {
@@ -1553,6 +1764,15 @@ export default class LibraryMemberShell extends LightningElement {
     return `badge badge-${String(value || "")
       .toLowerCase()
       .replaceAll(" ", "-")}`;
+  }
+
+  planMoney(value) {
+    const amount = Number(value || 0);
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: amount % 1 === 0 ? 0 : 2
+    }).format(amount);
   }
 
   currency(value) {

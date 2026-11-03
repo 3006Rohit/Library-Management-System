@@ -289,7 +289,7 @@ public with sharing class LibraryLibrarianController {
     String term = String.isBlank(searchTerm)
       ? null
       : '%' + searchTerm.trim() + '%';
-    String q = 'SELECT Id,Name,ISBN__c,Publisher__c,Publication_Year__c,Edition__c,Language__c,Total_Copies__c,Available_Copies__c,Status__c,(SELECT Author__r.Name FROM Book_Authors__r),(SELECT Book_Category__r.Name FROM Book_Category_Links__r) FROM Book__c';
+    String q = 'SELECT Id,Name,ISBN__c,Publisher__c,Publication_Year__c,Edition__c,Language__c,Total_Copies__c,Available_Copies__c,Status__c,Cover_Image_URL__c,(SELECT Author__r.Name FROM Book_Authors__r),(SELECT Book_Category__r.Name FROM Book_Category_Links__r) FROM Book__c';
     List<String> clauses = new List<String>();
     if (term != null)
       clauses.add(
@@ -310,7 +310,13 @@ public with sharing class LibraryLibrarianController {
   @AuraEnabled(cacheable=true)
   public static List<Author__c> getAuthors() {
     LibraryPolicyService.require('Manage_Library_Catalog');
-    return [SELECT Id, Name FROM Author__c WITH SYSTEM_MODE ORDER BY Name LIMIT 500];
+    return [
+      SELECT Id, Name
+      FROM Author__c
+      WITH SYSTEM_MODE
+      ORDER BY Name
+      LIMIT 500
+    ];
   }
   @AuraEnabled(cacheable=true)
   public static List<Book_Category__c> getCategories() {
@@ -1052,7 +1058,8 @@ public with sharing class LibraryLibrarianController {
     List<PaymentRow> result = new List<PaymentRow>();
     for (
       Membership_Payment__c payment : (List<Membership_Payment__c>) Database.query(
-        q, AccessLevel.SYSTEM_MODE
+        q,
+        AccessLevel.SYSTEM_MODE
       )
     ) {
       PaymentRow row = new PaymentRow();
@@ -1070,7 +1077,12 @@ public with sharing class LibraryLibrarianController {
     if (!String.isBlank(status))
       fineQuery += ' AND Status__c=:status';
     fineQuery += ' ORDER BY Paid_Date__c DESC LIMIT 200';
-    for (Fine__c fine : (List<Fine__c>) Database.query(fineQuery, AccessLevel.SYSTEM_MODE)) {
+    for (
+      Fine__c fine : (List<Fine__c>) Database.query(
+        fineQuery,
+        AccessLevel.SYSTEM_MODE
+      )
+    ) {
       PaymentRow row = new PaymentRow();
       row.id = fine.Id;
       row.name = fine.Name;
@@ -1115,6 +1127,10 @@ public with sharing class LibraryLibrarianController {
     return LibraryCirculationService.processExpiredReservations();
   }
   @AuraEnabled
+  public static List<LibraryMemberReviewService.ReviewDTO> getPendingBookReviews() {
+    return LibraryMemberReviewService.getPending();
+  }
+  @AuraEnabled
   public static void moderateBookReview(Id reviewId, String status) {
     LibraryMemberReviewService.moderate(reviewId, status);
   }
@@ -1148,14 +1164,20 @@ public with sharing class LibraryLibrarianController {
     String name,
     String location,
     Integer capacity,
-    String equipment
+    String equipment,
+    String roomType
   ) {
     return LibraryRoomBookingService.createRoom(
       name,
       location,
       capacity,
-      equipment
+      equipment,
+      roomType
     );
+  }
+  @AuraEnabled
+  public static LibraryRoomInsightService.InsightsDTO getRoomInsights() {
+    return LibraryRoomInsightService.getInsights();
   }
   @AuraEnabled
   public static List<LibraryRoomBookingService.RoomDTO> getLibraryRoomsForLibrarian() {

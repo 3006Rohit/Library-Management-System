@@ -7,6 +7,72 @@
         <p>Pick a time, choose a room, then reserve a seat.</p>
       </div>
     </div>
+    <template if:true={hasForecast}>
+      <section class="forecast" aria-label="Busy times">
+        <div class="forecast-head">
+          <div>
+            <span class="eyebrow">✦ Busy times</span>
+            <h3>When are the rooms busiest?</h3>
+            <p class="forecast-sub">
+              Based on past bookings, so you can pick a time that suits you.
+            </p>
+          </div>
+          <div class={expectedClass}>
+            <span class="dot"></span>
+            <span>{expectedLabel}</span>
+          </div>
+        </div>
+        <div class="forecast-grid">
+          <div class="forecast-card">
+            <h4>By hour</h4>
+            <div class="chart" role="img" aria-label="Busy times by hour">
+              <template for:each={forecastHours} for:item="bar">
+                <div class="col" key={bar.key} title={bar.title}>
+                  <div class="track">
+                    <div class={bar.className} style={bar.barStyle}></div>
+                  </div>
+                  <span class="tick">{bar.label}</span>
+                </div>
+              </template>
+            </div>
+          </div>
+          <div class="forecast-card">
+            <h4>By day</h4>
+            <div class="chart" role="img" aria-label="Busy times by day">
+              <template for:each={forecastDays} for:item="bar">
+                <div class="col" key={bar.key} title={bar.title}>
+                  <div class="track">
+                    <div class={bar.className} style={bar.barStyle}></div>
+                  </div>
+                  <span class="tick">{bar.label}</span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+        <template if:true={hasBestTimes}>
+          <div class="best">
+            <strong>Best times to book:</strong>
+            <template for:each={bestTimes} for:item="time">
+              <span class="pill" key={time}>{time}</span>
+            </template>
+          </div>
+        </template>
+        <template if:true={hasTips}>
+          <ul class="tips">
+            <template for:each={forecastTips} for:item="tip">
+              <li key={tip.key}>{tip.text}</li>
+            </template>
+          </ul>
+        </template>
+      </section>
+    </template>
+    <template if:true={forecastEmpty}>
+      <div class="notice forecast-empty">
+        <span>✦</span> Busy-time guidance will appear once there are more room
+        bookings.
+      </div>
+    </template>
     <div class="search-card">
       <div class="search-field">
         <label for="startAt">Starts</label>
@@ -64,6 +130,7 @@
           <div>
             <h3>{room.name}</h3>
             <span>{room.details}</span>
+            <span class="tag">{room.typeLabel}</span>
             <span>{room.seatSummary}</span>
           </div>
           <button
@@ -73,7 +140,7 @@
             onclick={chooseRoom}
             disabled={room.disabled}
           >
-            Choose seat
+            {room.chooseLabel}
           </button>
         </article>
       </template>
@@ -83,31 +150,39 @@
     </div>
     <template if:true={selectedRoom}>
       <section class="seat-panel" aria-label="Seat map">
-        <h3>{selectedRoom.name} – choose a seat</h3>
+        <h3>{seatPanelTitle}</h3>
         <template if:true={loadingSeats}
           ><div class="loading">Loading seats…</div></template
         >
-        <div class="seat-grid">
-          <template for:each={seatItems} for:item="seat">
-            <button
-              type="button"
-              key={seat.seatNo}
-              class={seat.className}
-              data-number={seat.seatNo}
-              aria-label={seat.label}
-              aria-pressed={seat.pressed}
-              disabled={seat.taken}
-              onclick={chooseSeat}
-            >
-              {seat.seatNo}
-            </button>
-          </template>
-        </div>
-        <div class="seat-legend">
-          <span class="swatch free"></span>Free
-          <span class="swatch selected"></span>Selected
-          <span class="swatch taken"></span>Taken
-        </div>
+        <template if:false={selectedIsPrivate}>
+          <div class="seat-grid">
+            <template for:each={seatItems} for:item="seat">
+              <button
+                type="button"
+                key={seat.seatNo}
+                class={seat.className}
+                data-number={seat.seatNo}
+                aria-label={seat.label}
+                aria-pressed={seat.pressed}
+                disabled={seat.taken}
+                onclick={chooseSeat}
+              >
+                {seat.seatNo}
+              </button>
+            </template>
+          </div>
+          <div class="seat-legend">
+            <span class="swatch free"></span>Free
+            <span class="swatch selected"></span>Selected
+            <span class="swatch taken"></span>Taken
+          </div>
+        </template>
+        <template if:true={selectedIsPrivate}>
+          <p class="private-note">
+            This is a private single-person room. Booking it reserves the whole
+            room for your chosen time.
+          </p>
+        </template>
         <button
           type="button"
           class="primary"

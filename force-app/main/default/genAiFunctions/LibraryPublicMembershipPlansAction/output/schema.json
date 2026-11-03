@@ -1,0 +1,62 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "planName": {
+      "title": "Plan Name",
+      "description": "Membership plan name.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "fee": {
+      "title": "Fee",
+      "description": "Plan fee.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "durationDays": {
+      "title": "Duration Days",
+      "description": "Membership duration in days.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "borrowLimit": {
+      "title": "Borrow Limit",
+      "description": "Maximum items that can be borrowed at once.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "loanDurationDays": {
+      "title": "Loan Duration Days",
+      "description": "Loan period in days.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "joiningSteps": {
+      "title": "Joining Steps",
+      "description": "How to join the library.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "message": {
+      "title": "Message",
+      "description": "Status note when no plans are available.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

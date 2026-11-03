@@ -1,0 +1,14 @@
+{
+  "required": [],
+  "unevaluatedProperties": false,
+  "properties": {
+    "topic": {
+      "title": "Topic",
+      "description": "Optional topic the visitor asked about. Not used for filtering.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": false
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

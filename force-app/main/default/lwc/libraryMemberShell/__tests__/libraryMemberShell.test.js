@@ -4,6 +4,26 @@ import getCurrentMemberContext from "@salesforce/apex/LibraryMemberSessionContro
 import getMyDashboard from "@salesforce/apex/LibraryMemberSessionController.getMyDashboard";
 import getMyAnalytics from "@salesforce/apex/LibraryMemberSessionController.getMyAnalytics";
 import getSuggestedBooks from "@salesforce/apex/LibraryMemberSessionController.getSuggestedBooks";
+import getBookDetails from "@salesforce/apex/LibraryMemberSessionController.getBookDetails";
+import getPublishedBookReviews from "@salesforce/apex/LibraryMemberSessionController.getPublishedBookReviews";
+import getMyBookReviews from "@salesforce/apex/LibraryMemberSessionController.getMyBookReviews";
+import getMembershipPlanCatalog from "@salesforce/apex/LibraryMemberSessionController.getMembershipPlanCatalog";
+
+jest.mock(
+  "@salesforce/apex/LibraryMemberSessionController.getMembershipPlanCatalog",
+  () => ({ default: jest.fn(() => Promise.resolve([])) }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryMemberSessionController.getPublishedBookReviews",
+  () => ({ default: jest.fn(() => Promise.resolve([])) }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryMemberSessionController.getMyBookReviews",
+  () => ({ default: jest.fn(() => Promise.resolve([])) }),
+  { virtual: true }
+);
 
 jest.mock(
   "@salesforce/apex/LibraryMemberSessionController.getCurrentMemberContext",
@@ -274,6 +294,168 @@ describe("libraryMemberShell state safety", () => {
     expect(panel.querySelectorAll("c-library-member-book-card")).toHaveLength(
       1
     );
+  });
+
+  it("groups the portal sections in a top navigation with dropdowns", async () => {
+    getCurrentMemberContext.mockResolvedValueOnce({ First_Name__c: "Member" });
+    const element = createElement("c-library-member-shell", {
+      is: LibraryMemberShell
+    });
+    document.body.appendChild(element);
+    await flushPromises();
+    const groups = [...element.shadowRoot.querySelectorAll(".nav-group")].map(
+      (group) => group.dataset.group
+    );
+    expect(groups).toEqual(["Dashboard", "Books", "Services", "Account"]);
+    expect(element.shadowRoot.querySelector(".sidebar")).toBeNull();
+    expect(element.shadowRoot.querySelector(".menu.open")).toBeNull();
+
+    element.shadowRoot.querySelector('button[data-group="Books"]').click();
+    await flushPromises();
+    expect(element.shadowRoot.querySelector(".menu.open")).not.toBeNull();
+
+    element.shadowRoot
+      .querySelector('.menu.open button[data-section="Reservations"]')
+      .click();
+    await flushPromises();
+    expect(element.shadowRoot.querySelector(".menu.open")).toBeNull();
+    expect(
+      element.shadowRoot.querySelector(".page-heading h1").textContent
+    ).toBe("My Reservations");
+  });
+
+  it("shows published reviews and the member's own pending review in the book popup", async () => {
+    getCurrentMemberContext.mockResolvedValueOnce({ First_Name__c: "Member" });
+    getSuggestedBooks.mockResolvedValueOnce([
+      { Id: "book-1", Name: "A Suggested Book", Available_Copies__c: 2 }
+    ]);
+    getBookDetails.mockResolvedValueOnce({
+      Id: "book-1",
+      Name: "A Suggested Book",
+      Available_Copies__c: 2,
+      Total_Copies__c: 3
+    });
+    getPublishedBookReviews.mockResolvedValueOnce([
+      {
+        id: "r1",
+        bookId: "book-1",
+        rating: 5,
+        reviewText: "Loved it.",
+        status: "Published"
+      },
+      {
+        id: "r2",
+        bookId: "book-1",
+        rating: 4,
+        reviewText: "Very good.",
+        status: "Published"
+      }
+    ]);
+    getMyBookReviews.mockResolvedValueOnce([
+      {
+        id: "mine",
+        bookId: "book-1",
+        rating: 3,
+        reviewText: "My honest view.",
+        status: "Pending"
+      }
+    ]);
+    const element = createElement("c-library-member-shell", {
+      is: LibraryMemberShell
+    });
+    document.body.appendChild(element);
+    await flushPromises();
+    element.shadowRoot
+      .querySelector(".recommended-panel c-library-member-book-card")
+      .dispatchEvent(
+        new CustomEvent("bookaction", { detail: { id: "book-1" } })
+      );
+    await flushPromises();
+    await flushPromises();
+    const reviews = element.shadowRoot.querySelector(".reviews");
+    expect(reviews).not.toBeNull();
+    expect(reviews.textContent).toContain("Member reviews");
+    expect(reviews.textContent).toContain("4.5");
+    expect(reviews.textContent).toContain("2 reviews");
+    expect(reviews.textContent).toContain("Loved it.");
+    expect(reviews.textContent).toContain("My honest view.");
+    expect(reviews.textContent).toContain("Waiting for librarian approval");
+  });
+
+  it("shows every plan like the home page with a billing toggle and upgrade states", async () => {
+    getCurrentMemberContext.mockResolvedValueOnce({ First_Name__c: "Member" });
+    getMembershipPlanCatalog.mockResolvedValueOnce([
+      {
+        id: "p1",
+        name: "Basic",
+        fee: 600,
+        durationDays: 365,
+        borrowLimit: 3,
+        current: false,
+        upgradeAllowed: false
+      },
+      {
+        id: "p2",
+        name: "Standard",
+        fee: 1200,
+        durationDays: 365,
+        borrowLimit: 5,
+        loanDurationDays: 14,
+        current: true,
+        upgradeAllowed: false
+      },
+      {
+        id: "p3",
+        name: "Premium",
+        fee: 3650,
+        durationDays: 365,
+        borrowLimit: 10,
+        current: false,
+        upgradeAllowed: true
+      }
+    ]);
+    const element = createElement("c-library-member-shell", {
+      is: LibraryMemberShell
+    });
+    document.body.appendChild(element);
+    await flushPromises();
+    element.shadowRoot.querySelector('button[data-group="Account"]').click();
+    await flushPromises();
+    element.shadowRoot
+      .querySelector('.menu.open button[data-section="Membership"]')
+      .click();
+    await flushPromises();
+    await flushPromises();
+
+    const cards = [...element.shadowRoot.querySelectorAll(".plan-grid .plan")];
+    expect(cards).toHaveLength(4);
+    expect(
+      element.shadowRoot.querySelector(".plan.featured").textContent
+    ).toContain("Premium");
+    expect(
+      element.shadowRoot.querySelector(".plan.featured .popular")
+    ).not.toBeNull();
+    const buttons = cards
+      .slice(0, 3)
+      .map((card) => card.querySelector("button"));
+    expect(buttons.map((button) => button.textContent.trim())).toEqual([
+      "Lower tier",
+      "Current plan",
+      "Upgrade"
+    ]);
+    expect(buttons.map((button) => button.disabled)).toEqual([
+      true,
+      true,
+      false
+    ]);
+    expect(cards[3].textContent).toContain("Institutions");
+    expect(cards[2].textContent).toContain("/year");
+
+    element.shadowRoot.querySelector('button[data-billing="monthly"]').click();
+    await flushPromises();
+    expect(
+      element.shadowRoot.querySelectorAll(".plan-grid .plan")[2].textContent
+    ).toContain("/month");
   });
 
   it("surfaces the exact Apex diagnostic when the member context fails", async () => {

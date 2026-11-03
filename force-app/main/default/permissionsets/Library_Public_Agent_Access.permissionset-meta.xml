@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Library Public Agent Access</label>
+    <description
+  >Lets the Library Public Assistant agent user invoke the public, read-only Apex actions (catalog, branches, policies, membership plans, events). Class access only: no object, field or member-data permissions.</description>
+    <classAccesses>
+        <apexClass>LibraryAgentCatalogAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>LibraryPublicBranchInfoAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>LibraryPublicPoliciesAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>LibraryPublicMembershipPlansAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>LibraryPublicEventsAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <hasActivationRequired>false</hasActivationRequired>
+</PermissionSet>

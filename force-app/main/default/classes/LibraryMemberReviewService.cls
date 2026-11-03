@@ -16,6 +16,8 @@ public without sharing class LibraryMemberReviewService {
     public String status;
     @AuraEnabled
     public Datetime submittedAt;
+    @AuraEnabled
+    public String memberName;
   }
 
   public static ReviewDTO submit(
@@ -51,7 +53,9 @@ public without sharing class LibraryMemberReviewService {
       WHERE
         Idempotency_Key__c = :key
         AND Member__c = :member.Id
-        AND Operation__c = :OPERATION WITH SYSTEM_MODE LIMIT 1
+        AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
+      LIMIT 1
     ];
     Library_Scan_Transaction__c row = existing.isEmpty()
       ? new Library_Scan_Transaction__c(
@@ -83,7 +87,9 @@ public without sharing class LibraryMemberReviewService {
     List<Library_Scan_Transaction__c> rows = [
       SELECT Id, Result_Message__c, Created_At__c
       FROM Library_Scan_Transaction__c
-      WHERE Member__c = :member.Id AND Operation__c = :OPERATION WITH SYSTEM_MODE ORDER BY Created_At__c DESC
+      WHERE Member__c = :member.Id AND Operation__c = :OPERATION
+      WITH SYSTEM_MODE
+      ORDER BY Created_At__c DESC
       LIMIT 200
     ];
     return mapRows(rows);
@@ -93,7 +99,13 @@ public without sharing class LibraryMemberReviewService {
     LibraryMemberSessionService.getCurrentMember(sessionToken);
     if (bookId == null)
       return new List<ReviewDTO>();
-    Book__c book = [SELECT Id, Name FROM Book__c WHERE Id = :bookId WITH SYSTEM_MODE LIMIT 1];
+    Book__c book = [
+      SELECT Id, Name
+      FROM Book__c
+      WHERE Id = :bookId
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
     String bookPattern = '%"b":"' + String.valueOf(bookId) + '"%';
     List<Library_Scan_Transaction__c> rows = [
       SELECT Id, Result_Message__c, Created_At__c
@@ -109,6 +121,47 @@ public without sharing class LibraryMemberReviewService {
         row.bookTitle = book.Name;
         result.add(row);
       }
+    return result;
+  }
+
+  public static List<ReviewDTO> getPending() {
+    LibraryPolicyService.require('Manage_Library_Catalog');
+    List<Library_Scan_Transaction__c> rows = [
+      SELECT
+        Id,
+        Result_Message__c,
+        Created_At__c,
+        Member__r.First_Name__c,
+        Member__r.Last_Name__c
+      FROM Library_Scan_Transaction__c
+      WHERE
+        Operation__c = :OPERATION
+        AND Result_Message__c LIKE '%"s":"Pending"%'
+      WITH SYSTEM_MODE
+      ORDER BY Created_At__c ASC
+      LIMIT 100
+    ];
+    Map<Id, String> names = new Map<Id, String>();
+    for (Library_Scan_Transaction__c row : rows) {
+      names.put(
+        row.Id,
+        String.join(
+            new List<String>{
+              row.Member__r?.First_Name__c,
+              row.Member__r?.Last_Name__c
+            },
+            ' '
+          )
+          .trim()
+      );
+    }
+    List<ReviewDTO> result = new List<ReviewDTO>();
+    for (ReviewDTO review : mapRows(rows)) {
+      if (review.status == 'Pending') {
+        review.memberName = names.get(review.id);
+        result.add(review);
+      }
+    }
     return result;
   }
 
@@ -144,7 +197,9 @@ public without sharing class LibraryMemberReviewService {
     }
     Map<Id, Book__c> books = ids.isEmpty()
       ? new Map<Id, Book__c>()
-      : new Map<Id, Book__c>([SELECT Id, Name FROM Book__c WHERE Id IN :ids WITH SYSTEM_MODE]);
+      : new Map<Id, Book__c>(
+          [SELECT Id, Name FROM Book__c WHERE Id IN :ids WITH SYSTEM_MODE]
+        );
     List<ReviewDTO> result = new List<ReviewDTO>();
     for (Library_Scan_Transaction__c row : rows)
       if (payloads.containsKey(row.Id)) {

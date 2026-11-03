@@ -1,5 +1,4 @@
 import { api, LightningElement } from "lwc";
-import authHero from "@salesforce/resourceUrl/LibraryAuthHero";
 
 export default class LibraryAuthState extends LightningElement {
   @api title = "Registration Submitted!";
@@ -8,10 +7,6 @@ export default class LibraryAuthState extends LightningElement {
   @api actionUrl;
   @api icon = "◷";
   @api variant = "pending";
-
-  get heroStyle() {
-    return `background-image: url("${authHero}")`;
-  }
 
   get hasActionUrl() {
     return Boolean(this.actionUrl);

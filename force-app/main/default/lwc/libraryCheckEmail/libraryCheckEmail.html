@@ -1,0 +1,52 @@
+<template>
+  <div class="page">
+    <div class="frame">
+      <c-library-auth-nav></c-library-auth-nav>
+
+      <div class="split">
+        <section class="form-side">
+          <span class="badge">▥ Check Email</span>
+          <h1>Check your email</h1>
+          <p class="sub">
+            If an account exists for the address you entered, we have sent
+            instructions to reset your password. The link works for a limited
+            time.
+          </p>
+
+          <button type="button" class="primary" onclick={backToLogin}>
+            Back to login
+          </button>
+
+          <p class="foot">
+            Didn't get it?
+            <button type="button" class="link strong" onclick={sendAgain}>
+              Send again
+            </button>
+          </p>
+        </section>
+
+        <aside class="panel">
+          <div class="panel-logo">Library Portal</div>
+          <h2>Back in a few clicks</h2>
+          <p>
+            Open the email, follow the link and choose a new password to get
+            back to your loans and reservations.
+          </p>
+          <div class="shelf" aria-hidden="true">
+            <div class="spine s1"><span>The Silent Sea</span></div>
+            <div class="spine s2"><span>Ember Road</span></div>
+            <div class="spine s3"><span>Field Notes</span></div>
+            <div class="spine s4"><span>Atlas of Rain</span></div>
+          </div>
+          <div class="due" aria-hidden="true">
+            <span class="dot"></span>
+            <div>
+              <strong>Check your inbox</strong>
+              <small>Look in spam if you can't find it</small>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</template>

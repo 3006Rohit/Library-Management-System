@@ -387,6 +387,18 @@
     >Library_Registration__c.Interests__c</field><editable
     >true</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field
+    >Library_Registration__c.Payment_Status__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Registration__c.Payment_Reference__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Registration__c.Payment_Amount__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
+    >Library_Registration__c.Payment_Method_Used__c</field><editable
+    >false</editable><readable>true</readable></fieldPermissions>
+    <fieldPermissions><field
     >Library_Registration__c.Requested_Plan__c</field><editable
     >true</editable><readable>true</readable></fieldPermissions>
     <fieldPermissions><field

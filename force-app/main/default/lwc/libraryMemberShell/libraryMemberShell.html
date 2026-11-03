@@ -12,53 +12,88 @@
 
   <template if:false={showAccessState}>
     <div class={accessibilityClassName}>
-      <aside class="sidebar">
-        <div class="brand">
-          <span class="brand-mark">▥</span><span>Library</span>
-        </div>
-        <button
-          class="mobile-menu-button"
-          aria-label="Toggle navigation"
-          onclick={toggleMobileNav}
-        >
-          ☰
-        </button>
-        <nav class={mobileNavClass}>
-          <template for:each={navItems} for:item="item">
-            <button
-              key={item.value}
-              class={item.className}
-              data-section={item.value}
-              onclick={selectSection}
-            >
-              <lightning-icon
-                icon-name={item.icon}
-                size="xx-small"
-              ></lightning-icon
-              ><span>{item.label}</span>
-            </button>
-          </template>
-        </nav>
-        <div class="sidebar-footer">
-          <span>Member Portal</span><small>Secure library access</small>
-        </div>
-      </aside>
-
-      <main class="workspace">
-        <header class="topbar">
-          <div class="global-search">
-            <lightning-icon
-              icon-name="utility:search"
-              size="x-small"
-            ></lightning-icon>
-            <input
-              aria-label="Search the catalog"
-              placeholder="Search for books, authors, categories..."
-              value={globalSearch}
-              oninput={handleGlobalSearch}
-            />
-          </div>
+      <div class="frame">
+        <header class="nav">
+          <button
+            type="button"
+            class="logo"
+            data-section="Dashboard"
+            onclick={selectSection}
+          >
+            Library Portal
+          </button>
+          <button
+            type="button"
+            class="mobile-menu-button"
+            aria-label="Toggle navigation"
+            aria-expanded={mobileNavOpen}
+            onclick={toggleMobileNav}
+          >
+            ☰
+          </button>
+          <nav class={linksClass} aria-label="Member sections">
+            <template for:each={navGroups} for:item="group">
+              <div
+                class="nav-group"
+                key={group.label}
+                data-group={group.label}
+                onfocusout={handleGroupFocusOut}
+              >
+                <template lwc:if={group.single}>
+                  <button
+                    type="button"
+                    class={group.linkClass}
+                    data-section={group.firstSection}
+                    onclick={selectSection}
+                  >
+                    {group.label}
+                  </button>
+                </template>
+                <template lwc:else>
+                  <button
+                    type="button"
+                    class={group.linkClass}
+                    aria-haspopup="true"
+                    aria-expanded={group.expanded}
+                    data-group={group.label}
+                    onclick={toggleGroup}
+                  >
+                    {group.label}<span class="caret" aria-hidden="true">▾</span>
+                  </button>
+                  <div class={group.menuClass}>
+                    <template for:each={group.items} for:item="item">
+                      <button
+                        type="button"
+                        key={item.value}
+                        class={item.className}
+                        data-section={item.value}
+                        onclick={selectSection}
+                      >
+                        <lightning-icon
+                          icon-name={item.icon}
+                          size="xx-small"
+                        ></lightning-icon
+                        ><span>{item.label}</span>
+                      </button>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </nav>
           <div class="top-actions">
+            <div class="global-search">
+              <lightning-icon
+                icon-name="utility:search"
+                size="x-small"
+              ></lightning-icon>
+              <input
+                aria-label="Search the catalog"
+                placeholder="Search books..."
+                value={globalSearch}
+                oninput={handleGlobalSearch}
+              />
+            </div>
             <button
               class="icon-button"
               aria-label="Notifications"
@@ -124,14 +159,31 @@
             </div></template
           >
           <template if:true={isReady}>
-            <template if:false={isMemberAssistant}>
-              <div class="page-heading">
-                <div>
-                  <h1>{pageTitle}</h1>
-                  <p>{pageSubtitle}</p>
+            <div class="page-heading hero">
+              <span class="hero-badge">▥ {section}</span>
+              <h1>{pageHeadline}</h1>
+              <p>{pageSubtitle}</p>
+              <template if:true={isDashboard}>
+                <div class="cta">
+                  <button
+                    type="button"
+                    class="button primary large"
+                    data-section="Explore Books"
+                    onclick={openSection}
+                  >
+                    Explore books
+                  </button>
+                  <button
+                    type="button"
+                    class="button soft large"
+                    data-section="My Books"
+                    onclick={openSection}
+                  >
+                    My books
+                  </button>
                 </div>
-              </div>
-            </template>
+              </template>
+            </div>
 
             <template if:true={isDashboard}>
               <section
@@ -572,33 +624,6 @@
                     </button>
                   </div>
                 </section>
-                <section class="card available-plans">
-                  <h2>Available Plans</h2>
-                  <template for:each={availableUpgradePlans} for:item="plan"
-                    ><div class="plan-option" key={plan.id}>
-                      <span class="plan-icon">♛</span>
-                      <div>
-                        <strong>{plan.name}</strong
-                        ><small
-                          >{plan.borrowLimit} books · {plan.priceLabel}</small
-                        >
-                      </div>
-                      <template if:false={plan.current}
-                        ><button
-                          class="button outline compact"
-                          data-id={plan.id}
-                          onclick={requestUpgrade}
-                        >
-                          Select
-                        </button></template
-                      ><template if:true={plan.current}
-                        ><span class="badge badge-active"
-                          >Current</span
-                        ></template
-                      >
-                    </div></template
-                  >
-                </section>
               </div>
               <div class="benefit-grid">
                 <div>
@@ -615,6 +640,93 @@
                   <strong>{planRenewalLimit}</strong><span>Renewals</span>
                 </div>
               </div>
+
+              <section class="plans-section" aria-label="Membership plans">
+                <div class="plans-head">
+                  <span class="hero-badge">▥ Membership plans</span>
+                  <h2 class="plans-title">
+                    Simple, Transparent Membership For Every Reader
+                  </h2>
+                  <p>
+                    Compare every plan and upgrade whenever you're ready. Your
+                    current plan is marked.
+                  </p>
+                  <div class="toggle" role="group" aria-label="Billing period">
+                    <button
+                      type="button"
+                      class={monthlyTabClass}
+                      data-billing="monthly"
+                      aria-pressed={isMonthlyBilling}
+                      onclick={handleBilling}
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      type="button"
+                      class={annualTabClass}
+                      data-billing="annual"
+                      aria-pressed={isAnnualBilling}
+                      onclick={handleBilling}
+                    >
+                      Annually
+                    </button>
+                  </div>
+                </div>
+                <div class="plan-grid">
+                  <template for:each={planCards} for:item="plan">
+                    <article key={plan.id} class={plan.className}>
+                      <template lwc:if={plan.featured}>
+                        <span class="popular">Most popular</span>
+                      </template>
+                      <p class="plan-name">{plan.name}</p>
+                      <div class="plan-price">
+                        <strong>{plan.price}</strong><span>{plan.unit}</span>
+                      </div>
+                      <p class="plan-note">{plan.billedNote}</p>
+                      <button
+                        type="button"
+                        class={plan.buttonClass}
+                        data-id={plan.id}
+                        disabled={plan.disabled}
+                        onclick={requestUpgrade}
+                      >
+                        {plan.buttonLabel}
+                      </button>
+                      <p class="plan-includes">Includes:</p>
+                      <ul>
+                        <template for:each={plan.includes} for:item="item">
+                          <li key={item.key}>
+                            <span aria-hidden="true">✓</span>{item.text}
+                          </li>
+                        </template>
+                      </ul>
+                    </article>
+                  </template>
+                  <article class="plan">
+                    <p class="plan-name">Institutions</p>
+                    <div class="plan-price"><strong>Custom</strong></div>
+                    <p class="plan-note">Tailored to your organisation</p>
+                    <a class="button outline wide" href="/library/contact"
+                      >Contact Us</a
+                    >
+                    <p class="plan-includes">Includes:</p>
+                    <ul>
+                      <li>
+                        <span aria-hidden="true">✓</span>Bulk memberships for
+                        groups
+                      </li>
+                      <li>
+                        <span aria-hidden="true">✓</span>Custom borrow and loan
+                        limits
+                      </li>
+                      <li>
+                        <span aria-hidden="true">✓</span>Dedicated librarian
+                        support
+                      </li>
+                    </ul>
+                  </article>
+                </div>
+              </section>
             </template>
 
             <template if:true={isFinesPayments}>
@@ -905,7 +1017,7 @@
             </template>
           </template>
         </section>
-      </main>
+      </div>
     </div>
   </template>
 
@@ -923,52 +1035,44 @@
     >
       <button class="modal-close" onclick={closeBookDetails}>×</button>
       <div class="detail-cover">
-        <template if:true={bookDetailCover}
-          ><img src={bookDetailCover} alt="Book cover" /></template
-        ><template if:false={bookDetailCover}>BOOK</template>
+        <c-library-book-cover
+          size="large"
+          title={bookDetail.Name}
+          author={bookDetailAuthors}
+          cover-url={bookDetailCover}
+        ></c-library-book-cover>
       </div>
       <div class="book-detail-main">
-        <button class="back-link" onclick={closeBookDetails}>
-          ← Back to Books
-        </button>
+        <div class="detail-tags">
+          <span class="category-pill">{bookDetailCategories}</span
+          ><span class={bookDetailStatusClass}
+            >{bookDetail.Available_Copies__c} of {bookDetail.Total_Copies__c}
+            copies available</span
+          >
+        </div>
         <h2>{bookDetail.Name}</h2>
-        <p class="book-author">{bookDetailAuthors}</p>
-        <template if:true={bookDetailAuthorId}>
-          <button class="author-follow-link" onclick={followBookAuthor}>
-            Follow author
+        <div class="author-row">
+          <p class="book-author">{bookDetailAuthors}</p>
+          <template if:true={bookDetailAuthorId}>
+            <button class="author-follow-link" onclick={followBookAuthor}>
+              + Follow author
+            </button>
+          </template>
+        </div>
+        <div class="detail-actions">
+          <template if:true={bookDetailAvailable}
+            ><button class="button primary" onclick={requestBorrow}>
+              Borrow Book
+            </button></template
+          ><template if:false={bookDetailAvailable}
+            ><button class="button primary" onclick={requestReserve}>
+              Reserve Book
+            </button></template
+          ><button class="button outline" onclick={saveBookToReadingList}>
+            Save to Reading List
           </button>
-        </template>
-        <span class="category-pill">{bookDetailCategories}</span
-        ><span class={bookDetailStatusClass}
-          >{bookDetail.Available_Copies__c} of {bookDetail.Total_Copies__c}
-          copies available</span
-        >
+        </div>
         <p class="description">{bookDetail.Description__c}</p>
-        <section class="review-box" aria-label="Write a book review">
-          <h3>Share your experience</h3>
-          <p>Reviews are checked by a librarian before they appear publicly.</p>
-          <lightning-input
-            type="number"
-            min="1"
-            max="5"
-            label="Rating (1-5)"
-            value={reviewRating}
-            onchange={handleReviewRating}
-          ></lightning-input>
-          <textarea
-            class="review-text"
-            maxlength="150"
-            placeholder="Write at least 10 characters"
-            oninput={handleReviewText}
-          >
-{reviewText}</textarea>
-          <button class="button outline" onclick={submitReview}>
-            Submit for moderation
-          </button>
-          <template if:true={reviewStatus}
-            ><span class="review-status">Status: {reviewStatus}</span></template
-          >
-        </section>
         <div class="metadata-grid">
           <div><small>ISBN</small><strong>{bookDetail.ISBN__c}</strong></div>
           <div>
@@ -988,19 +1092,69 @@
             <small>Borrowed Copies</small><strong>{borrowedCopyCount}</strong>
           </div>
         </div>
-        <div class="detail-actions">
-          <template if:true={bookDetailAvailable}
-            ><button class="button primary" onclick={requestBorrow}>
-              Borrow Book
-            </button></template
-          ><template if:false={bookDetailAvailable}
-            ><button class="button primary" onclick={requestReserve}>
-              Reserve Book
-            </button></template
-          ><button class="button outline" onclick={saveBookToReadingList}>
-            Save to Reading List
+        <section class="reviews" aria-label="Member reviews">
+          <div class="reviews-head">
+            <h3>Member reviews</h3>
+            <template lwc:if={hasPublishedReviews}>
+              <span class="rating-summary"
+                ><strong>{averageRating}</strong
+                ><span class="stars" aria-hidden="true">{averageStars}</span
+                ><small>{reviewCountLabel}</small></span
+              >
+            </template>
+          </div>
+          <template lwc:if={hasMyReview}>
+            <article class="review-card mine">
+              <div class="review-top">
+                <span class="stars">{myBookReview.stars}</span
+                ><span class={myBookReview.statusClass}
+                  >{myBookReview.status}</span
+                >
+              </div>
+              <p>{myBookReview.reviewText}</p>
+              <small>Your review · {myReviewNote}</small>
+            </article>
+          </template>
+          <template for:each={otherReviews} for:item="review">
+            <article class="review-card" key={review.id}>
+              <div class="review-top">
+                <span class="stars">{review.stars}</span>
+              </div>
+              <p>{review.reviewText}</p>
+              <small>Library member · {review.dateLabel}</small>
+            </article>
+          </template>
+          <template lwc:if={showNoReviews}>
+            <p class="reviews-empty">
+              No reviews yet. Be the first to share your experience.
+            </p>
+          </template>
+        </section>
+        <section class="review-box" aria-label="Write a book review">
+          <h3>Share your experience</h3>
+          <p>Reviews are checked by a librarian before they appear publicly.</p>
+          <lightning-input
+            type="number"
+            min="1"
+            max="5"
+            label="Rating (1-5)"
+            value={reviewRating}
+            onchange={handleReviewRating}
+          ></lightning-input>
+          <textarea
+            class="review-text"
+            maxlength="150"
+            placeholder="Write at least 10 characters"
+            value={reviewText}
+            oninput={handleReviewText}
+          ></textarea>
+          <button class="button primary" onclick={submitReview}>
+            Submit for moderation
           </button>
-        </div>
+          <template if:true={reviewStatus}
+            ><span class="review-status">Status: {reviewStatus}</span></template
+          >
+        </section>
       </div>
     </section>
   </template>

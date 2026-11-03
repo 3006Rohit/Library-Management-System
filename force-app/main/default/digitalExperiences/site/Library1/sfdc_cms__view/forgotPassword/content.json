@@ -16,38 +16,26 @@
                 "layoutDirectionMobile": "column",
                 "layoutDirectionTablet": "column",
                 "maxContentWidth": "",
-                "sectionColumnGutterWidth": "0",
-                "sectionConfig": "{\"UUID\":\"5d0c3c82-42b3-419c-9787-2f53264f7eea\",\"columns\":[{\"UUID\":\"94494d2f-5763-45d9-80f6-8f18750a1c12\",\"columnName\":\"Hero\",\"columnKey\":\"col1\",\"columnWidth\":\"5\",\"seedComponents\":null},{\"UUID\":\"1d194da9-d015-469f-91b5-56f87bf12fea\",\"columnName\":\"Reset Form\",\"columnKey\":\"col2\",\"columnWidth\":\"7\",\"seedComponents\":null}]}",
-                "sectionMinHeight": "100vh",
-                "sectionVerticalAlign": "center"
+                "sectionColumnGutterWidth": "",
+                "sectionConfig": "{\"UUID\":\"5d0c3c82-42b3-419c-9787-2f53264f7eea\",\"columns\":[{\"UUID\":\"1d194da9-d015-469f-91b5-56f87bf12fea\",\"columnName\":\"Page\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+                "sectionMinHeight": "",
+                "sectionVerticalAlign": "flex-start"
               },
               "children": [
                 {
                   "children": [
                     {
-                      "attributes": {},
-                      "definition": "c:libraryAuthHero",
-                      "id": "777295e8-97d1-4d8a-ad1b-9d9d8ca89cad",
-                      "type": "component"
-                    }
-                  ],
-                  "id": "94494d2f-5763-45d9-80f6-8f18750a1c12",
-                  "name": "col1",
-                  "title": "Hero",
-                  "type": "region"
-                },
-                {
-                  "children": [
-                    {
-                      "attributes": { "mode": "forgot" },
+                      "attributes": {
+                        "mode": "forgot"
+                      },
                       "definition": "c:libraryMemberAuthFlow",
                       "id": "2fc46745-c4a2-444b-b8c3-44e7ee3bd894",
                       "type": "component"
                     }
                   ],
                   "id": "1d194da9-d015-469f-91b5-56f87bf12fea",
-                  "name": "col2",
-                  "title": "Reset Form",
+                  "name": "col1",
+                  "title": "Page",
                   "type": "region"
                 }
               ],

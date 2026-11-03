@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Returns public branch names, addresses and opening hours when published. Optionally filter by branch name or code.</description>
+    <developerName>LibraryPublicBranchInfoAction</developerName>
+    <invocationTarget>LibraryPublicBranchInfoAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryPublicBranchInfoAction</localDeveloperName>
+    <masterLabel>Get Branch Info</masterLabel>
+    <progressIndicatorMessage
+  >Looking up branch information</progressIndicatorMessage>
+</GenAiFunction>

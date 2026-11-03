@@ -40,6 +40,10 @@
         <apexClass>LibraryAgentMyReservationsAction</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>LibraryAgentRoomInsightsAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <objectPermissions>
         <object>Author__c</object>
         <allowRead>true</allowRead>

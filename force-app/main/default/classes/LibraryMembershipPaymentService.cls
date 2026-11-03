@@ -27,6 +27,10 @@ public without sharing class LibraryMembershipPaymentService {
     public Decimal reservationLimit { get; set; }
     @AuraEnabled
     public Decimal renewalLimit { get; set; }
+    @AuraEnabled
+    public Boolean current { get; set; }
+    @AuraEnabled
+    public Boolean upgradeAllowed { get; set; }
   }
 
   private static List<Member__c> memberRows(Id memberId, Boolean lockRow) {
@@ -84,6 +88,45 @@ public without sharing class LibraryMembershipPaymentService {
     return result;
   }
 
+  // Every active plan, so the portal can show the same comparison as the public
+  // site. Only plans that cost more than the member's current plan can be bought.
+  public static List<UpgradePlan> getPlanCatalog(Id memberId) {
+    List<Member__c> members = memberRows(memberId, false);
+    if (members.isEmpty())
+      throw new AuraHandledException(
+        'The current library member could not be found.'
+      );
+    Member__c member = members[0];
+    Decimal currentFee = member.Membership_Plan__r == null ||
+      member.Membership_Plan__r.Fee__c == null
+      ? 0
+      : member.Membership_Plan__r.Fee__c;
+    List<UpgradePlan> result = new List<UpgradePlan>();
+    String planQuery = 'SELECT Id,Name,Fee__c,Duration_Days__c,Borrow_Limit__c,Loan_Duration_Days__c,Reservation_Limit__c,Renewal_Limit__c FROM Membership_Plan__c WHERE Active__c=true ORDER BY Fee__c ASC, Name ASC';
+    for (
+      Membership_Plan__c plan : (List<Membership_Plan__c>) Database.queryWithBinds(
+        planQuery,
+        new Map<String, Object>(),
+        AccessLevel.SYSTEM_MODE
+      )
+    ) {
+      Decimal fee = plan.Fee__c == null ? 0 : plan.Fee__c;
+      UpgradePlan value = new UpgradePlan();
+      value.id = plan.Id;
+      value.name = plan.Name;
+      value.fee = fee;
+      value.durationDays = plan.Duration_Days__c;
+      value.borrowLimit = plan.Borrow_Limit__c;
+      value.loanDurationDays = plan.Loan_Duration_Days__c;
+      value.reservationLimit = plan.Reservation_Limit__c;
+      value.renewalLimit = plan.Renewal_Limit__c;
+      value.current = plan.Id == member.Membership_Plan__c;
+      value.upgradeAllowed = !value.current && fee > currentFee;
+      result.add(value);
+    }
+    return result;
+  }
+
   public static Id payAndUpgrade(Id memberId, Id newPlanId) {
     requireVerifiedPaymentGateway();
     List<Member__c> members = memberRows(memberId, true);
@@ -127,7 +170,9 @@ public without sharing class LibraryMembershipPaymentService {
         WHERE
           Member__c = :member.Id
           AND New_Plan__c = :plan.Id
-          AND Status__c = 'Paid' WITH SYSTEM_MODE ] > 0
+          AND Status__c = 'Paid'
+        WITH SYSTEM_MODE
+      ] > 0
     )
       throw new AuraHandledException(
         'A completed payment already exists for this membership upgrade.'

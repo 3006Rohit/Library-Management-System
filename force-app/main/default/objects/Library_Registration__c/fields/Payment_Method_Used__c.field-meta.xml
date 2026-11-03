@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Payment_Method_Used__c</fullName>
+  <description
+  >Payment option the applicant chose, such as Card or UPI.</description>
+  <label>Payment Method Used</label>
+  <length>40</length>
+  <type>Text</type>
+</CustomField>

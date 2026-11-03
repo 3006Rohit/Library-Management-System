@@ -1,0 +1,63 @@
+<template>
+  <section class="review-panel" aria-label="Book review moderation">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Catalog moderation</p>
+        <h2>Book reviews awaiting approval</h2>
+        <p class="hint">
+          Approved reviews appear on the book for every member. Rejected ones
+          stay hidden.
+        </p>
+      </div>
+      <div class="header-actions">
+        <span class="count">{countLabel}</span>
+        <button type="button" class="refresh" onclick={refresh}>Refresh</button>
+      </div>
+    </div>
+    <template if:true={loading}
+      ><div class="loading">Loading reviews…</div></template
+    >
+    <template if:true={error}
+      ><div class="error" role="alert">{error}</div></template
+    >
+    <template if:true={hasReviews}>
+      <div class="review-list">
+        <template for:each={rows} for:item="review">
+          <article class="review-row" key={review.id}>
+            <div class="review-main">
+              <strong>{review.bookTitle}</strong>
+              <span class="stars" aria-label="Rating">{review.stars}</span>
+              <p>{review.reviewText}</p>
+              <small>{review.memberLabel} · {review.dateLabel}</small>
+            </div>
+            <div class="review-actions">
+              <button
+                type="button"
+                class="primary"
+                data-id={review.id}
+                disabled={review.disabled}
+                onclick={approve}
+              >
+                Approve
+              </button>
+              <button
+                type="button"
+                class="secondary"
+                data-id={review.id}
+                disabled={review.disabled}
+                onclick={reject}
+              >
+                Reject
+              </button>
+            </div>
+          </article>
+        </template>
+      </div>
+    </template>
+    <template if:false={hasReviews}>
+      <template if:false={loading}
+        ><div class="empty">No reviews are waiting for approval.</div></template
+      >
+    </template>
+  </section>
+</template>

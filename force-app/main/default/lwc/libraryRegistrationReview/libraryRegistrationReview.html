@@ -34,6 +34,14 @@
           <dd class="slds-item_detail slds-truncate">
             {registration.Requested_Plan__r.Name}
           </dd>
+          <template lwc:if={registration.Payment_Status__c}>
+            <dt class="slds-item_label slds-truncate">Payment</dt>
+            <dd class="slds-item_detail slds-truncate">
+              {registration.Payment_Status__c}: {registration.Payment_Amount__c}
+              via {registration.Payment_Method_Used__c}
+              ({registration.Payment_Reference__c})
+            </dd>
+          </template>
           <dt class="slds-item_label slds-truncate">Submitted</dt>
           <dd class="slds-item_detail slds-truncate">
             {registration.Registration_Date__c}

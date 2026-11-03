@@ -25,8 +25,8 @@
                 {
                   "children": [
                     {
-                      "attributes": {},
-                      "definition": "c:libraryRegistrationRedirect",
+                      "attributes": { "dxpStyle": {} },
+                      "definition": "c:libraryLandingPage",
                       "id": "3a814081-3f42-49ee-8b2e-8dcaab2dc1ae",
                       "type": "component"
                     }

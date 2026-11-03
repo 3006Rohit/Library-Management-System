@@ -2,6 +2,7 @@ import { LightningElement } from "lwc";
 import getLibraryRooms from "@salesforce/apex/LibraryMemberSessionController.getLibraryRooms";
 import getLibraryRoomSeats from "@salesforce/apex/LibraryMemberSessionController.getLibraryRoomSeats";
 import bookLibraryRoom from "@salesforce/apex/LibraryMemberSessionController.bookLibraryRoom";
+import getRoomDemandForecast from "@salesforce/apex/LibraryMemberSessionController.getRoomDemandForecast";
 import getMyRoomBookings from "@salesforce/apex/LibraryMemberSessionController.getMyRoomBookings";
 import cancelLibraryRoomBooking from "@salesforce/apex/LibraryMemberSessionController.cancelLibraryRoomBooking";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
@@ -14,6 +15,7 @@ const toLocalInput = (date) =>
 
 export default class LibraryMemberRooms extends LightningElement {
   rooms = [];
+  forecast;
   bookings = [];
   seats = [];
   selectedRoom;
@@ -31,6 +33,18 @@ export default class LibraryMemberRooms extends LightningElement {
   connectedCallback() {
     this.refreshBookings();
     this.search();
+    this.loadForecast();
+  }
+
+  async loadForecast() {
+    try {
+      this.forecast = await getRoomDemandForecast({
+        sessionToken: this.sessionToken
+      });
+    } catch {
+      // Busy times are a helpful extra; booking works without them.
+      this.forecast = undefined;
+    }
   }
 
   localHoursFromNow(hours) {
@@ -82,7 +96,14 @@ export default class LibraryMemberRooms extends LightningElement {
         })) || [];
       this.rooms = rows.map((room) => ({
         ...room,
-        seatSummary: `${room.availableSeats} of ${room.capacity} seats free`,
+        isPrivate: Boolean(room.isPrivate),
+        typeLabel: room.isPrivate ? "Private room" : "Shared room",
+        chooseLabel: room.isPrivate ? "Book private room" : "Choose seat",
+        seatSummary: room.isPrivate
+          ? room.available === false
+            ? "Booked at this time"
+            : "Free at this time"
+          : `${room.availableSeats} of ${room.capacity} seats free`,
         details: [room.location, room.equipment].filter(Boolean).join(" · "),
         disabled: room.available === false
       }));
@@ -102,6 +123,12 @@ export default class LibraryMemberRooms extends LightningElement {
     const room = this.rooms.find((row) => row.id === roomId);
     if (!room) return;
     this.selectedRoom = room;
+    if (room.isPrivate) {
+      // A private room has one seat and is booked whole.
+      this.selectedSeat = 1;
+      this.seats = [];
+      return;
+    }
     this.selectedSeat = undefined;
     this.loadingSeats = true;
     try {
@@ -140,6 +167,74 @@ export default class LibraryMemberRooms extends LightningElement {
     });
   }
 
+  get hasForecast() {
+    return Boolean(this.forecast?.hasData);
+  }
+
+  get forecastEmpty() {
+    return Boolean(this.forecast) && !this.forecast.hasData;
+  }
+
+  get forecastHours() {
+    return this.bars(this.forecast?.hours, "h", (b) =>
+      b.label.replace(" ", "")
+    );
+  }
+
+  get forecastDays() {
+    return this.bars(this.forecast?.days, "d", (b) => b.label);
+  }
+
+  bars(rows, prefix, label) {
+    return (rows || []).map((bucket, index) => ({
+      key: `${prefix}${index}`,
+      label: label(bucket),
+      title: `${bucket.label}: ${String(bucket.level).toLowerCase()} demand`,
+      barStyle: `height:${Math.max(bucket.percent, bucket.bookings ? 8 : 3)}%`,
+      className: `bar level-${String(bucket.level).toLowerCase()}`
+    }));
+  }
+
+  get bestTimes() {
+    return this.forecast?.quietTimes || [];
+  }
+
+  get hasBestTimes() {
+    return this.bestTimes.length > 0;
+  }
+
+  get forecastTips() {
+    return (this.forecast?.suggestions || []).map((text, index) => ({
+      key: `tip${index}`,
+      text
+    }));
+  }
+
+  get hasTips() {
+    return this.forecastTips.length > 0;
+  }
+
+  // Expected demand for the start time the member chose, from past bookings.
+  get expectedLevel() {
+    if (!this.forecast?.hasData || !this.startAt) return "None";
+    const start = new Date(this.startAt);
+    if (Number.isNaN(start.getTime())) return "None";
+    const hour = this.forecast.hours.find((b) => b.hour === start.getHours());
+    const dayNumber = start.getDay() === 0 ? 7 : start.getDay();
+    const day = this.forecast.days.find((b) => b.day === dayNumber);
+    const rank = { None: 0, Low: 1, Medium: 2, High: 3 };
+    const levels = [hour?.level || "Low", day?.level || "Low"];
+    return levels.sort((a, b) => rank[b] - rank[a])[0];
+  }
+
+  get expectedLabel() {
+    return `${this.expectedLevel} demand at your chosen time`;
+  }
+
+  get expectedClass() {
+    return `expected level-${this.expectedLevel.toLowerCase()}`;
+  }
+
   get hasRooms() {
     return this.rooms.length > 0;
   }
@@ -152,7 +247,18 @@ export default class LibraryMemberRooms extends LightningElement {
     return !this.selectedSeat || this.booking;
   }
 
+  get selectedIsPrivate() {
+    return Boolean(this.selectedRoom?.isPrivate);
+  }
+
+  get seatPanelTitle() {
+    return this.selectedIsPrivate
+      ? `${this.selectedRoom.name} – private room`
+      : `${this.selectedRoom?.name} – choose a seat`;
+  }
+
   get reserveLabel() {
+    if (this.selectedIsPrivate) return "Reserve private room";
     return this.selectedSeat
       ? `Reserve seat ${this.selectedSeat}`
       : "Select a seat";
@@ -196,7 +302,13 @@ export default class LibraryMemberRooms extends LightningElement {
         endAt: this.endIso,
         purpose: this.purpose
       });
-      this.toast("Seat reserved", "Your seat was saved.", "success");
+      this.toast(
+        this.selectedIsPrivate ? "Room reserved" : "Seat reserved",
+        this.selectedIsPrivate
+          ? "Your private room was saved."
+          : "Your seat was saved.",
+        "success"
+      );
       await Promise.all([this.search(), this.refreshBookings()]);
     } catch (error) {
       this.toast(

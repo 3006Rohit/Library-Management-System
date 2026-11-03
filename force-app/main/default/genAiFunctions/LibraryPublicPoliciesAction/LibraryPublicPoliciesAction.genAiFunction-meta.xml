@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Returns published borrowing policies per membership plan: loan period in days, borrow limit, renewal limit, reservation limit and fine per day.</description>
+    <developerName>LibraryPublicPoliciesAction</developerName>
+    <invocationTarget>LibraryPublicPoliciesAction</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>LibraryPublicPoliciesAction</localDeveloperName>
+    <masterLabel>Get Library Policies</masterLabel>
+    <progressIndicatorMessage
+  >Looking up library policies</progressIndicatorMessage>
+</GenAiFunction>
