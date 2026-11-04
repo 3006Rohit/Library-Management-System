@@ -137,6 +137,16 @@ public without sharing class LibraryRoomBookingService {
     Integer minimumCapacity
   ) {
     LibraryMemberSessionService.getCurrentMember(sessionToken);
+    return getAvailability(startAt, endAt, minimumCapacity);
+  }
+
+  // Room availability for a time window. Callers authorize first: the member
+  // portal validates a session, the librarian assistant checks a permission.
+  public static List<RoomDTO> getAvailability(
+    Datetime startAt,
+    Datetime endAt,
+    Integer minimumCapacity
+  ) {
     if (minimumCapacity != null && minimumCapacity < 1)
       throw new AuraHandledException('Capacity must be positive.');
     Map<Id, Set<Integer>> taken = takenSeats(startAt, endAt, false);

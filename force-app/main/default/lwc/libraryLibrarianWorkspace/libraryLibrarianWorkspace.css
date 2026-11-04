@@ -2586,16 +2586,17 @@ tbody tr:hover {
 .app-shell {
   display: block;
   min-height: 100vh;
-  padding: 32px;
-  background: var(--page-bg);
+  padding: 0;
+  background: #fff;
 }
 .frame {
-  max-width: 1340px;
-  margin: 0 auto;
-  padding: 36px 46px 56px;
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px 28px 32px;
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 40px;
+  border: 0;
+  border-radius: 0;
   --slds-c-input-radius-border: 999px;
   --slds-c-input-color-border: #e3e3e3;
   --slds-c-input-color-background: #fff;
@@ -2778,6 +2779,89 @@ tbody tr:hover {
 }
 .librarian-notification:hover {
   background: #f4f4f4;
+}
+.notification-panel-header {
+  padding: 20px 24px 16px;
+  border-bottom-color: var(--border-color);
+}
+.notification-panel-header strong {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.notification-panel-header span {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  color: #444;
+  font-size: 12px;
+}
+.notification-list {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px 12px;
+}
+.librarian-notification {
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  transition: background 0.15s ease;
+}
+.notification-icon {
+  position: relative;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  background: #f1f1f1;
+}
+.notification-icon lightning-icon {
+  --slds-c-icon-color-foreground-default: #111;
+}
+.notification-icon.blue,
+.notification-icon.amber,
+.notification-icon.red,
+.notification-icon.rose {
+  background: #f1f1f1;
+}
+/* Neutral grey badge with a coloured status dot, like the status pills */
+.notification-icon::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #888;
+}
+.notification-icon.blue::after {
+  background: #2f6fd0;
+}
+.notification-icon.amber::after {
+  background: var(--warning);
+}
+.notification-icon.red::after {
+  background: var(--danger);
+}
+.notification-icon.rose::after {
+  background: #c2456b;
+}
+.notification-copy strong {
+  color: #111;
+  font-size: 14px;
+  font-weight: 500;
+}
+.notification-copy span {
+  color: #666;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.librarian-notification lightning-icon[icon-name="utility:chevronright"] {
+  --slds-c-icon-color-foreground-default: #999;
+}
+.notification-empty {
+  font-size: 14px;
 }
 
 /* Content, hero and notices */
@@ -3245,7 +3329,7 @@ td {
 /* Responsive */
 @media (max-width: 1180px) {
   .frame {
-    padding: 30px 30px 48px;
+    padding: 18px 22px 28px;
   }
   .links {
     gap: 20px;
@@ -3265,11 +3349,11 @@ td {
 }
 @media (max-width: 900px) {
   .app-shell {
-    padding: 12px;
+    padding: 0;
   }
   .frame {
-    padding: 22px 18px 36px;
-    border-radius: 28px;
+    padding: 14px 14px 24px;
+    border-radius: 0;
   }
   .nav {
     grid-template-columns: 1fr auto;

@@ -91,7 +91,7 @@ private class LibraryRoomInsightServiceTest {
     Date day = Date.today().addDays(-7);
     booking(roomA, 1, at(day, 17), 1, 'Booked');
     booking(roomA, 1, at(day, 17), 1, 'Booked');
-    booking(roomA, 2, at(day, 17), 1, 'Booked');
+    booking(roomA, 1, at(day, 17), 1, 'Booked');
     booking(roomA, 3, at(day, 10), 1, 'Booked');
     booking(pod, 1, at(day, 17), 1, 'Booked');
     booking(pod, 1, at(day, 17), 1, 'Booked');

@@ -41,6 +41,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>LibraryAgentRoomAvailabilityAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>LibraryAgentRoomInsightsAction</apexClass>
         <enabled>true</enabled>
     </classAccesses>

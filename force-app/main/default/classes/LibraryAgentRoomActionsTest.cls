@@ -118,4 +118,84 @@ private class LibraryAgentRoomActionsTest {
     }
     System.assertEquals(true, rejected);
   }
+
+  @IsTest
+  static void availabilityActionServesMembersAndLibrariansOnly() {
+    LibraryPolicyService.testGrantedPermissions.add('Manage_Library_Catalog');
+    Id roomId = LibraryRoomBookingService.createRoom(
+      'Free Room',
+      'Ground',
+      2,
+      null
+    );
+    LibraryPolicyService.testGrantedPermissions.clear();
+    Member__c member = new Member__c(
+      First_Name__c = 'Avail',
+      Last_Name__c = 'Reader',
+      Email__c = 'avail-reader@example.com',
+      Normalized_Email__c = 'avail-reader@example.com',
+      Status__c = 'Active',
+      Account_Status__c = 'Active'
+    );
+    insert member;
+    String token = LibraryMemberSessionService.create(
+      member,
+      null,
+      'Agent test'
+    );
+    Datetime startAt = Datetime.now().addDays(2);
+    LibraryRoomBookingService.book(
+      token,
+      roomId,
+      1,
+      startAt,
+      startAt.addHours(1),
+      'Study'
+    );
+    String iso = startAt.formatGmt('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'');
+
+    LibraryAgentRoomAvailabilityAction.Request memberRequest = new LibraryAgentRoomAvailabilityAction.Request();
+    memberRequest.sessionToken = token;
+    memberRequest.startTime = iso;
+    LibraryAgentRoomAvailabilityAction.Response seen = LibraryAgentRoomAvailabilityAction.execute(
+      new List<LibraryAgentRoomAvailabilityAction.Request>{ memberRequest }
+    )[0];
+    System.assertEquals(true, seen.available);
+    System.assert(seen.roomsJson.contains('Free Room'));
+    System.assert(seen.roomsJson.contains('"seatsFree":1'));
+
+    // Default window is right now for one hour, and nothing is booked then.
+    memberRequest.startTime = null;
+    LibraryAgentRoomAvailabilityAction.Response now = LibraryAgentRoomAvailabilityAction.execute(
+      new List<LibraryAgentRoomAvailabilityAction.Request>{ memberRequest }
+    )[0];
+    System.assertEquals(1, now.freeRoomCount);
+
+    // No token and no librarian permission is refused; with it, allowed.
+    LibraryAgentRoomAvailabilityAction.Request anonymous = new LibraryAgentRoomAvailabilityAction.Request();
+    System.assertEquals(
+      false,
+      LibraryAgentRoomAvailabilityAction.execute(
+          new List<LibraryAgentRoomAvailabilityAction.Request>{ anonymous }
+        )[0]
+        .available
+    );
+    LibraryPolicyService.testGrantedPermissions.add(
+      'Manage_Library_Circulation'
+    );
+    System.assertEquals(
+      true,
+      LibraryAgentRoomAvailabilityAction.execute(
+          new List<LibraryAgentRoomAvailabilityAction.Request>{ anonymous }
+        )[0]
+        .available
+    );
+
+    anonymous.startTime = 'not a time';
+    LibraryAgentRoomAvailabilityAction.Response bad = LibraryAgentRoomAvailabilityAction.execute(
+      new List<LibraryAgentRoomAvailabilityAction.Request>{ anonymous }
+    )[0];
+    System.assertEquals(false, bad.available);
+    System.assert(bad.message.contains('could not be understood'));
+  }
 }

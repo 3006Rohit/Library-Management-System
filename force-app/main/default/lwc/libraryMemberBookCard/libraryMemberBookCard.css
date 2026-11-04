@@ -41,23 +41,37 @@ p {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.category {
-  display: inline-block;
+.tags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+}
+.category,
+.availability,
+.availability-meta {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
   max-width: 100%;
-  margin-top: 6px;
-  padding: 3px 12px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 14px;
   border-radius: 999px;
   background: #f1f1f1;
   color: #333;
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1;
+}
+.category:empty {
+  display: none;
 }
 .availability,
 .availability-meta {
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
-  margin-top: 10px;
-  padding: 6px 14px;
+  margin: 0;
+  padding: 0 14px;
   border-radius: 999px;
   background: #f1f1f1;
   color: #111;

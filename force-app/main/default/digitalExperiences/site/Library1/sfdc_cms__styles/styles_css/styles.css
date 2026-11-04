@@ -17,7 +17,16 @@ body {
  * control of credentials; these rules only give those native components the
  * same visual shell as the member portal. */
 body:has([data-f6-region-name="content"]) {
-  background: #eef4fb;
+  background: #fff;
+}
+
+/* The member portal supplies its own navigation; drop the empty theme
+ * header/footer regions that leave a gray band around it. */
+[data-f6-region-name="header"],
+[data-f6-region-name="footer"] {
+  display: none;
+  margin: 0;
+  padding: 0;
 }
 
 [data-f6-region-name="content"] {
@@ -28,7 +37,32 @@ body:has([data-f6-region-name="content"]) {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background: #eef4fb;
+  background: #fff;
+}
+
+/* Every ancestor of the member portal (site section, column, region) loses its
+ * gutter, margin and width cap so the portal is edge to edge and full height. */
+html:has(c-library-member-page),
+body:has(c-library-member-page),
+:has(> c-library-member-page),
+:has(c-library-member-page):not(html):not(body) {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  border-radius: 0 !important;
+}
+
+/* Member portal renders full-bleed: strip every wrapper's spacing. */
+[data-f6-region-name="content"] > *,
+[data-f6-region-name="content"] > * > *,
+[data-f6-region-name="content"] c-library-member-page,
+[data-f6-region-name="content"] c-library-member-shell {
+  box-sizing: border-box;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
 [data-f6-region-name="content"] button,

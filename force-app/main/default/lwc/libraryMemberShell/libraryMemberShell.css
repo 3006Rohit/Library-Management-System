@@ -26,8 +26,8 @@
   position: relative;
   width: 100%;
   min-height: 100dvh;
-  padding: 32px;
-  background: var(--page);
+  padding: 0;
+  background: #fff;
 }
 .member-app.high-contrast {
   --page: #fff;
@@ -54,12 +54,13 @@ input {
 
 /* Frame and header (same as the home page) */
 .frame {
-  max-width: 1340px;
-  margin: 0 auto;
+  max-width: none;
+  min-height: 100dvh;
+  margin: 0;
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 40px;
-  padding: 36px 46px 56px;
+  border: 0;
+  border-radius: 0;
+  padding: 20px 28px 32px;
 }
 .member-app.high-contrast .frame {
   border-color: #000;
@@ -1347,7 +1348,7 @@ td strong {
 /* Responsive */
 @media (max-width: 1180px) {
   .frame {
-    padding: 30px 30px 48px;
+    padding: 18px 22px 28px;
   }
   .links {
     gap: 24px;
@@ -1374,11 +1375,11 @@ td strong {
 }
 @media (max-width: 900px) {
   .member-app {
-    padding: 12px;
+    padding: 0;
   }
   .frame {
-    padding: 22px 18px 36px;
-    border-radius: 28px;
+    padding: 14px 14px 24px;
+    border-radius: 0;
   }
   .nav {
     grid-template-columns: 1fr auto;

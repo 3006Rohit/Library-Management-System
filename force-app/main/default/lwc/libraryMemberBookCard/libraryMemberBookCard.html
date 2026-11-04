@@ -10,8 +10,10 @@
     <div class="book-content">
       <h3 title={book.Name}>{book.Name}</h3>
       <p class="author" title={book.authors}>{book.authors}</p>
-      <p class="category" title={book.categories}>{book.categories}</p>
-      <span class={book.availabilityClass}>{book.availabilityMeta}</span>
+      <div class="tags">
+        <p class="category" title={book.categories}>{book.categories}</p>
+        <span class={book.availabilityClass}>{book.availabilityMeta}</span>
+      </div>
     </div>
     <button class="view-button" onclick={handleAction}>{actionLabel}</button>
   </article>

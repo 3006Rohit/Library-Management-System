@@ -87,9 +87,12 @@ public without sharing class LibraryRoomInsightService {
     public Integer bookings;
     public Integer compareTo(Object other) {
       SeatStat that = (SeatStat) other;
-      if (bookings == that.bookings)
-        return seatNo - that.seatNo;
-      return bookings > that.bookings ? -1 : 1;
+      if (bookings != that.bookings)
+        return bookings > that.bookings ? -1 : 1;
+      // Break ties by room name then seat so the order is stable between runs.
+      Integer byRoom = (roomName == null ? '' : roomName)
+        .compareTo(that.roomName == null ? '' : that.roomName);
+      return byRoom != 0 ? byRoom : seatNo - that.seatNo;
     }
   }
 

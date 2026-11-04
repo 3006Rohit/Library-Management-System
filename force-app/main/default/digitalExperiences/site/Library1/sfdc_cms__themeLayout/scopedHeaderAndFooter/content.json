@@ -4,8 +4,8 @@
   "contentBody": {
     "component": {
       "attributes": {
-        "hideThemeFooter": false,
-        "showThemeFooterAtBottom": true,
+        "hideThemeFooter": true,
+        "showThemeFooterAtBottom": false,
         "stickyThemeHeader": false
       },
       "children": [

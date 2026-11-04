@@ -225,37 +225,6 @@ label {
   background: #6d5a8a;
 }
 
-.due {
-  margin-top: -34px;
-  align-self: flex-start;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  background: #fff;
-  border-radius: 20px;
-  padding: 14px 20px;
-  text-align: left;
-  box-shadow: 0 0 0 1px #e8e8e8;
-}
-
-.due strong {
-  display: block;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.due small {
-  color: #777;
-  font-size: 13px;
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #111;
-}
-
 @media (max-width: 900px) {
   .page {
     padding: 12px;
