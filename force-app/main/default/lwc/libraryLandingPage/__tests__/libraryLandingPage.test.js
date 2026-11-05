@@ -2,6 +2,10 @@ import { createElement } from "lwc";
 import LibraryLandingPage from "c/libraryLandingPage";
 import getActivePlans from "@salesforce/apex/LibraryRegistrationGuestController.getActivePlans";
 import getDisplayCurrency from "@salesforce/apex/LibraryRegistrationGuestController.getDisplayCurrency";
+import getLibraryStats from "@salesforce/apex/LibraryRegistrationGuestController.getLibraryStats";
+import endSession from "@salesforce/apex/LibraryPublicAgentController.endSession";
+import startSession from "@salesforce/apex/LibraryPublicAgentController.startSession";
+import sendMessage from "@salesforce/apex/LibraryPublicAgentController.sendMessage";
 import searchPublicCatalog from "@salesforce/apex/LibraryRegistrationGuestController.searchPublicCatalog";
 
 jest.mock(
@@ -11,6 +15,11 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/LibraryRegistrationGuestController.getDisplayCurrency",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/LibraryRegistrationGuestController.getLibraryStats",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -70,6 +79,7 @@ async function mount() {
   searchPublicCatalog.mockResolvedValue([]);
   getActivePlans.mockResolvedValue(PLANS);
   getDisplayCurrency.mockResolvedValue("INR");
+  getLibraryStats.mockResolvedValue({ bookCount: 1234, memberCount: 56 });
   const element = createElement("c-library-landing-page", {
     is: LibraryLandingPage
   });
@@ -129,5 +139,42 @@ describe("c-library-landing-page plans", () => {
     const featured = element.shadowRoot.querySelector(".plan.featured");
     expect(featured.textContent).toContain("Premium");
     expect(featured.querySelector(".popular")).not.toBeNull();
+  });
+});
+
+describe("c-library-landing-page assistant", () => {
+  afterEach(() => {
+    while (document.body.firstChild)
+      document.body.removeChild(document.body.firstChild);
+    jest.clearAllMocks();
+  });
+
+  async function ask(reply) {
+    endSession.mockResolvedValue();
+    startSession.mockResolvedValue({ sessionId: "s1" });
+    sendMessage.mockResolvedValue({ message: reply });
+    const element = await mount();
+    const input = element.shadowRoot.querySelector(".composer input");
+    input.value = "question";
+    input.dispatchEvent(new CustomEvent("input"));
+    element.shadowRoot
+      .querySelector(".composer")
+      .dispatchEvent(new CustomEvent("submit"));
+    await flush();
+    return element;
+  }
+
+  it("shows Register and Log in buttons when a reply needs membership", async () => {
+    const element = await ask("Holds need registration and a membership.");
+    const links = [...element.shadowRoot.querySelectorAll(".gate-actions a")];
+    expect(links.map((a) => a.getAttribute("href"))).toEqual([
+      "/library/register",
+      "/library/login"
+    ]);
+  });
+
+  it("does not show the buttons for a plain availability reply", async () => {
+    const element = await ask("Dune: 2 of 3 copies available.");
+    expect(element.shadowRoot.querySelector(".gate-actions")).toBeNull();
   });
 });

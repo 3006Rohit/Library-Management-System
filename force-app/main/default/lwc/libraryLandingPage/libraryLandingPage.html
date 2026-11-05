@@ -89,6 +89,12 @@
             <template for:each={messages} for:item="message">
               <div key={message.id} class={message.className}>
                 {message.text}
+                <template if:true={message.showGate}>
+                  <div class="gate-actions">
+                    <a class="btn soft" href="/library/register">Register</a>
+                    <a class="btn dark" href="/library/login">Log in</a>
+                  </div>
+                </template>
               </div>
             </template>
           </div>
@@ -117,6 +123,11 @@
               {sendLabel}
             </button>
           </form>
+          <p class="muted gate-note">
+            Loans, holds, rooms and events need registration and a membership.
+            <a href="/library/register">Register</a> or
+            <a href="/library/login">log in</a>.
+          </p>
         </article>
       </section>
 

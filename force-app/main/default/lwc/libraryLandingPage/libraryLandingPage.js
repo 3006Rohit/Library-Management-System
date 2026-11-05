@@ -1,6 +1,7 @@
 import { LightningElement } from "lwc";
 import searchPublicCatalog from "@salesforce/apex/LibraryRegistrationGuestController.searchPublicCatalog";
 import getActivePlans from "@salesforce/apex/LibraryRegistrationGuestController.getActivePlans";
+import getLibraryStats from "@salesforce/apex/LibraryRegistrationGuestController.getLibraryStats";
 import getDisplayCurrency from "@salesforce/apex/LibraryRegistrationGuestController.getDisplayCurrency";
 import startSession from "@salesforce/apex/LibraryPublicAgentController.startSession";
 import sendMessage from "@salesforce/apex/LibraryPublicAgentController.sendMessage";
@@ -42,6 +43,14 @@ function monthsInTerm(days) {
   return Math.max(1, Math.round(days / 30.4375));
 }
 
+// Replies that point the visitor at registration, membership or sign-in get
+// Register and Log in buttons so the next step is one click away.
+const GATE_PATTERN = /regist|sign[ -]?up|sign[ -]?in|log[ -]?in|member(ship)?/i;
+
+function isGateReply(text) {
+  return GATE_PATTERN.test(text || "");
+}
+
 function errorText(error) {
   return (
     error?.body?.message ||
@@ -59,12 +68,13 @@ export default class LibraryLandingPage extends LightningElement {
   input = "";
   busy = false;
   sessionId;
+  sessionToken;
   sequence = 0;
   messages = [
     {
       id: "welcome",
       className: BOT_CLASS,
-      text: "Hi! I can answer questions about branch hours, membership plans and library policies. What would you like to know?"
+      text: "Hi! I can show which books are available, and answer questions about branch hours, membership plans, events and library policies. Loans, holds and other member features need registration and a membership."
     }
   ];
 
@@ -75,11 +85,16 @@ export default class LibraryLandingPage extends LightningElement {
     { label: "Available now", term: "" }
   ].map((f) => ({ ...f, key: f.label, className: "chip" }));
 
-  suggestions = ["Branch hours", "Membership plans", "Library policies"];
+  suggestions = [
+    "Which books are available?",
+    "What genres do you have?",
+    "What can the library do?",
+    "Membership plans"
+  ];
 
   stats = [
-    { value: "+25k", label: "Books and media" },
-    { value: "+8k", label: "Active members" }
+    { value: "–", label: "Books and media" },
+    { value: "–", label: "Active members" }
   ];
 
   members = [
@@ -91,12 +106,30 @@ export default class LibraryLandingPage extends LightningElement {
   connectedCallback() {
     this.loadBooks("");
     this.loadPlans();
+    this.loadStats();
+  }
+
+  async loadStats() {
+    try {
+      const result = await getLibraryStats();
+      const fmt = new Intl.NumberFormat("en-IN");
+      this.stats = [
+        { value: fmt.format(result.bookCount || 0), label: "Books and media" },
+        { value: fmt.format(result.memberCount || 0), label: "Active members" }
+      ];
+    } catch {
+      // keep placeholder dashes if the counts cannot be loaded
+    }
   }
 
   disconnectedCallback() {
     if (this.sessionId) {
-      endSession({ sessionId: this.sessionId }).catch(() => undefined);
+      endSession({
+        sessionId: this.sessionId,
+        token: this.sessionToken
+      }).catch(() => undefined);
       this.sessionId = undefined;
+      this.sessionToken = undefined;
     }
   }
 
@@ -269,17 +302,24 @@ export default class LibraryLandingPage extends LightningElement {
       if (!this.sessionId) {
         const session = await startSession();
         this.sessionId = session.sessionId;
+        this.sessionToken = session.token;
         this.sequence = 0;
       }
       this.sequence += 1;
       const response = await sendMessage({
         sessionId: this.sessionId,
+        token: this.sessionToken,
         sequenceId: this.sequence,
         text: question
       });
       this.messages = [
         ...this.messages,
-        { id: `a-${Date.now()}`, className: BOT_CLASS, text: response.message }
+        {
+          id: `a-${Date.now()}`,
+          className: BOT_CLASS,
+          text: response.message,
+          showGate: isGateReply(response.message)
+        }
       ];
     } catch (error) {
       this.messages = [
@@ -291,6 +331,7 @@ export default class LibraryLandingPage extends LightningElement {
         }
       ];
       this.sessionId = undefined;
+      this.sessionToken = undefined;
       this.sequence = 0;
     } finally {
       this.busy = false;

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Public Chat Session</label>
+    <pluralLabel>Public Chat Sessions</pluralLabel>
+    <description
+  >Server-side ledger for signed-out assistant sessions. Binds each Agentforce session to a hashed client token and enforces rate limits. Never exposed to guests.</description>
+    <nameField>
+        <label>Session Ref</label>
+        <type>AutoNumber</type>
+        <displayFormat>PCS-{000000}</displayFormat>
+        <startingNumber>1</startingNumber>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>Private</sharingModel>
+    <externalSharingModel>Private</externalSharingModel>
+    <fields>
+        <fullName>Session_Id__c</fullName>
+        <label>Agentforce Session Id</label>
+        <length>80</length>
+        <type>Text</type>
+        <required>true</required>
+        <unique>true</unique>
+        <caseSensitive>true</caseSensitive>
+        <externalId>true</externalId>
+    </fields>
+    <fields>
+        <fullName>Token_Hash__c</fullName>
+        <label>Token Hash</label>
+        <description
+    >SHA-256 hex of the client token. The raw token is never stored.</description>
+        <length>64</length>
+        <type>Text</type>
+        <required>true</required>
+    </fields>
+    <fields>
+        <fullName>Message_Count__c</fullName>
+        <label>Message Count</label>
+        <defaultValue>0</defaultValue>
+        <precision>6</precision>
+        <scale>0</scale>
+        <type>Number</type>
+    </fields>
+    <fields>
+        <fullName>Ended__c</fullName>
+        <label>Ended</label>
+        <defaultValue>false</defaultValue>
+        <type>Checkbox</type>
+    </fields>
+</CustomObject>

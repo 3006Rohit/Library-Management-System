@@ -3,6 +3,10 @@
     <label>Library Public Agent Access</label>
     <description
   >Lets the Library Public Assistant agent user invoke the public, read-only Apex actions (catalog, branches, policies, membership plans, events). Class access only: no object, field or member-data permissions.</description>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Library_Public_Agent</name>
+    </customPermissions>
     <classAccesses>
         <apexClass>LibraryAgentCatalogAction</apexClass>
         <enabled>true</enabled>
