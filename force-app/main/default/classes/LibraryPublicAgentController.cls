@@ -82,7 +82,7 @@ public without sharing class LibraryPublicAgentController {
       // Count the attempt even if the callout failed, so errors cannot be used
       // to bypass the cap. DML after the callout is allowed.
       session.Message_Count__c = session.Message_Count__c + 1;
-      Database.update(session, AccessLevel.SYSTEM_MODE);
+      save(session);
     }
   }
 
@@ -96,8 +96,12 @@ public without sharing class LibraryPublicAgentController {
       LibraryAgentApiController.endSession(sessionId);
     } finally {
       session.Ended__c = true;
-      Database.update(session, AccessLevel.SYSTEM_MODE);
+      save(session);
     }
+  }
+
+  private static void save(Library_Public_Chat_Session__c session) {
+    Database.update(session, AccessLevel.SYSTEM_MODE);
   }
 
   // setMessage makes the text visible to Apex getMessage() as well as to LWC.
