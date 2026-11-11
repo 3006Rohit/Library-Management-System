@@ -4077,3 +4077,136 @@ td {
 .fine-search lightning-icon {
   flex: none;
 }
+
+/* Reports: portal-theme tiles and delivery health layout */
+.report-card {
+  padding: 20px 24px;
+  border: 0;
+  border-radius: 20px;
+  background: #f4f4f4;
+}
+.report-card span {
+  font-size: 13px;
+}
+.report-card strong {
+  color: #111;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.report-panel h2 {
+  margin-bottom: 18px;
+}
+.report-panel-heading p {
+  margin: -12px 0 18px;
+  color: #666;
+  font-size: 14px;
+}
+.report-panel .report-lines {
+  gap: 16px;
+}
+.report-panel .report-lines div {
+  padding: 18px 22px;
+  border: 1px solid #ececec;
+  border-radius: 20px;
+  background: #fff;
+}
+.report-panel .report-lines span {
+  color: #666;
+  font-size: 13px;
+}
+.report-panel .report-lines strong {
+  margin-top: 6px;
+  color: #111;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.report-panel .report-lines.delivery-lines {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.report-panel .report-lines strong.delivery-failed {
+  color: var(--danger);
+}
+.delivery-total {
+  font-size: 14px;
+}
+@media (max-width: 1050px) {
+  .report-panel .report-lines.delivery-lines {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Settings: portal-theme cards, icons, notes and tool buttons */
+.settings-grid {
+  gap: 16px;
+}
+.settings-card.editable-settings-card {
+  padding: 28px;
+  border: 0;
+  background: #f4f4f4;
+}
+.settings-card-heading {
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e3e3e3;
+}
+.settings-card h2 {
+  color: #111;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.settings-card p {
+  margin-top: 4px;
+  color: #666;
+  font-size: 14px;
+}
+.settings-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+}
+.settings-icon lightning-icon {
+  --slds-c-icon-color-foreground-default: #111;
+}
+.settings-fields {
+  gap: 16px 20px;
+  padding-top: 20px;
+}
+.settings-help {
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #fff;
+  color: #666;
+  font-size: 13px;
+}
+.settings-tools {
+  margin-top: 16px;
+}
+.settings-tools-heading p {
+  margin-top: 4px;
+  color: #666;
+  font-size: 15px;
+}
+.security-note {
+  padding: 6px 14px;
+  border: 1px solid #e3e3e3;
+  color: #111;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+}
+.settings-actions {
+  gap: 12px;
+  margin-top: 20px;
+}
+.settings-actions .button.secondary:hover {
+  background: #ececec;
+}
+@media (max-width: 1050px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,14 +1,10 @@
-// Stage 1: plans, books (70), authors/category links, copies (170), members (50).
+// Stage 1: books (70), authors/category links, copies (170), members (50).
 // Marker: ISBN 97820*, barcode SEED-*, member email *@seed.library.test
 if ([SELECT COUNT() FROM Book__c WHERE ISBN__c LIKE '97820%'] > 0) {
     throw new DmlException('Seed data already present - run cleanup first.');
 }
 
-insert new List<Membership_Plan__c>{
-    new Membership_Plan__c(Name = 'Student', Active__c = true, Fee__c = 300, Borrow_Limit__c = 3, Duration_Days__c = 365, Fine_Per_Day__c = 5, Loan_Duration_Days__c = 14, Renewal_Limit__c = 1, Reservation_Limit__c = 2, Description__c = 'Discounted plan for students.'),
-    new Membership_Plan__c(Name = 'Platinum', Active__c = true, Fee__c = 2000, Borrow_Limit__c = 15, Duration_Days__c = 365, Fine_Per_Day__c = 5, Loan_Duration_Days__c = 30, Renewal_Limit__c = 3, Reservation_Limit__c = 8, Description__c = 'Top tier with the longest loans.')
-};
-List<Membership_Plan__c> plans = [SELECT Id, Name, Borrow_Limit__c FROM Membership_Plan__c WHERE Active__c = true ORDER BY Name];
+List<Membership_Plan__c> plans = [SELECT Id, Name, Borrow_Limit__c FROM Membership_Plan__c WHERE Active__c = true AND Name IN ('Basic', 'Standard', 'Premium') ORDER BY Name];
 List<Author__c> authors = [SELECT Id FROM Author__c ORDER BY Name LIMIT 40];
 List<Book_Category__c> cats = [SELECT Id, Name FROM Book_Category__c ORDER BY Name];
 

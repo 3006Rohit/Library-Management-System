@@ -46,17 +46,21 @@ private class LibraryAgentCatalogSummaryTest {
       EmailEncodingKey = 'UTF-8',
       LanguageLocaleKey = 'en_US'
     );
-    insert u;
-    insert new PermissionSetAssignment(
-      AssigneeId = u.Id,
-      PermissionSetId = [
-        SELECT Id
-        FROM PermissionSet
-        WHERE Name = 'Library_Public_Agent_Access'
-        LIMIT 1
-      ]
-      .Id
-    );
+    // Setup objects (User, PermissionSetAssignment) cannot be mixed with
+    // non-setup DML in one transaction, so run them as a separate context.
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      insert u;
+      insert new PermissionSetAssignment(
+        AssigneeId = u.Id,
+        PermissionSetId = [
+          SELECT Id
+          FROM PermissionSet
+          WHERE Name = 'Library_Public_Agent_Access'
+          LIMIT 1
+        ]
+        .Id
+      );
+    }
     return u;
   }
 

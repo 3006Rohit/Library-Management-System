@@ -4,8 +4,8 @@
       <div>
         <h2>Acquisition intelligence</h2>
         <p class="subheading">
-          Books that need more copies or replacements, based on the last 90
-          days.
+          Holds per copy, wait times, loans and condition decide what to buy,
+          replace or weed.
         </p>
       </div>
       <button
@@ -43,7 +43,6 @@
         <template for:each={visibleRows} for:item="row">
           <article class="recommendation-card" key={row.id}>
             <div class="card-topline">
-              <span class="action-label">{row.actionLabel}</span>
               <span class={row.statusClass}>{row.status}</span>
             </div>
             <h3>{row.bookTitle}</h3>

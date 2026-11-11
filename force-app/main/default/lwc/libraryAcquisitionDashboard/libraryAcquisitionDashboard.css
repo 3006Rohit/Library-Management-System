@@ -103,7 +103,7 @@ button:disabled {
 
 .card-topline {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 10px;
 }
@@ -258,4 +258,14 @@ h3 {
   .recommendation-card {
     padding: 22px;
   }
+}
+
+.ai-badge {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #e8f1ff;
+  color: #0b4aa8;
+  font-size: 0.7rem;
+  font-weight: 600;
 }

@@ -494,63 +494,36 @@ export default class LibraryLibrarianWorkspace extends LightningElement {
       ? `Last updated: ${new Date(this.analytics.lastUpdated).toLocaleString()} • ${cadence}`
       : cadence;
   }
-  get copyAnalytics() {
-    const m = this.analytics?.copyMetrics || {};
+  // Only the figures a librarian acts on, plus rates that show how things are going.
+  get keyMetrics() {
+    const m = this.analytics || {};
+    const c = m.copyMetrics || {};
+    const l = m.loanMetrics || {};
+    const r = m.reservationMetrics || {};
+    const f = m.fineMetrics || {};
+    const num = (v) => Number(v) || 0;
+    const pct = (part, whole) => {
+      const total = num(whole);
+      return total > 0 ? `${Math.round((num(part) / total) * 100)}%` : "—";
+    };
+    const closedHolds =
+      num(r.fulfilledReservations) +
+      num(r.cancelledReservations) +
+      num(r.expiredReservations);
     return [
-      ["Total Copies", m.totalCopies, "▤", "blue"],
-      ["Available", m.availableCopies, "✓", "green"],
-      ["Borrowed", m.borrowedCopies, "●", "orange"],
-      ["Reserved", m.reservedCopies, "▦", "gold"],
-      ["Lost", m.lostCopies, "!", "red"]
-    ].map(([label, value, icon, tone]) => ({
-      label,
-      value: value ?? 0,
-      icon,
-      cardClass: `analytics-stat ${tone}`
-    }));
-  }
-  get loanAnalytics() {
-    const m = this.analytics?.loanMetrics || {};
-    return [
-      ["Total Loans", m.totalLoans, "▤", "blue"],
-      ["Active", m.activeLoans, "●", "green"],
-      ["Returned", m.returnedLoans, "✓", "purple"],
-      ["Overdue", m.overdueLoans, "!", "red"]
-    ].map(([label, value, icon, tone]) => ({
-      label,
-      value: value ?? 0,
-      icon,
-      cardClass: `analytics-stat ${tone}`
-    }));
-  }
-  get reservationAnalytics() {
-    const m = this.analytics?.reservationMetrics || {};
-    return [
-      ["Total Reservations", m.totalReservations, "▦", "blue"],
-      ["Fulfilled", m.fulfilledReservations, "✓", "green"],
-      ["Cancelled", m.cancelledReservations, "×", "purple"],
-      ["Pending", m.pendingReservations, "◉", "gold"],
-      ["Ready", m.readyReservations, "●", "cyan"],
-      ["Expired", m.expiredReservations, "!", "red"]
-    ].map(([label, value, icon, tone]) => ({
-      label,
-      value: value ?? 0,
-      icon,
-      cardClass: `analytics-stat ${tone}`
-    }));
-  }
-  get fineAnalytics() {
-    const m = this.analytics?.fineMetrics || {};
-    return [
-      ["Total Fine Count", m.totalFineCount, "₹", "orange"],
-      ["Paid", m.paidFineCount, "✓", "green"],
-      ["Unpaid", m.unpaidFineCount, "!", "red"]
-    ].map(([label, value, icon, tone]) => ({
-      label,
-      value: value ?? 0,
-      icon,
-      cardClass: `analytics-stat ${tone}`
-    }));
+      ["Total Copies", num(c.totalCopies), "▤"],
+      ["Available", num(c.availableCopies), "✓"],
+      ["Availability Rate", pct(c.availableCopies, c.totalCopies), "%"],
+      ["Lost", num(c.lostCopies), "!"],
+      ["Active Loans", num(l.activeLoans), "●"],
+      ["Overdue", num(l.overdueLoans), "!"],
+      ["Overdue Rate", pct(l.overdueLoans, l.activeLoans), "%"],
+      ["Waiting Holds", num(r.pendingReservations), "◉"],
+      ["Ready for Pickup", num(r.readyReservations), "●"],
+      ["Hold Fulfilment", pct(r.fulfilledReservations, closedHolds), "%"],
+      ["Unpaid Fines", num(f.unpaidFineCount), "₹"],
+      ["Fine Collection", pct(f.paidFineCount, f.totalFineCount), "%"]
+    ].map(([label, value, icon]) => ({ label, value, icon }));
   }
   get activities() {
     return (this.dashboard.recentLoans || []).slice(0, 5).map((row) => ({

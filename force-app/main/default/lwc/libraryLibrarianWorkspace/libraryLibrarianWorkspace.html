@@ -342,40 +342,7 @@
             </div>
             <template if:true={analyticsAvailable}>
               <div class="analytics-summary-grid">
-                <template for:each={copyAnalytics} for:item="metric">
-                  <article class="analytics-card" key={metric.label}>
-                    <span class="analytics-stat-icon" aria-hidden="true"
-                      >{metric.icon}</span
-                    >
-                    <span class="analytics-stat-copy"
-                      ><small>{metric.label}</small
-                      ><strong>{metric.value}</strong></span
-                    >
-                  </article>
-                </template>
-                <template for:each={loanAnalytics} for:item="metric">
-                  <article class="analytics-card" key={metric.label}>
-                    <span class="analytics-stat-icon" aria-hidden="true"
-                      >{metric.icon}</span
-                    >
-                    <span class="analytics-stat-copy"
-                      ><small>{metric.label}</small
-                      ><strong>{metric.value}</strong></span
-                    >
-                  </article>
-                </template>
-                <template for:each={reservationAnalytics} for:item="metric">
-                  <article class="analytics-card" key={metric.label}>
-                    <span class="analytics-stat-icon" aria-hidden="true"
-                      >{metric.icon}</span
-                    >
-                    <span class="analytics-stat-copy"
-                      ><small>{metric.label}</small
-                      ><strong>{metric.value}</strong></span
-                    >
-                  </article>
-                </template>
-                <template for:each={fineAnalytics} for:item="metric">
+                <template for:each={keyMetrics} for:item="metric">
                   <article class="analytics-card" key={metric.label}>
                     <span class="analytics-stat-icon" aria-hidden="true"
                       >{metric.icon}</span

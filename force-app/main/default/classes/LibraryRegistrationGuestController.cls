@@ -80,6 +80,31 @@ public without sharing class LibraryRegistrationGuestController {
     return options;
   }
 
+  public class LibraryStats {
+    @AuraEnabled
+    public Integer bookCount;
+    @AuraEnabled
+    public Integer memberCount;
+  }
+
+  @AuraEnabled(cacheable=true)
+  public static LibraryStats getLibraryStats() {
+    LibraryStats stats = new LibraryStats();
+    stats.bookCount = [
+      SELECT COUNT()
+      FROM Book__c
+      WHERE Status__c = 'Active'
+      WITH SYSTEM_MODE
+    ];
+    stats.memberCount = [
+      SELECT COUNT()
+      FROM Member__c
+      WHERE Account_Status__c = 'Active'
+      WITH SYSTEM_MODE
+    ];
+    return stats;
+  }
+
   @AuraEnabled(cacheable=true)
   public static String getDisplayCurrency() {
     return paymentCurrency();

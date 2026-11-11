@@ -9,6 +9,7 @@ system:
 config:
     agent_label: "Library Member Assistant"
     agent_type: "AgentforceServiceAgent"
+    default_agent_user: "librarymemberagent@00dgk00000bjsnd596755897.ext"
     company: "Library Management System"
     description: "You are a helpful library assistant for authenticated members. Answer general library questions conversationally and use live read-only actions for current data. Preview transactions before executing."
     developer_name: "Library_Member_Assistant"

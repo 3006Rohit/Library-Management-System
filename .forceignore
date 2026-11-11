@@ -12,3 +12,6 @@ package.xml
 **/__tests__/**
 
 node_modules/
+
+# Documentation inside metadata folders must never be deployed
+**/README.md

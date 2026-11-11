@@ -71,26 +71,34 @@ private class LibraryAcquisitionInsightServiceTest {
     return f;
   }
 
+  private static void addHolds(Fixture f, Integer count, Datetime heldSince) {
+    List<Reservation__c> holds = new List<Reservation__c>();
+    for (Integer i = 0; i < count; i++)
+      holds.add(
+        new Reservation__c(
+          Member__c = f.member.Id,
+          Book__c = f.book.Id,
+          Contact__c = f.contact.Id,
+          Reservation_Date__c = heldSince,
+          Status__c = 'Pending',
+          Queue_Position__c = i + 1
+        )
+      );
+    insert holds;
+  }
+
   @IsTest
   static void recommendationsPersistEvidenceAndDecision() {
     Fixture f = fixture();
     Id loanId = LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
-    Reservation__c reservation = new Reservation__c(
-      Member__c = f.member.Id,
-      Book__c = f.book.Id,
-      Contact__c = f.contact.Id,
-      Reservation_Date__c = System.now(),
-      Status__c = 'Pending',
-      Queue_Position__c = 1
-    );
-    insert reservation;
+    addHolds(f, 4, System.now());
     Test.startTest();
     List<LibraryAcquisitionInsightService.RecommendationDTO> rows = LibraryAcquisitionInsightService.getRecommendations();
     Test.stopTest();
     System.assertEquals(1, rows.size());
     System.assertEquals('Purchase', rows[0].recommendationType);
     System.assertEquals('Open', rows[0].status);
-    System.assert(rows[0].evidence.contains('reservations'));
+    System.assert(rows[0].evidence.contains('holds waiting'));
     Acquisition_Recommendation__c snapshot = [
       SELECT Id, Evidence__c, Status__c, Snapshot_Key__c
       FROM Acquisition_Recommendation__c
@@ -116,29 +124,23 @@ private class LibraryAcquisitionInsightServiceTest {
   static void decisionsSurviveRefreshAndCanBeUndone() {
     Fixture f = fixture();
     LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
-    insert new Reservation__c(
-      Member__c = f.member.Id,
-      Book__c = f.book.Id,
-      Contact__c = f.contact.Id,
-      Reservation_Date__c = System.now(),
-      Status__c = 'Pending',
-      Queue_Position__c = 1
-    );
+    addHolds(f, 4, System.now());
     List<LibraryAcquisitionInsightService.RecommendationDTO> first = LibraryAcquisitionInsightService.getRecommendations();
-    // 1 unmet reservation (30) + 1 checkout (2) + empty shelf (10)
-    System.assertEquals(42, first[0].score);
+    // 4:1 hold ratio (capped 50) + 1 loan per copy (5) + empty shelf (10)
+    System.assertEquals(65, first[0].score);
     System.assertEquals(1, first[0].recommendedQuantity);
 
-    LibraryAcquisitionInsightService.decide(first[0].id, 'Accepted', 'Order it');
+    LibraryAcquisitionInsightService.decide(
+      first[0].id,
+      'Accepted',
+      'Order it'
+    );
     List<LibraryAcquisitionInsightService.RecommendationDTO> again = LibraryAcquisitionInsightService.getRecommendations();
     System.assertEquals(1, again.size());
     System.assertEquals(first[0].id, again[0].id);
     System.assertEquals('Accepted', again[0].status);
     System.assertEquals('Order it', again[0].decisionNotes);
-    System.assertEquals(
-      1,
-      [SELECT COUNT() FROM Acquisition_Recommendation__c]
-    );
+    System.assertEquals(1, [SELECT COUNT() FROM Acquisition_Recommendation__c]);
 
     LibraryAcquisitionInsightService.decide(first[0].id, 'Open', null);
     System.assertEquals(
@@ -156,26 +158,144 @@ private class LibraryAcquisitionInsightServiceTest {
   }
 
   @IsTest
-  static void scoreRisesWithUnmetDemandAndStaysCapped() {
+  static void purchaseQuantityFollowsHoldRatioAndWaitTime() {
     Fixture f = fixture();
     LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
-    List<Reservation__c> waits = new List<Reservation__c>();
-    for (Integer i = 0; i < 5; i++)
-      waits.add(
-        new Reservation__c(
-          Member__c = f.member.Id,
-          Book__c = f.book.Id,
-          Contact__c = f.contact.Id,
-          Reservation_Date__c = System.now(),
-          Status__c = 'Pending',
-          Queue_Position__c = i + 1
-        )
-      );
-    insert waits;
+    addHolds(f, 10, System.now().addDays(-30));
     LibraryAcquisitionInsightService.RecommendationDTO row = LibraryAcquisitionInsightService.getRecommendations()[0];
-    // 5 unmet reservations cap at 60, +2 checkout, +10 empty shelf
-    System.assertEquals(72, row.score);
-    System.assertEquals(5, row.recommendedQuantity);
+    // 10 holds at 3:1 needs 4 copies; 1 owned, so buy 3
+    System.assertEquals('Purchase', row.recommendationType);
+    System.assertEquals(3, row.recommendedQuantity);
+    // ratio capped 50 + 30 day wait (15) + loans (5) + empty shelf (10)
+    System.assertEquals(80, row.score);
+    System.assertEquals(30, row.longestWaitDays);
+  }
+
+  @IsTest
+  static void holdsBelowTargetDoNotTriggerPurchase() {
+    Fixture f = fixture();
+    LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
+    addHolds(f, 2, System.now());
+    System.assertEquals(
+      0,
+      LibraryAcquisitionInsightService.getRecommendations().size()
+    );
+  }
+
+  @IsTest
+  static void longWaitTriggersOneCopyEvenBelowRatio() {
+    Fixture f = fixture();
+    LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
+    addHolds(f, 1, System.now().addDays(-25));
+    LibraryAcquisitionInsightService.RecommendationDTO row = LibraryAcquisitionInsightService.getRecommendations()[0];
+    System.assertEquals('Purchase', row.recommendationType);
+    System.assertEquals(1, row.recommendedQuantity);
+  }
+
+  @IsTest
+  static void unusedEstablishedTitleIsFlaggedForWeeding() {
+    Fixture f = fixture();
+    update new Book_Copy__c(
+      Id = f.copy.Id,
+      Acquisition_Date__c = Date.today().addYears(-3)
+    );
+    LibraryAcquisitionInsightService.RecommendationDTO row = LibraryAcquisitionInsightService.getRecommendations()[0];
+    System.assertEquals('Weed', row.recommendationType);
+    System.assertEquals(1, row.recommendedQuantity);
+  }
+
+  @IsTest
+  static void newTitleIsNeverWeeded() {
+    Fixture f = fixture();
+    update new Book_Copy__c(
+      Id = f.copy.Id,
+      Acquisition_Date__c = Date.today().addMonths(-3)
+    );
+    System.assertEquals(
+      0,
+      LibraryAcquisitionInsightService.getRecommendations().size()
+    );
+  }
+
+  @IsTest
+  static void damagedCopyIsReplacedOnlyWhileTitleIsWanted() {
+    Fixture f = fixture();
+    update new Book_Copy__c(Id = f.copy.Id, Status__c = 'Damaged');
+    // No demand: nothing to replace
+    System.assertEquals(
+      0,
+      LibraryAcquisitionInsightService.getRecommendations().size()
+    );
+    addHolds(f, 1, System.now());
+    LibraryAcquisitionInsightService.RecommendationDTO row = LibraryAcquisitionInsightService.getRecommendations()[0];
+    System.assertEquals('Replace', row.recommendationType);
+    System.assertEquals(1, row.recommendedQuantity);
+  }
+
+  @IsTest
+  static void agentforceAnswerIsUsedWhenItFollowsTheRules() {
+    Fixture f = fixture();
+    LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
+    addHolds(f, 4, System.now());
+    LibraryAcquisitionInsightService.testAiResponse =
+      '```json' +
+      '\n' +
+      '[{"bookId":"' +
+      f.book.Id +
+      '","type":"Purchase","quantity":2,' +
+      '"score":88,"confidence":"High","rationale":"4 holds on one copy."}]' +
+      '\n' +
+      '```';
+    LibraryAcquisitionInsightService.RecommendationDTO row = LibraryAcquisitionInsightService.getRecommendations()[0];
+    System.assertEquals('Agentforce', row.generatedBy);
+    System.assertEquals('Purchase', row.recommendationType);
+    System.assertEquals(2, row.recommendedQuantity);
+    System.assertEquals(88, row.score);
+    System.assertEquals('High', row.confidence);
+    System.assert(row.evidence.contains('4 holds on one copy.'));
+  }
+
+  @IsTest
+  static void agentforceCannotWeedATitleThatHasHolds() {
+    Fixture f = fixture();
+    LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
+    addHolds(f, 4, System.now());
+    LibraryAcquisitionInsightService.testAiResponse =
+      '[{"bookId":"' +
+      f.book.Id +
+      '","type":"Weed","quantity":1,' +
+      '"score":90,"confidence":"High","rationale":"Remove it."}]';
+    LibraryAcquisitionInsightService.RecommendationDTO row = LibraryAcquisitionInsightService.getRecommendations()[0];
+    // Rejected, so the rule-based answer is used instead
+    System.assertEquals('Rules', row.generatedBy);
+    System.assertEquals('Purchase', row.recommendationType);
+  }
+
+  @IsTest
+  static void unreadableAgentforceOutputFallsBackToRules() {
+    Fixture f = fixture();
+    LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
+    addHolds(f, 4, System.now());
+    LibraryAcquisitionInsightService.testAiResponse = 'Sorry, I cannot help.';
+    LibraryAcquisitionInsightService.RecommendationDTO row = LibraryAcquisitionInsightService.getRecommendations()[0];
+    System.assertEquals('Rules', row.generatedBy);
+    System.assertEquals('Purchase', row.recommendationType);
+  }
+
+  @IsTest
+  static void agentforceCanDecideATitleNeedsNothing() {
+    Fixture f = fixture();
+    LibraryCirculationService.checkout(f.member.Id, f.copy.Id);
+    addHolds(f, 4, System.now());
+    LibraryAcquisitionInsightService.testAiResponse =
+      '[{"bookId":"' +
+      f.book.Id +
+      '","type":"None","quantity":0,' +
+      '"score":1,"confidence":"Low","rationale":"Fine."}]';
+    System.assertEquals(
+      0,
+      LibraryAcquisitionInsightService.getRecommendations().size()
+    );
   }
 
   @IsTest

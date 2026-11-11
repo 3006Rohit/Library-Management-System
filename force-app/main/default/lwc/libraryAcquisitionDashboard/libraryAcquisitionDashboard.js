@@ -41,18 +41,24 @@ export default class LibraryAcquisitionDashboard extends LightningElement {
     const scoreValue = Math.round(row.score || 0);
     const priority =
       scoreValue >= 70 ? "High" : scoreValue >= 40 ? "Medium" : "Low";
-    const isBuy = row.recommendationType === "Purchase";
+    const type = row.recommendationType;
     const quantity = row.recommendedQuantity || 1;
+    const copies = quantity === 1 ? "1 copy" : `${quantity} copies`;
+    const verb =
+      type === "Purchase" ? "Buy" : type === "Weed" ? "Withdraw" : "Replace";
+    const cost = row.estimatedCost ? ` · about ${row.estimatedCost}` : "";
     return {
       ...row,
       notes: row.decisionNotes || "",
       scoreValue,
+      isAgentforce: row.generatedBy === "Agentforce",
       scoreLabel: `${scoreValue}/100`,
       scoreStyle: `width:${scoreValue}%`,
       priority,
       priorityClass: `priority priority-${priority.toLowerCase()}`,
-      actionLabel: isBuy ? "Buy more" : "Replace",
-      headline: `${isBuy ? "Buy" : "Replace"} ${quantity === 1 ? "1 copy" : `${quantity} copies`}`,
+      actionLabel:
+        type === "Purchase" ? "Buy more" : type === "Weed" ? "Weed" : "Replace",
+      headline: `${verb} ${copies}${cost}`,
       isOpen: (row.status || "Open") === "Open",
       statusClass: `status-pill status-${(row.status || "open").toLowerCase()}`
     };
