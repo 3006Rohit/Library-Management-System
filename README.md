@@ -4,6 +4,10 @@ A complete library platform built natively on Salesforce: a public website with 
 
 > This file is the entry point. Every folder has its own `README.md` that goes deeper. Start here, then follow the links.
 
+## Member Portal
+
+Access the live library member portal: [Library Member Portal](https://orgfarm-8a11434b25-dev-ed.develop.my.site.com/library)
+
 ---
 
 ## 1. What the system does
